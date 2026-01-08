@@ -37,8 +37,6 @@ public:
     ~ViewHash();
 
 private slots:
-    void onSgnGetViewingKey(QString viewingKey, QString error);
-
     void on_showWalletKeyButton_clicked();
     void on_startScanning_clicked();
     void on_viewingKey_textChanged(const QString &arg1);

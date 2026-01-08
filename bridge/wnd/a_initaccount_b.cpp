@@ -16,6 +16,7 @@
 #include "../../state/state.h"
 #include "../../state/statemachine.h"
 #include "../../state/a_initaccount.h"
+#include "util/Log.h"
 
 namespace bridge {
 
@@ -29,11 +30,13 @@ InitAccount::~InitAccount() {}
 
 // Set Password for a new account (First step of account creation)
 void InitAccount::setPassword(QString password) {
+    logger::logInfo(logger::BRIDGE, "Call InitAccount::setPassword with <password>");
     getState()->setPassword(password);
 }
 
 // Cancel whatever init account you have and return to the starting page
 void InitAccount::cancelInitAccount() {
+    logger::logInfo(logger::BRIDGE, "Call InitAccount::cancelInitAccount");
     // Not needed for now and implementaiton need to be done.
     // keeping the bridge method in case UI will need cancellation workflow
     getState()->cancel();
@@ -41,17 +44,20 @@ void InitAccount::cancelInitAccount() {
 
 // Create a wallet form the seed
 void InitAccount::createWalletWithSeed(QVector<QString> seed) {
+    logger::logInfo(logger::BRIDGE, "Call InitAccount::createWalletWithSeed with seed Length " + QString::number(seed.size()));
     getState()->createWalletWithSeed(seed);
 }
 
 // newWalletChoice: see values at state::InitAccount::NEW_WALLET_CHOICE
 // network: see values at state::InitAccount::MWC_NETWORK
 void InitAccount::submitWalletCreateChoices(int network, QString newInstanceName) {
+    logger::logInfo(logger::BRIDGE, "Call InitAccount::submitWalletCreateChoices with network=" + QString::number(network) + " instanceName=" + newInstanceName);
     getState()->submitWalletCreateChoices( state::InitAccount::MWC_NETWORK(network), newInstanceName);
 }
 
 // wordsNum: words number to create
 void InitAccount::submitSeedLength(int wordsNum) {
+    logger::logInfo(logger::BRIDGE, "Call InitAccount::submitSeedLength with wordsNum=" + QString::number(wordsNum));
     getState()->submitSeedLength(wordsNum);
 }
 

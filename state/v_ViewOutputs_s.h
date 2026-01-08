@@ -25,8 +25,6 @@
 
 namespace state {
 
-const QString VIEW_ACCOUNTS_CALLER_ID = "ViewOutputs";
-
 class ViewOutputs : public QObject, public State {
 public:
     ViewOutputs(StateContext * context);
@@ -43,12 +41,6 @@ public:
 
     void back();
 
-    QString getLastViewViewingKey() {
-        QString res = lastViewedViewingKey;
-        lastViewedViewingKey = "";
-        return res;
-    }
-
 protected:
     virtual NextStateRespond execute() override;
 
@@ -59,20 +51,11 @@ protected:
 
     virtual QString getHelpDocName() override {return helpDocName;}
 private slots:
-    void onRecoverProgress( int progress, int maxVal );
-    void onScanRewindHash( QVector< wallet::WalletOutput > outputResult, int64_t total, QString errors );
-    void onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
-
+    void onScanProgress( QString responseId, QJsonObject statusMessage );
+    void onScanRewindHash( QString responseId, wallet::ViewWallet walletOutputs, QString error  );
 private:
-    int respondCounter = 0;
-    int respondZeroLevel = 0;
-    int progressBase = 0;
-
-    bool inScanProcess = false;
-
-    QString lastViewedViewingKey;
-
     QString helpDocName = "viewing_key_start.html";
+    QString scanRespondId;
 };
 
 } // state

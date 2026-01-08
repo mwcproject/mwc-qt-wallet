@@ -28,7 +28,7 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-  <widget class="QWidget" name="centralWidget">
+  <widget class="control::MwcWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
      <number>0</number>
@@ -56,7 +56,7 @@
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
+      <widget class="control::MwcWidget" name="scrollAreaWidgetContents">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -82,7 +82,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QWidget" name="mainWindowConainer" native="true">
+         <widget class="control::MwcWidget" name="mainWindowConainer" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
             <number>0</number>
@@ -123,7 +123,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="helpButton">
+            <widget class="control::MwcPushButton" name="helpButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -137,10 +137,10 @@
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="toolTip">
-              <string>Click for help</string>
+              <string>Open help</string>
              </property>
              <property name="statusTip">
-              <string>Click for help</string>
+              <string>Open help</string>
              </property>
              <property name="styleSheet">
               <string notr="true">#helpButton{border: none;}</string>
@@ -164,7 +164,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="btnSpacerLabel1">
+            <widget class="control::MwcLabel" name="btnSpacerLabel1">
              <property name="minimumSize">
               <size>
                <width>10</width>
@@ -254,7 +254,7 @@
               <string>View listener settings and status</string>
              </property>
              <property name="text">
-              <string>TOR</string>
+              <string>Tor</string>
              </property>
              <property name="icon">
               <iconset>
@@ -273,7 +273,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="rightestSpacerLabel">
+            <widget class="control::MwcLabel" name="rightestSpacerLabel">
              <property name="minimumSize">
               <size>
                <width>30</width>
@@ -300,8 +300,8 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QMenuBar" name="menuBar">
+  <widget class="control::MwcStatusBar" name="statusBar"/>
+  <widget class="control::MwcMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -310,7 +310,7 @@
      <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuWallet">
+   <widget class="control::MwcMenu" name="menuWallet">
     <property name="title">
      <string>Wallet</string>
     </property>
@@ -331,7 +331,7 @@
     <addaction name="separator"/>
     <addaction name="actionRunning_Mode_Cold_Wallet"/>
    </widget>
-   <widget class="QMenu" name="menuNetwork">
+   <widget class="control::MwcMenu" name="menuNetwork">
     <property name="title">
      <string>Network</string>
     </property>
@@ -340,7 +340,7 @@
     <addaction name="separator"/>
     <addaction name="actionResync_with_full_node"/>
    </widget>
-   <widget class="QMenu" name="menuAccount">
+   <widget class="control::MwcMenu" name="menuAccount">
     <property name="title">
      <string>Account</string>
     </property>
@@ -351,7 +351,7 @@
     <addaction name="separator"/>
     <addaction name="actionLogout"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
+   <widget class="control::MwcMenu" name="menuHelp">
     <property name="title">
      <string>Links</string>
     </property>
@@ -498,10 +498,10 @@
     <string>Atomic Swap</string>
    </property>
    <property name="toolTip">
-    <string>Peer to peer atomic Swap</string>
+    <string>Peer-to-peer atomic swap</string>
    </property>
    <property name="statusTip">
-    <string>Peer to peer atomic Swap</string>
+    <string>Peer-to-peer atomic swap</string>
    </property>
   </action>
   <action name="actionAtomicSwapMarketplace">
@@ -528,6 +528,36 @@
    <extends>QFrame</extends>
    <header>control_desktop/MwcMainWndContainer.h</header>
    <container>1</container>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcMenu</class>
+   <extends>QMenu</extends>
+   <header>control_desktop/MwcMenu.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcMenuBar</class>
+   <extends>QMenuBar</extends>
+   <header>control_desktop/MwcMenuBar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButton</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcStatusBar</class>
+   <extends>QStatusBar</extends>
+   <header>control_desktop/MwcStatusBar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

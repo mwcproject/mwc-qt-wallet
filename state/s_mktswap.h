@@ -15,6 +15,10 @@
 #ifndef MWC_QT_WALLET_S_MKTSWAP_H
 #define MWC_QT_WALLET_S_MKTSWAP_H
 
+#include "../features.h"
+
+#ifdef FEATURE_MKTPLACE
+
 #include "state.h"
 #include "../wallet/wallet.h"
 #include <QJsonObject>
@@ -296,6 +300,6 @@ private:
 
 }
 
-
+#endif
 
 #endif //MWC_QT_WALLET_S_MKTSWAP_H

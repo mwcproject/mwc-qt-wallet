@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>HelpDlg</class>
- <widget class="QDialog" name="HelpDlg">
+ <widget class="control::MwcDialog" name="HelpDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Help</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -142,6 +142,11 @@
    <class>control::MwcTextEditDlg</class>
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcPlainEditLogs.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

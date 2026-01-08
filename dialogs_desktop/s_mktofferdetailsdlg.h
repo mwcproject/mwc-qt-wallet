@@ -15,6 +15,10 @@
 #ifndef S_MKTOFFERDETAILSDLG_H
 #define S_MKTOFFERDETAILSDLG_H
 
+#include "../features.h"
+
+#ifdef FEATURE_MKTPLACE
+
 #include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
@@ -44,5 +48,5 @@ private:
 };
 
 }
-
+#endif
 #endif // S_MKTOFFERDETAILSDLG_H

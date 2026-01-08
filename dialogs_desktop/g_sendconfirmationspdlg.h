@@ -26,6 +26,7 @@ class SendConfirmationSlatePackDlg;
 
 namespace bridge {
     class Config;
+    class Wallet;
 }
 
 
@@ -37,7 +38,7 @@ class SendConfirmationSlatePackDlg : public control::MwcDialog
 
 public:
     explicit SendConfirmationSlatePackDlg(QWidget *parent, QString title, QString messageBody, double widthScale,
-                int inputsNum, int ttl, const QString & passwordHash);
+                int inputsNum, int ttl);
     ~SendConfirmationSlatePackDlg();
 
     int getTTlBlocks() const {return ttl_blocks;}
@@ -57,9 +58,9 @@ private:
 private:
     Ui::SendConfirmationSlatePackDlg *ui;
     bridge::Config * config = nullptr;
+    bridge::Wallet * wallet = nullptr;
 
     int ttl_blocks = -1;
-    QString passwordHash;
     QString messageBody;
     int inputsNum;
 };

@@ -30,7 +30,7 @@ class config;
 
 namespace core {
 
-// WIndows menager is responsible for connection between UI and the data
+// Windows manager is responsible for connection between UI and the data
 class WindowManager : public QObject
 {
     Q_OBJECT

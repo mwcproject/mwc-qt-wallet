@@ -38,18 +38,7 @@ bool notificationStateCheck(NOTIFICATION_STATES state) {
 }
 
 // Message that will be requlified from Critical to Info
-static QSet<QString> falseCriticalMessages{"keybase not found! consider installing keybase locally first."};
-static QSet<QString> falseMessages{"MWCMQS listener is offline", "MWCMQS listener is online", "Tor is offline", // handled differently, there is another message
-                "mwcmqs listener is closed! consider using `listen` first.", "Tor listener is not running.", // Expected message
-                "this proof should only be considered valid if the kernel is actually on-chain with sufficient confirmations", // It is part of UI
-};
-
-void addFalseMessage(const QString & msg) {
-    falseMessages.insert(msg);
-}
-void remeoveFalseMessage(const QString & msg) {
-    falseMessages.remove(msg);
-}
+static QSet<QString> falseCriticalMessages{};
 
 const int MESSAGE_SIZE_LIMIT = 1000;
 static QVector<NotificationMessage> notificationMessages;
@@ -136,23 +125,7 @@ void appendNotificationMessage( bridge::MESSAGE_LEVEL level, QString message ) {
     if (message.isEmpty())
         return;
 
-    logger::logInfo("Notification", toString(level) + "  " + message );
-
-    for (const auto & fm : falseMessages) {
-        if ( message.startsWith(fm) )
-            return;
-    }
-
-    static MessageMapper msgMapper(":/resource/notification_mappers.txt");
-
-    QString m = msgMapper.processMessage(message);
-    if (m != message) {
-        logger::logInfo("Notification", "Message is updated: " + m );
-        message = m;
-    }
-
-    if (message.isEmpty() || message=="Swap trade not found")
-        return; // Ignoring
+    logger::logInfo(logger::NOTIFICATION, toString(level) + "  " + message );
 
     if (level == bridge::MESSAGE_LEVEL::FATAL_ERROR) {
         // Fatal error. Display message box and exiting. We don't want to continue
@@ -177,7 +150,7 @@ void appendNotificationMessage( bridge::MESSAGE_LEVEL level, QString message ) {
             notificationMessages.pop_front();
     }
 
-    logger::logEmit( "MWC713", "onNewNotificationMessage", msg.toString() );
+    logger::logEmit( logger::NOTIFICATION, "onNewNotificationMessage", msg.toString() );
 
     Notification::getObject2Notify()->sendNewNotificationMessage(msg.level, msg.message);
 }

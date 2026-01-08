@@ -25,8 +25,16 @@
 #include "../util/Json.h"
 #include "../util/filedialog.h"
 #include "../util/Files.h"
+#include "../util/Log.h"
+#include "../state/state.h"
+#include "../wallet/wallet.h"
 
 namespace bridge {
+
+static wallet::Wallet * getWallet() {
+    return state::getStateContext()->wallet;
+}
+
 
 Util::Util(QObject *parent) : QObject(parent) {}
 
@@ -38,31 +46,37 @@ Util::~Util() {
 }
 
 void Util::openUrlInBrowser(QString url) {
+    logger::logInfo(logger::BRIDGE, "Call Util::openUrlInBrowser with url=" + url);
     util::openUrlInBrowser(url);
 }
 
 // Generate API secret string
 QString Util::generateApiSecret(int length) {
+    logger::logInfo(logger::BRIDGE, "Call Util::generateApiSecret with length=" + QString::number(length));
     return util::generateSecret(length);
 }
 
 // Calculate Hash for string. Needed to validate a password against hash
 QString Util::calcHSA256Hash(QString str) {
+    logger::logInfo(logger::BRIDGE, "Call Util::calcHSA256Hash with str=<hidden>");
     return crypto::calcHSA256Hash(str);
 }
 
 // Return true if this String can be a hash
 bool Util::isHashValid(QString str) {
+    logger::logInfo(logger::BRIDGE, "Call Util::isHashValid with str=" + str);
     return crypto::isHashValid(str);
 }
 
 // Return true if string looks like a signature
 bool Util::isSignatureValid(QString str) {
+    logger::logInfo(logger::BRIDGE, "Call Util::isSignatureValid with str=" + str);
     return crypto::isSignatureValid(str);
 }
 
 // Return true is string looks like a public key
 bool Util::isPublicKeyValid(QString str) {
+    logger::logInfo(logger::BRIDGE, "Call Util::isPublicKeyValid with str=" + str);
     return crypto::isPublicKeyValid(str);
 }
 
@@ -70,6 +84,7 @@ bool Util::isPublicKeyValid(QString str) {
 // Verify address and return the address type.
 // Return values: "unknown", "https", "tor", "mwcmqs"
 QString Util::verifyAddress(QString address) {
+    logger::logInfo(logger::BRIDGE, "Call Util::verifyAddress with address=" + address);
     QPair<QString, util::ADDRESS_TYPE> res = util::verifyAddress(address);
     if (!res.first.isEmpty())
         return "unknown";
@@ -87,6 +102,7 @@ QString Util::verifyAddress(QString address) {
 // Password analyzer routine, simplifyed version for GUI.
 // Set word for analysys
 void Util::passwordQualitySet(QString password) {
+    //logger::logInfo(logger::BRIDGE, "Call Util::passwordQualitySet with password=<hidden>");
     if (pa == nullptr) {
         pa = new util::PasswordAnalyser( "#3600C9", "#CCCCCC");
     }
@@ -101,14 +117,17 @@ void Util::passwordQualitySet(QString password) {
 
 // Flag is this password acceptable for a new wallet
 bool Util::passwordQualityIsAcceptable() {
+    //logger::logInfo(logger::BRIDGE, "Call Util::passwordQualityIsAcceptable");
     return passwordAnalyserLastRespond.second;
 }
 // String with comments about this password. Comments most time are available
 QString Util::passwordQualityComment() {
+    //logger::logInfo(logger::BRIDGE, "Call Util::passwordQualityComment");
     return passwordAnalyserLastRespond.first;
 }
 // Release PasswordAnalyser instance. It takes memory.
 void Util::releasePasswordAnalyser() {
+    logger::logInfo(logger::BRIDGE, "Call Util::releasePasswordAnalyser");
     if (pa == nullptr) {
         delete pa;
         pa = nullptr;
@@ -117,22 +136,26 @@ void Util::releasePasswordAnalyser() {
 
 // Request a bip 39 words. There are not many of them, it is safe to get all of them
 QVector<QString> Util::getBip39words() {
+    logger::logInfo(logger::BRIDGE, "Call Util::getBip39words");
     return util::getBip39words();
 }
 
 // Parse input phrase into the words. Does a split with some trics
 QVector<QString> Util::parsePhrase2Words( QString phrase ) {
+    logger::logInfo(logger::BRIDGE, "Call Util::parsePhrase2Words with phrase=<hidden>");
     return util::parsePhrase2Words(phrase);
 }
 
 // Convert nano mwc into string number ready to print
 QString Util::nano2one(QString mwcNano) {
+    logger::logInfo(logger::BRIDGE, "Call Util::nano2one with mwcNano=" + mwcNano);
     return util::nano2one(mwcNano.toLongLong());
 }
 
 // Validate string for mwc713 input
 // Return empty string for OK. Otherwise return string is an error
 QString Util::validateMwc713Str(QString str) {
+    logger::logInfo(logger::BRIDGE, "Call Util::validateMwc713Str with str=" + str);
     auto res = util::validateMwc713Str(str);
     if (res.first)
         return "";
@@ -149,11 +172,14 @@ QString Util::longLong2Str(int n) {
 
 // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
 QString Util::trimStrAsDouble(const QString & dblStr, int maxLen) {
+    logger::logInfo(logger::BRIDGE, "Call Util::trimStrAsDouble with dblStr=" + dblStr + " maxLen=" + QString::number(maxLen));
     return util::trimStrAsDouble(dblStr, maxLen);
 }
 
 // Convert time interval in seconds into 2 sevel word description.
 QString Util::interval2String(int intervalSec, bool shortUnits, int tiers) {
+    logger::logInfo(logger::BRIDGE, "Call Util::interval2String with intervalSec=" + QString::number(intervalSec) +
+        " shortUnits=" + QString::number(shortUnits) + " tiers=" + QString::number(tiers));
     return util::interval2String(intervalSec, shortUnits, tiers);
 }
 
@@ -164,6 +190,7 @@ using namespace qrcodegen;
 // res[0]  - size of the QR code
 // res[1]  - SVG string that can draw the QR code. Seems like both Desctop and QML can draw the SVG path.
 QVector<QString> Util::generateQrCode(QString content) {
+    logger::logInfo(logger::BRIDGE, "Call Util::generateQrCode with content=<hidden>");
     const QrCode qrCodeResult = QrCode::encodeText(content.toStdString().c_str(), QrCode::Ecc::MEDIUM);
 
     int size = qrCodeResult.getSize();
@@ -180,9 +207,11 @@ QVector<QString> Util::generateQrCode(QString content) {
 // res[0] = transactionId
 // res[1] = amount
 QVector<QString> Util::parseSlateContent( QString slateContent, int fileTransactionType, QString slateSenderAddress ) {
+    logger::logInfo(logger::BRIDGE, "Call Util::parseSlateContent with slateContent=<hidden> fileTransactionType=" + QString::number(fileTransactionType) +
+        " slateSenderAddress=" + slateSenderAddress);
     util::FileTransactionInfo fileInfo;
 
-    QPair<bool, QString> res = fileInfo.parseSlateContent( slateContent, util::FileTransactionType(fileTransactionType), slateSenderAddress );
+    QPair<bool, QString> res = fileInfo.parseSlateContent( slateContent, util::FileTransactionType(fileTransactionType), slateSenderAddress, getWallet() );
     if (!res.first) {
         // error
         return { res.second };
@@ -196,12 +225,16 @@ QVector<QString> Util::parseSlateContent( QString slateContent, int fileTransact
 // Open QFileDialog::getSaveFileName with all standard verificaitons that we normally have
 // Return file name or empty value is request was cancelled or error happens
 QString Util::getSaveFileName(QString title, QString callerId, QString extentionsDlg, QString extentionFile) {
+    logger::logInfo(logger::BRIDGE, "Call Util::getSaveFileName with title=" + title +
+        " callerId=" + callerId + " extentionsDlg=" + extentionsDlg + " extentionFile=" + extentionFile);
     return util::getSaveFileName(title, callerId, extentionsDlg, extentionFile);
 }
 
 // Open QFileDialog::getOpenFileName with all standard verificaitons that we normally have
 // Return file name or empty value is request was cancelled or error happens
 QString Util::getOpenFileName(QString title, QString callerId, QString extentionsDlg) {
+    logger::logInfo(logger::BRIDGE, "Call Util::getOpenFileName with title=" + title +
+        " callerId=" + callerId + " extentionsDlg=" + extentionsDlg);
     return util::getOpenFileName(title, callerId, extentionsDlg);
 }
 
@@ -209,21 +242,26 @@ QString Util::getOpenFileName(QString title, QString callerId, QString extention
 
 // Write some text into the file
 bool Util::writeTextFile(QString fileName, QStringList lines ) {
+    logger::logInfo(logger::BRIDGE, "Call Util::writeTextFile with fileName=" + fileName +
+        " lines.count=" + QString::number(lines.count()));
     return util::writeTextFile(fileName, lines);
 }
 
 QStringList Util::readTextFile(QString fileName) {
+    logger::logInfo(logger::BRIDGE, "Call Util::readTextFile with fileName=" + fileName);
     return util::readTextFile(fileName, true, true, [](){});
 }
 
 
 // Extract PubKey from address
 QString Util::extractPubKeyFromAddress(QString address) {
+    logger::logInfo(logger::BRIDGE, "Call Util::extractPubKeyFromAddress with address=" + address);
     return util::extractPubKeyFromAddress(address);
 }
 
 // convert nano items to dtirng that represent that fraction as a double
 QString Util::nano2one(int64_t nano) {
+    logger::logInfo(logger::BRIDGE, "Call Util::nano2one with nano=" + QString::number(nano));
     return util::nano2one(nano);
 }
 

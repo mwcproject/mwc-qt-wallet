@@ -16,6 +16,7 @@
 #define STATE_H
 
 #include <QString>
+#include "../features.h"
 
 namespace core {
     class WindowManager;
@@ -28,7 +29,8 @@ namespace wallet {
 }
 
 namespace node {
-class MwcNode;
+    class MwcNode;
+    class NodeClient;
 }
 
 namespace state {
@@ -65,10 +67,15 @@ enum STATE {
     WALLET_SETTINGS = 23,       // Settings page
 
     MIGRATION = 24,             // Data migration between wallet versions.
+#ifdef FEATURE_SWAP
     SWAP = 25,                  // Atomic swaps
+#endif
+#ifdef FEATURE_MKTPLACE
     SWAP_MKT = 26,              // Atomic swaps marketplace
+#endif
 
     VIEW_ACCOUNTS = 27,          // View account with rewind hash
+    HEART_BEAT = 28,             // Special state without window. Heart beat functionality
 };
 
 struct NextStateRespond {
@@ -84,15 +91,28 @@ struct NextStateRespond {
 
 struct StateContext {
     core::AppContext    * const appContext = nullptr;
-    wallet::Wallet      * const wallet = nullptr; //wallet caller interface
-    node::MwcNode       * const mwcNode = nullptr;
+    wallet::Wallet      * const wallet = nullptr; // wallet caller interface
+    node::MwcNode       * mwcNode = nullptr;
+    node::NodeClient    * nodeClient = nullptr;
     StateMachine        * stateMachine = nullptr;
+    QString               walletPasePath;
 
-    StateContext(core::AppContext * _appContext, wallet::Wallet * _wallet,
-                 node::MwcNode * _mwcNode) :
-        appContext(_appContext), wallet(_wallet), mwcNode(_mwcNode), stateMachine(nullptr) {}
+    StateContext(core::AppContext * _appContext,
+                 wallet::Wallet * _wallet,
+                 node::MwcNode * _mwcNode);
 
     void setStateMachine(StateMachine * sm) {stateMachine=sm;}
+
+    // Init node & wallet for a well defined path
+    bool isWalletDataValid(const QString & basePath, bool hasSeed);
+
+    // Will read the network from the base path
+    bool initWalletNode(const QString & basePath);
+
+    // Dont expect any wallet info in the base Path (online network case)
+    bool initWalletNode(const QString & basePath, const QString & network);
+
+    const QString & getCurrentBasePath() const {return walletPasePath;}
 };
 
 void setStateContext(StateContext * context);

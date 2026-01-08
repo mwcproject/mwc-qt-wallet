@@ -42,19 +42,13 @@ protected:
 
 private slots:
     // set receive account name results
-    void onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc );
-    void onWalletBalanceUpdated();
+    void onSend(  bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag );
 
-    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
 private:
     int transferState = -1;
-    bool nodeIsHealthy = false;
 
     // Single transfer context
-    QString trAccountFrom;
-    QString trAccountTo;
-    int64_t trNanoCoins = 0;
     QStringList outputs2use;
 };
 

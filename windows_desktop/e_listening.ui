@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Listening</class>
- <widget class="QWidget" name="Listening">
+ <widget class="control::MwcWidget" name="Listening">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -148,10 +148,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Your current MWC MQS address</string>
+            <string>Your current MWCMQS address</string>
            </property>
            <property name="statusTip">
-            <string>Your current MWC MQS address</string>
+            <string>Your current MWCMQS address</string>
            </property>
            <property name="maxLength">
             <number>1024</number>
@@ -170,7 +170,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>MWC MQS</string>
+            <string>MWCMQS</string>
            </property>
           </widget>
           <widget class="control::MwcLabelTiny" name="mwcMqStatusTxt">
@@ -189,7 +189,7 @@
             <set>Qt::AlignCenter</set>
            </property>
           </widget>
-          <widget class="QLabel" name="mwcMqStatusImg">
+          <widget class="control::MwcLabel" name="mwcMqStatusImg">
            <property name="geometry">
             <rect>
              <x>84</x>
@@ -199,16 +199,16 @@
             </rect>
            </property>
            <property name="toolTip">
-            <string>MWC MQS listener status</string>
+            <string>MWCMQS listener status</string>
            </property>
            <property name="statusTip">
-            <string>MWC MQS listener status</string>
+            <string>MWCMQS listener status</string>
            </property>
            <property name="text">
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
+            <pixmap>:/img/StatusOk@2x.svg</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -283,10 +283,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Your current Tor address</string>
+            <string>Your current Slatepack/Tor address</string>
            </property>
            <property name="statusTip">
-            <string>Your current Tor address</string>
+            <string>Your current Slatepack/Tor address</string>
            </property>
            <property name="maxLength">
             <number>1024</number>
@@ -311,7 +311,7 @@
             <set>Qt::AlignCenter</set>
            </property>
           </widget>
-          <widget class="QLabel" name="torStatusImg">
+          <widget class="control::MwcLabel" name="torStatusImg">
            <property name="geometry">
             <rect>
              <x>84</x>
@@ -330,7 +330,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
+            <pixmap>:/img/StatusOk@2x.svg</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -372,80 +372,6 @@
            </property>
            <property name="text">
             <string>Tor</string>
-           </property>
-          </widget>
-          <widget class="control::MwcLineEditNormal" name="torClientOptions">
-           <property name="geometry">
-            <rect>
-             <x>507</x>
-             <y>78</y>
-             <width>191</width>
-             <height>40</height>
-            </rect>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Tor client options. Might be requred for some bridge protocols.</string>
-           </property>
-           <property name="statusTip">
-            <string>Tor client options. Might be requred for some bridge protocols.</string>
-           </property>
-           <property name="maxLength">
-            <number>1024</number>
-           </property>
-           <property name="readOnly">
-            <bool>false</bool>
-           </property>
-           <property name="placeholderText">
-            <string>Optional client options</string>
-           </property>
-          </widget>
-          <widget class="control::MwcLineEditNormal" name="torBridgeConection">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>78</y>
-             <width>461</width>
-             <height>40</height>
-            </rect>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Optional Tor bridge connection string - use it only if Tor blocked by firewall.</string>
-           </property>
-           <property name="statusTip">
-            <string>Optional Tor bridge connection string - use it only if Tor blocked by firewall.</string>
-           </property>
-           <property name="maxLength">
-            <number>1024</number>
-           </property>
-           <property name="readOnly">
-            <bool>false</bool>
-           </property>
-           <property name="placeholderText">
-            <string>Optional Tor bridge connection</string>
            </property>
           </widget>
          </widget>
@@ -619,10 +545,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Select a specific index for your TOR/Slatepack and MWC MQS address.</string>
+            <string>Select a specific index for your Tor/Slatepack and MWCMQS address.</string>
            </property>
            <property name="statusTip">
-            <string>Select a specific index for your TOR/Slatepack and MWC MQS address.</string>
+            <string>Select a specific index for your Tor/Slatepack and MWCMQS address.</string>
            </property>
            <property name="text">
             <string>To address index</string>
@@ -656,10 +582,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Select next address for TOR/Slatepack and MWC MQS messages.</string>
+            <string>Select the next address for Tor/Slatepack and MWCMQS messages.</string>
            </property>
            <property name="statusTip">
-            <string>Select next next address for TOR/Slatepack and MWC MQS messages.</string>
+            <string>Select the next address for Tor/Slatepack and MWCMQS messages.</string>
            </property>
            <property name="text">
             <string>Next Address</string>
@@ -739,18 +665,24 @@
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>mwcmqsAddress</tabstop>
   <tabstop>torAddress</tabstop>
-  <tabstop>torBridgeConection</tabstop>
-  <tabstop>torClientOptions</tabstop>
   <tabstop>slatepackAddress</tabstop>
   <tabstop>mwcMqNextAddress</tabstop>
   <tabstop>mwcMqToIndex</tabstop>
  </tabstops>
- <resources>
-  <include location="../resources_desktop.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

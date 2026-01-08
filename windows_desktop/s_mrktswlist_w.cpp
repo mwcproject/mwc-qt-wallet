@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_mrktswlist_w.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_mrktswlist_w.h"
 #include "../bridge/wnd/swapmkt_b.h"
 #include "../bridge/wnd/swap_b.h"
@@ -242,6 +245,8 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
             state::MySwapOffer offer(s);
 
             control::RichItem *itm = control::createMarkedItem(offer.offer.id, ui->buyOffersTable, true, offer.offer.sell ? "#ff0000" : "#009127" );
+            itm->setParent(ui->buyOffersTable);
+
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
             // Line 1
@@ -250,7 +255,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
             itm->addWidget(control::createLabel(itm, false, false,
                                                     (offer.offer.sell ? "Sell " : "Buy ") + QString::number(offer.offer.mwcAmount) + " MWC for " +
                                                     QString::number(offer.offer.secAmount) + " " + offer.offer.secondaryCurrency +
-                                                    " ; Price "+ offer.offer.calcRateAsStr() + " (" + offer.offer.secondaryCurrency + "); " + (hasTor ? offer.getStatusStr(lastNodeHeight) : "Waiting for TOR...")   ));
+                                                    " ; Price "+ offer.offer.calcRateAsStr() + " (" + offer.offer.secondaryCurrency + "); " + (hasTor ? offer.getStatusStr(lastNodeHeight) : "Waiting for Tor...")   ));
 //            itm->setMinWidth(275);
 //            itm->addWidget(control::createLabel(itm, false, true, "Auto renew: Yes"));
             itm->addHSpacer().pop();
@@ -352,6 +357,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
             }
             Q_ASSERT(parent);
             control::RichItem * itm = control::createMarkedItem(mktOfferId, parent, ownOffer, "", 3, 10, 3, 10);
+            itm->setParent(parent);
 
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
@@ -597,7 +603,7 @@ void MrktSwList::on_depositAccountHelpBtn_clicked() {
 
 void MrktSwList::on_reservedAmountHelpBtn_clicked() {
     control::MessageBox::messageText(this, "Help",
-                                     "To mitigate integrity fee transaction privacy leaks, your mwc wallet separate some coins and use them to pay integrity fees.");
+                                     "To mitigate integrity fee transaction privacy leaks, your MWC wallet separates some coins and uses them to pay integrity fees.");
 }
 
 void MrktSwList::on_activeFeesHelpBtn_clicked() {
@@ -612,7 +618,7 @@ void MrktSwList::on_withdrawHelpBtn_clicked() {
 
 void MrktSwList::on_newOfferButton_clicked() {
     if (!wallet->getTorListenerStatus()) {
-        control::MessageBox::messageText(this, "TOR is offline", "Atomic swap marketplace requires connection to the TOR network. Please tart TOR listener for the wallet.");
+        control::MessageBox::messageText(this, "Tor is offline", "Atomic swap marketplace requires a connection to the Tor network. Please start the Tor listener for the wallet.");
         return;
     }
 
@@ -718,3 +724,4 @@ void MrktSwList::on_viewIntegrityTransactionsBtn_clicked() {
 
 
 }
+#endif

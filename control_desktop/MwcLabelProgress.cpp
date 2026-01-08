@@ -26,14 +26,14 @@ void onMessageBoxShown() {
 }
 
 MwcLabelProgress::MwcLabelProgress(QWidget *parent, Qt::WindowFlags f, bool hideWithMessageBox) :
-        QLabel(parent,f)
+        MwcLabel(parent,f)
 {
     if (hideWithMessageBox)
     processWndsToHide.push_back(this);
 }
 
 MwcLabelProgress::MwcLabelProgress(const QString &text, QWidget *parent, Qt::WindowFlags f, bool hideWithMessageBox) :
-        QLabel(text,parent, f)
+        MwcLabel(text,parent, f)
 {
     if (hideWithMessageBox)
         processWndsToHide.push_back(this);

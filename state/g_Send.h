@@ -34,28 +34,26 @@ public:
     Send( StateContext * context);
     virtual ~Send() override;
 
-    bool isNodeHealthy() const {return nodeIsHealthy;}
-
     // Process sept 1 send request.  sendAmount is a value as user input it
     // return code:
     //   0 - ok
     //   1 - account error
     //   2 - amount error
-    int initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString account, QString sendAmount, bool gotoNextPage );
+    int initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString accountPath, QString sendAmount, bool gotoNextPage );
     // Data that was collected by initialSendSelection. Can be used if gotoNextPage is false
     int64_t getTmpAmount() const {return tmpAmount;}
-    QString getTmpAccountName() const {return tmpAccountName;}
+    QString getTmpAccountPath() const {return tmpAccountPath;}
 
     // Handle whole workflow to send offline
     // return true if some long process was started.
-    bool sendMwcOffline( QString account, int64_t amount, QString message, bool isLockLater, QString slatepackRecipientAddress);
+    bool sendMwcOffline( const QString & account, const QString & accountPath, int64_t amount, const QString & message, bool isLockLater, const QString & slatepackRecipientAddress );
 
     // Handle whole workflow to send online
     // return true if some long process was started.
-    bool sendMwcOnline( QString account, int64_t amount, QString address, QString apiSecret, QString message);
+    bool sendMwcOnline( const QString & account, const QString & accountPath, int64_t amount, QString address, const QString & message );
 
     // Returns the amount of coins, minus the transaction fee, which can be spent for this account
-    QString getSpendAllAmount(QString account);
+    QString getSpendAllAmount(QString accountPath);
 
 protected:
     virtual NextStateRespond execute() override;
@@ -63,37 +61,18 @@ protected:
     virtual QString getHelpDocName() override;
 
 private slots:
-    void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate );
+    void sendRespond(bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag);
 
-    void respSendFile( bool success, QStringList errors, QString fileName );
-    void respSendSlatepack( QString tagId, QString error, QString slatepack, QString txId );
-
-    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-
-    // Response from requestRecieverWalletAddress(url)
-    void onRequestRecieverWalletAddress(QString url, QString proofAddress, QString error);
-
-#ifdef WALLET_MOBILE
-    void sgnOnFileReady( int eventCode, QString fileUri );
-#endif
 private:
     void switchToStartingWindow();
 
-    void implRespSendFile( bool success, QStringList errors, QString fileName );
+    QString getAccountPathByName(const QString account, bool showErrMessage);
 private:
-    bool nodeIsHealthy = false;
-
-    QString respProofAddress;
-    QString restProofError;
     bool atSendInitialPage = true;
-#ifdef WALLET_MOBILE
-    QString scrFileName;
-    QtAndroidService * androidDevice = nullptr;
-#endif
 
     // temp buffered data
     int64_t tmpAmount = 0;
-    QString tmpAccountName;
+    QString tmpAccountPath;
 };
 
 }

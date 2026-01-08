@@ -17,7 +17,6 @@
 
 #include "state.h"
 #include "../core/Notification.h"
-#include "../wallet/mwc713.h"
 #include "../bridge/notification_b.h"
 
 namespace wnd {
@@ -39,8 +38,6 @@ protected:
     virtual QString getHelpDocName() override {return "listener.html";}
 
 private slots:
-    // Login from anotehr wallet happens
-    void onListenerMqCollision();
 };
 
 }

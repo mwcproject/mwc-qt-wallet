@@ -13,7 +13,17 @@
 // limitations under the License.
 
 #include "state.h"
+
+#include <QFileInfo>
+
 #include "statemachine.h"
+#include "wallet/wallet_objs.h"
+#include "wallet/wallet.h"
+#include "node/MwcNode.h"
+#include "node/node_client.h"
+#include "util/ioutils.h"
+#include "util/Log.h"
+#include <QDir>
 
 namespace state {
 
@@ -36,6 +46,76 @@ State * getState(STATE state) {
     State * res = getStateContext()->stateMachine->getState(state);
     Q_ASSERT(res);
     return res;
+}
+
+StateContext::StateContext(core::AppContext * _appContext,
+                     wallet::Wallet * _wallet,
+                     node::MwcNode * _mwcNode) :
+            appContext(_appContext), wallet(_wallet), mwcNode(_mwcNode), stateMachine(nullptr) {
+    Q_ASSERT(appContext);
+    Q_ASSERT(wallet);
+    Q_ASSERT(mwcNode);
+}
+
+
+// Init node & wallet for a well defined path
+bool StateContext::isWalletDataValid(const QString & basePath, bool hasSeed) {
+    QPair<bool,QString> baseFullPath = ioutils::getAppDataPath( basePath );
+    if (!baseFullPath.first)
+        return false;
+
+    if (hasSeed && QFileInfo(baseFullPath.second + QDir::separator() + "wallet.seed").size() < 100 )
+        return false;
+
+    QVector<QString> walletInfo = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(basePath, appContext);
+    // walletInfo data: [Network, Arch, InstanceName]
+    return walletInfo.size()>=1;
+}
+
+// Will read the network from the base path
+bool StateContext::initWalletNode(const QString & basePath) {
+    QVector<QString> walletInfo = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(basePath, appContext);
+    if (walletInfo.size()>=1) {
+        return initWalletNode(basePath, walletInfo[0]);
+    }
+    return false;
+}
+
+// Dont expect any wallet info in the base Path (online network case)
+bool StateContext::initWalletNode(const QString & basePath, const QString & network) {
+    QPair<bool,QString> baseFullPath = ioutils::getAppDataPath( basePath );
+    if (!baseFullPath.first)
+        return false;
+
+    Q_ASSERT(mwcNode);
+    if (mwcNode->isRunning() && mwcNode->getCurrentNetwork() != network) {
+        Q_ASSERT(nodeClient != nullptr);
+        nodeClient->deleteLater();
+        nodeClient = nullptr;
+        mwcNode->stop();
+    }
+
+    // Starting new embedded node
+    if (!mwcNode->isRunning()) {
+        QPair<bool,QString> nodeDataPath = ioutils::getAppDataPath("mwc-node/" + network, true);
+        Q_ASSERT(nodeDataPath.first);
+        if (!nodeDataPath.first) {
+            logger::logError(logger::QT_WALLET, "Unable initialize directory for embedded node");
+            mwcNode->reportNodeFatalError("Unable initialize directory for embedded node");
+        }
+        mwcNode->start( nodeDataPath.second , network );
+
+        Q_ASSERT(nodeClient == nullptr);
+        nodeClient = new node::NodeClient(network, mwcNode);
+    }
+
+    Q_ASSERT(nodeClient);
+    wallet->logout();
+    wallet->init(network, baseFullPath.second, nodeClient);
+
+    walletPasePath = basePath;
+
+    return true;
 }
 
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Receive</class>
- <widget class="QWidget" name="Receive">
+ <widget class="control::MwcWidget" name="Receive">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
-    <height>676</height>
+    <width>907</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -68,7 +68,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="QLabel" name="mwcmqStatusImg">
+       <widget class="control::MwcLabel" name="mwcmqStatusImg">
         <property name="geometry">
          <rect>
           <x>184</x>
@@ -78,10 +78,10 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>MWC MQS connection status</string>
+         <string>MWCMQS connection status</string>
         </property>
         <property name="statusTip">
-         <string>MWC MQS connection status</string>
+         <string>MWCMQS connection status</string>
         </property>
         <property name="text">
          <string/>
@@ -195,7 +195,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="torStatusImg">
+       <widget class="control::MwcLabel" name="torStatusImg">
         <property name="geometry">
          <rect>
           <x>84</x>
@@ -370,10 +370,10 @@
            <enum>Qt::StrongFocus</enum>
           </property>
           <property name="toolTip">
-           <string>MWC MQS address of your wallet</string>
+           <string>MWCMQS address of your wallet</string>
           </property>
           <property name="statusTip">
-           <string>MWC MQS address of your wallet</string>
+           <string>MWCMQS address of your wallet</string>
           </property>
           <property name="maxLength">
            <number>1024</number>
@@ -405,7 +405,7 @@
         <item>
          <widget class="control::MwcLabelSmall" name="label_sp_tor">
           <property name="text">
-           <string>Slatepack/TOR address</string>
+           <string>Slatepack/Tor address</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -430,10 +430,10 @@
            <enum>Qt::StrongFocus</enum>
           </property>
           <property name="toolTip">
-           <string>Tor (onion) address of your wallet</string>
+           <string>Slatepack/Tor (onion) address of your wallet</string>
           </property>
           <property name="statusTip">
-           <string>Tor (onion) address of your wallet</string>
+           <string>Slatepack/Tor (onion) address of your wallet</string>
           </property>
           <property name="maxLength">
            <number>1024</number>
@@ -458,6 +458,86 @@
            <size>
             <width>20</width>
             <height>12</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+           <number>5</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="control::MwcPushButtonNormal" name="requestFaucetMWCButton">
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Sign incoming Slatepack transaction</string>
+            </property>
+            <property name="statusTip">
+             <string>Sign incoming Slatepack transaction</string>
+            </property>
+            <property name="text">
+             <string>Request 3.0 MWC from faucet</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>30</height>
            </size>
           </property>
          </spacer>
@@ -501,10 +581,10 @@
              <enum>Qt::StrongFocus</enum>
             </property>
             <property name="toolTip">
-             <string>Sign income Slatepack Transaction</string>
+             <string>Sign incoming Slatepack transaction</string>
             </property>
             <property name="statusTip">
-             <string>Sign income Slatepack Transaction</string>
+             <string>Sign incoming Slatepack transaction</string>
             </property>
             <property name="text">
              <string>Receive MWC by Slatepack</string>
@@ -595,7 +675,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -675,6 +755,16 @@
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -21,46 +21,21 @@
 
 namespace state {
 
-struct NodeStatus {
-    bool online = false;
-    QString errMsg;
-    int nodeHeight = 0;
-    int peerHeight = 0;
-    int64_t totalDifficulty = 0;
-    int connections = 0;
-
-    void setData(bool online,
-            const QString & errMsg,
-            int nodeHeight,
-            int peerHeight,
-            int64_t totalDifficulty,
-            int connections);
-};
-
-
 class NodeInfo : public QObject, public State {
 Q_OBJECT
 public:
     NodeInfo(StateContext * context);
     virtual ~NodeInfo() override;
 
-    void requestNodeInfo();
-
     void requestWalletResync();
 
-    int getCurrentNodeHeight() {return lastNodeStatus.nodeHeight;}
+    //node::MwcNode * getMwcNode() const;
 
-    // Connection with network
-    wallet::MwcNodeConnection getNodeConnection() const;
-    void updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect);
-
-    QString getMwcNodeStatus();
-
-    node::MwcNode * getMwcNode() const;
+    bool isNodeHealthy() const;
 
     void exportBlockchainData(QString fileName);
     void importBlockchainData(QString fileName);
-    void publishTransaction(QString fileName);
+    void publishTransaction(QString fileName, bool fluff);
     void resetEmbeddedNodeData();
 protected:
     virtual NextStateRespond execute() override;
@@ -68,22 +43,9 @@ protected:
     virtual QString getHelpDocName() override {return "node_overview.html";}
 
 private slots:
-    void onLoginResult(bool ok);
-
-    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-
-    void onMwcStatusUpdate(QString status);
-
-    void onSubmitFile(bool success, QString message, QString fileName);
-
 private:
-    virtual void timerEvent(QTimerEvent *event) override;
 private:
     bool  justLogin = false;
-    NodeStatus lastNodeStatus; // Satus as mwc713 see the node
-    QString lastLocalNodeStatus = "Waiting"; // Status from the embedded node
-    int timerCounter = 0; // update is different in different modes.
-    wallet::MwcNodeConnection currentNodeConnection;
 };
 
 }

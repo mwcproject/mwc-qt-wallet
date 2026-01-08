@@ -22,6 +22,10 @@ namespace Ui {
 class MessageBox;
 }
 
+namespace bridge {
+    class Wallet;
+}
+
 namespace control {
 
 class MessageBox : public MwcDialog
@@ -30,11 +34,9 @@ class MessageBox : public MwcDialog
 public:
 protected:
     // btnX if empty, the button will be hidden
-    // Password accepted as a HASH. EMpty String mean that no password is set.
-    // After return, passwordHash value will have input raw Password value. So it can be user for wallet
     explicit MessageBox(QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
-            bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE passBlockButton,
+            bool default1, bool default2, double widthScale, QString * password2ask, core::WndManager::RETURN_CODE passBlockButton,
             int ttl_blocks );
     virtual ~MessageBox() override;
 
@@ -58,7 +60,7 @@ public:
     // After return, passwordHash value will have input raw Password value. So it can be user for wallet
     static core::WndManager::RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
-            bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton );
+            bool default1, bool default2, double widthScale, QString * password2ask, core::WndManager::RETURN_CODE blockButton );
 
 private slots:
     void on_passwordEdit_textChanged(const QString &str);
@@ -71,9 +73,11 @@ private:
 
     Ui::MessageBox *ui;
     core::WndManager::RETURN_CODE retCode = core::WndManager::RETURN_CODE::BTN1;
-    QString & blockingPasswordHash;
     core::WndManager::RETURN_CODE passBlockButton = core::WndManager::RETURN_CODE::BTN1;
     int ttl_blocks = -1;
+    QString * password2ask = nullptr;
+
+    bridge::Wallet * wallet = nullptr;
 };
 
 }

@@ -18,13 +18,12 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/c_newseed_b.h"
 #include "statemachine.h"
+#include "util/message_mapper.h"
 
 namespace state {
 
 ShowSeed::ShowSeed( StateContext * context) : State(context,  STATE::SHOW_SEED )
 {
-    QObject::connect(context->wallet, &wallet::Wallet::onGetSeed,
-                                   this, &ShowSeed::recoverPassphrase, Qt::QueuedConnection);
 }
 
 ShowSeed::~ShowSeed() {}
@@ -38,16 +37,15 @@ NextStateRespond ShowSeed::execute() {
         if (walletPassword.isEmpty())
             return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-        core::getWndManager()->pageNewSeed(mwc::PAGE_X_SHOW_PASSPHRASE, QVector<QString>(), true);
-        context->wallet->getSeed(walletPassword);
+        QPair<QStringList, QString> seed = context->wallet->getSeed(walletPassword);
+        if (!seed.second.isEmpty()) {
+            core::getWndManager()->messageTextDlg("Seed access error", util::mapMessage(seed.second) );
+            return NextStateRespond(NextStateRespond::RESULT::DONE);
+        }
+
+        core::getWndManager()->pageNewSeed(mwc::PAGE_X_SHOW_PASSPHRASE, seed.first, true);
     }
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
-
-void ShowSeed::recoverPassphrase( QVector<QString> seed ) {
-    for (auto b : bridge::getBridgeManager()->getNewSeed() )
-        b->showSeedData(seed);
-}
-
 
 }

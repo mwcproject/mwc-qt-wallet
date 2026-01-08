@@ -18,6 +18,8 @@
 #include "../bridge/util_b.h"
 #include <QJsonDocument>
 
+#include "util/message_mapper.h"
+
 namespace dlg {
 
 DecodeSlatepackDlg::DecodeSlatepackDlg(QWidget *parent) :
@@ -28,9 +30,6 @@ DecodeSlatepackDlg::DecodeSlatepackDlg(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     util = new bridge::Util(this);
 
-    QObject::connect(wallet, &bridge::Wallet::sgnDecodeSlatepack,
-                     this, &dlg::DecodeSlatepackDlg::onSgnDecodeSlatepack, Qt::QueuedConnection);
-
     resetData();
 }
 
@@ -40,9 +39,7 @@ DecodeSlatepackDlg::~DecodeSlatepackDlg() {
 
 void DecodeSlatepackDlg::on_slatepackEdit_textChanged() {
     QString sp = ui->slatepackEdit->toPlainText().trimmed();
-    if (spInProgress.isEmpty()) {
-        decodeSlate(sp);
-    }
+    decodeSlate(sp);
 }
 
 void DecodeSlatepackDlg::resetData() {
@@ -63,33 +60,21 @@ void DecodeSlatepackDlg::decodeSlate(const QString &slatepack) {
         return;
     }
 
-    spInProgress = slatepack;
-    wallet->decodeSlatepack(slatepack, "DecodeSlatepackDlg");
-}
+    QJsonObject decodedSpJson = wallet->decodeSlatepack(slatepack);
+    wallet::DecodedSlatepack decodedSp = wallet::DecodedSlatepack::fromJson(decodedSpJson);
 
-void DecodeSlatepackDlg::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
-    if (tag!="DecodeSlatepackDlg")
-        return;
-
-    spInProgress = "";
-    if (!error.isEmpty()) {
-        ui->slateDetailsLabel->setText("<b>" + error + "</b>");
+    if (!decodedSp.error.isEmpty()) {
+        ui->slateDetailsLabel->setText("<b>" + decodedSp.error + "</b>");
     }
     else {
         // Let's dp prerry pring for json
-        QJsonDocument doc = QJsonDocument::fromJson(slateJson.toUtf8());
-        slateJson = doc.toJson(QJsonDocument::Indented);
+        QJsonDocument doc = QJsonDocument(decodedSp.slate);
+        QString slateJson = doc.toJson(QJsonDocument::Indented);
 
         ui->slateJsonEdit->setText(slateJson);
-        ui->slateDetailsLabel->setText("Content:  " + content +
-                "\nSender: " + (sender == "None"?"Non encrypted":sender) +
-                "\nRecipient: " + (recipient == "None"?"Non encrypted":recipient));
-    }
-
-    QString sp = ui->slatepackEdit->toPlainText().trimmed();
-
-    if (slatepack != sp) {
-        decodeSlate(sp);
+        ui->slateDetailsLabel->setText("Content:  " + decodedSp.content +
+                "\nSender: " + (decodedSp.sender == "None"? "Non encrypted":decodedSp.sender) +
+                "\nRecipient: " + (decodedSp.recipient == "None"?"Non encrypted":decodedSp.recipient));
     }
 }
 

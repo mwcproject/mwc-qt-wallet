@@ -22,6 +22,7 @@
 #include "../bridge/util_b.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wnd/g_send_b.h"
+#include "zz_utils.h"
 
 namespace wnd {
 
@@ -41,12 +42,12 @@ SendOfflineOnly::SendOfflineOnly(QWidget *parent) :
     connect( send, &bridge::Send::sgnShowSendResult,
                       this, &SendOfflineOnly::onSgnShowSendResult, Qt::QueuedConnection);
 
-    ui->progress->initLoader(true);
+    ui->progress->initLoader(false);
 
     ui->contactNameLable->setText("");
     ui->contactNameLable->hide();
 
-    wallet->requestWalletBalanceUpdate();
+    updateAccountsData(wallet, ui->accountComboBox, true, false);
 
     ui->generatePoof->setCheckState( config->getGenerateProof() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 }
@@ -56,49 +57,28 @@ SendOfflineOnly::~SendOfflineOnly()
     delete ui;
 }
 
-void SendOfflineOnly::onSgnWalletBalanceUpdated() {
-    // init accounts
-    ui->accountComboBox->clear();
-
-    QString account = wallet->getCurrentAccountName();
-    QVector<QString> accountInfo = wallet->getWalletBalance(true, true,  false);
-
-    int selectedAccIdx = 0;
-    int idx = 0;
-
-    for (int i=1; i<accountInfo.size(); i+=2) {
-        if ( accountInfo[i-1] == "integrity")
-            continue;
-
-        if (accountInfo[i-1] == account)
-            selectedAccIdx = idx;
-
-        ui->accountComboBox->addItem( accountInfo[i], QVariant(accountInfo[i-1]));
-        idx++;
-    }
-    ui->accountComboBox->setCurrentIndex(selectedAccIdx);
-
-    ui->progress->hide();
-}
-
 void SendOfflineOnly::on_allAmountButton_clicked() {
-    QString account = ui->accountComboBox->currentData().toString();
-    if (account.isEmpty())
+    QString accountPath = accountComboData2AccountPath(ui->accountComboBox->currentData().toString()).second;
+    if (accountPath.isEmpty())
         return;
     else {
-        QString amount = send->getSpendAllAmount(account);
+        QString amount = send->getSpendAllAmount(accountPath);
         ui->amountEdit->setText(amount);
     }
+}
+
+void SendOfflineOnly::onSgnWalletBalanceUpdated() {
+    updateAccountsData(wallet, ui->accountComboBox, true, false);
 }
 
 void SendOfflineOnly::on_accountComboBox_currentIndexChanged(int index)
 {
     Q_UNUSED(index)
-    QString account = ui->accountComboBox->currentData().toString();
-    if (account.isEmpty())
+    QString accountPath = accountComboData2AccountPath(ui->accountComboBox->currentData().toString()).second;
+    if (accountPath.isEmpty())
         return;
 
-    wallet->switchAccount(account);
+    wallet->switchAccountById(accountPath);
 }
 
 static bool showGenProofWarning = false;
@@ -135,8 +115,10 @@ void SendOfflineOnly::on_sendButton_clicked()
 {
     util::TimeoutLockObject to("SendOfflineOnly");
 
-    QString account = ui->accountComboBox->currentData().toString();
-    if (account.isEmpty())
+    auto accData = accountComboData2AccountPath(ui->accountComboBox->currentData().toString());
+    QString accountName = accData.first;
+    QString accountPath = accData.second;
+    if (accountPath.isEmpty())
         return;
 
     QString sendAmount = ui->amountEdit->text().trimmed();
@@ -144,7 +126,7 @@ void SendOfflineOnly::on_sendButton_clicked()
     config->setSendMethod(bridge::SEND_SELECTED_METHOD::SLATEPACK_ID);
 
     // Note, we don't go to the next page
-    int res = send->initialSendSelection( bridge::SEND_SELECTED_METHOD::ONLINE_ID, account, sendAmount, false );
+    int res = send->initialSendSelection( bridge::SEND_SELECTED_METHOD::ONLINE_ID, accountPath, sendAmount, false );
     if (res==1) {
         ui->accountComboBox->setFocus();
         return;
@@ -155,7 +137,7 @@ void SendOfflineOnly::on_sendButton_clicked()
     }
 
     uint64_t amount = send->getTmpAmount();
-    account = send->getTmpAccountName();
+    accountPath = send->getTmpAccountPath();
 
     QString recipientWallet;
         recipientWallet = ui->recipientAddress->text();
@@ -182,7 +164,7 @@ void SendOfflineOnly::on_sendButton_clicked()
         }
     }
 
-    if ( send->sendMwcOffline( account, QString::number(amount), description, config->getSendLockOutput(), recipientWallet) )
+    if ( send->sendMwcOffline( accountName, accountPath, QString::number(amount), description, config->getSendLockOutput(), recipientWallet) )
         ui->progress->show();
 }
 

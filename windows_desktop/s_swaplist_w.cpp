@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_swaplist_w.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_swaplist_w.h"
 #include "../bridge/wnd/swap_b.h"
 #include "../bridge/config_b.h"
@@ -348,6 +351,7 @@ void SwapList::updateTradeListData() {
 
         // Here we have only Hirizontal layout. It is simple and swap related only.
         control::RichItem *itm = control::createMarkedItem(sw.tradeId, ui->swapsTable, marked, "");
+        itm->setParent(ui->swapsTable);
 
         sw.markWnd = itm->getCurrentWidget();
 
@@ -701,8 +705,12 @@ void SwapList::on_swapBackupDir_textEdited(const QString &dir) {
 
 void SwapList::timerEvent(QTimerEvent *event)
 {
+    if (core::WalletApp::isExiting())
+        return;
+
     Q_UNUSED(event);
     swap->requestEthInfo();
 }
 
 }
+#endif

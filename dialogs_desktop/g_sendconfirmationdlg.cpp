@@ -22,6 +22,7 @@
 #include <QThread>
 #include "../bridge/util_b.h"
 #include "../bridge/config_b.h"
+#include "../bridge/wallet_b.h"
 #include "../util_desktop/widgetutils.h"
 #include "../util/ui.h"
 #include "../util/crypto.h"
@@ -30,16 +31,17 @@
 namespace dlg {
 
 SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QString message, double widthScale,
-                                         int _inputsNum, QString _passwordHash ) :
+                                         int _inputsNum ) :
      MwcDialog(parent),
     ui(new Ui::SendConfirmationDlg),
-    passwordHash(_passwordHash),
     messageBody(message),
     inputsNum(_inputsNum)
 {
     ui->setupUi(this);
     util = new bridge::Util(this);
     config = new bridge::Config(this);
+    wallet = new bridge::Wallet(this);
+
 
     if (widthScale!=1.0) {
         // Let's ujust Width first
@@ -92,8 +94,7 @@ void SendConfirmationDlg::updateMessageText() {
 }
 
 void SendConfirmationDlg::checkPasswordStatus() {
-    QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
-    bool ok = crypto::calcHSA256Hash(ui->passwordEdit->text()) == passwordHash;
+    bool ok = wallet->checkPassword(ui->passwordEdit->text());
     ui->confirmButton->setEnabled(ok);
     if (ok)
         ui->confirmButton->setFocus();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MwcToolbar</class>
- <widget class="QWidget" name="MwcToolbar">
+ <widget class="control::MwcWidget" name="MwcToolbar">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -57,7 +57,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="control::MwcLabel" name="label">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -108,10 +108,10 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
-      <number>20</number>
+      <number>5</number>
      </property>
      <item>
-      <widget class="QLabel" name="totalMwc">
+      <widget class="control::MwcLabel" name="totalMwc">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -128,9 +128,38 @@
         <string notr="true">#totalMwc {font-family: Open Sans;
 font-style: normal;
 font-weight: bold;
-font-size: 22px;
 line-height: 35px;
 color: #FFFFFF;}</string>
+       </property>
+       <property name="text">
+        <string>MWC</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="control::MwcLabel" name="mwc">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Total MWC across all accounts (some may be locked or unconfirmed)</string>
+       </property>
+       <property name="statusTip">
+        <string>Total MWC across all accounts (some may be locked or unconfirmed)</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#mwc {font-family: Open Sans;
+         font-style: normal;
+         font-weight: bold;
+         font-size: 22px;
+         line-height: 35px;
+         color: #FFFFFF;}</string>
        </property>
        <property name="text">
         <string>MWC</string>
@@ -164,7 +193,7 @@ color: #FFFFFF;}</string>
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="mwcUnconfFrame" native="true">
+      <widget class="control::MwcWidget" name="mwcUnconfFrame" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -212,7 +241,7 @@ color: #FFFFFF;}</string>
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="wait_icon">
+           <widget class="control::MwcLabel" name="wait_icon">
             <property name="minimumSize">
              <size>
               <width>14</width>
@@ -255,7 +284,7 @@ color: #FFFFFF;}</string>
          </layout>
         </item>
         <item>
-         <widget class="QLabel" name="nonConfMwcValue">
+         <widget class="control::MwcLabel" name="nonConfMwcValue">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -301,7 +330,7 @@ color: #CCFF33;}</string>
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -333,7 +362,7 @@ color: #CCFF33;}</string>
       <number>12</number>
      </property>
      <item>
-      <widget class="QToolButton" name="sendToolButton">
+      <widget class="control::MwcToolButton" name="sendToolButton">
        <property name="minimumSize">
         <size>
          <width>131</width>
@@ -383,7 +412,7 @@ color: #CCFF33;}</string>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="receiveToolButton">
+      <widget class="control::MwcToolButton" name="receiveToolButton">
        <property name="minimumSize">
         <size>
          <width>131</width>
@@ -433,7 +462,7 @@ color: #CCFF33;}</string>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="finalizeToolButton">
+      <widget class="control::MwcToolButton" name="finalizeToolButton">
        <property name="minimumSize">
         <size>
          <width>131</width>
@@ -453,10 +482,10 @@ color: #CCFF33;}</string>
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Finalize Slatepack Transaction</string>
+        <string>Finalize Slatepack transaction</string>
        </property>
        <property name="statusTip">
-        <string>Finalize Slatepack Transaction</string>
+        <string>Finalize Slatepack transaction</string>
        </property>
        <property name="text">
         <string notr="true">Finalize</string>
@@ -483,7 +512,7 @@ color: #CCFF33;}</string>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="transactionToolButton">
+      <widget class="control::MwcToolButton" name="transactionToolButton">
        <property name="minimumSize">
         <size>
          <width>131</width>
@@ -533,7 +562,7 @@ color: #CCFF33;}</string>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="swapToolButton">
+      <widget class="control::MwcToolButton" name="swapToolButton">
        <property name="minimumSize">
         <size>
          <width>131</width>
@@ -553,10 +582,10 @@ color: #CCFF33;}</string>
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Peer to peer Atomic Swaps</string>
+        <string>Peer-to-peer atomic swaps</string>
        </property>
        <property name="statusTip">
-        <string>Peer to peer Atomic Swaps</string>
+        <string>Peer-to-peer atomic swaps</string>
        </property>
        <property name="text">
         <string notr="true">Swap</string>
@@ -584,7 +613,7 @@ color: #CCFF33;}</string>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="swapMarketplaceToolButton">
+      <widget class="control::MwcToolButton" name="swapMarketplaceToolButton">
        <property name="minimumSize">
         <size>
          <width>131</width>
@@ -604,10 +633,10 @@ color: #CCFF33;}</string>
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Peer to peer Marketplace</string>
+        <string>Peer-to-peer marketplace</string>
        </property>
        <property name="statusTip">
-        <string>Peer to peer Marketplace</string>
+        <string>Peer-to-peer marketplace</string>
        </property>
        <property name="text">
         <string notr="true">Marketplace</string>
@@ -651,6 +680,23 @@ color: #CCFF33;}</string>
    </item>
   </layout>
  </widget>
+  <customwidgets>
+  <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcToolButton</class>
+   <extends>QToolButton</extends>
+   <header>control_desktop/MwcToolButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources_desktop.qrc"/>
  </resources>

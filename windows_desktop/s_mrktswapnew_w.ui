@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MrktSwapNew</class>
- <widget class="QWidget" name="MrktSwapNew">
+ <widget class="control::MwcWidget" name="MrktSwapNew">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -61,7 +61,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>700</width>
@@ -111,7 +111,7 @@
          <string>Account to trade MWC from</string>
         </property>
        </widget>
-       <widget class="QWidget" name="layoutWidget1">
+       <widget class="control::MwcWidget" name="layoutWidget1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -158,10 +158,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Cancel and return back</string>
+            <string>Cancel and return</string>
            </property>
            <property name="statusTip">
-            <string>Cancel and return back</string>
+            <string>Cancel and return</string>
            </property>
            <property name="text">
             <string>Cancel</string>
@@ -227,7 +227,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="layoutWidget2">
+       <widget class="control::MwcWidget" name="layoutWidget2">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -275,7 +275,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="secondaryCurrencyLabel">
+          <widget class="control::MwcLabel" name="secondaryCurrencyLabel">
            <property name="text">
             <string>XXX address:</string>
            </property>
@@ -310,7 +310,7 @@
           </widget>
          </item>
          <item row="0" column="3">
-          <widget class="QPushButton" name="swapRateHelpBtn">
+          <widget class="control::MwcPushButton" name="swapRateHelpBtn">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -324,10 +324,10 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="statusTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="styleSheet">
             <string notr="true">#swapRateHelpBtn{border: none;}</string>
@@ -351,7 +351,7 @@
           </widget>
          </item>
          <item row="2" column="3">
-          <widget class="QPushButton" name="secTransFeeHelpButton">
+          <widget class="control::MwcPushButton" name="secTransFeeHelpButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -365,10 +365,10 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="statusTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="styleSheet">
             <string notr="true">#secTransFeeHelpButton{border: none;}</string>
@@ -392,7 +392,7 @@
           </widget>
          </item>
          <item row="1" column="3">
-          <widget class="QPushButton" name="secAddressHelpBtn">
+          <widget class="control::MwcPushButton" name="secAddressHelpBtn">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -406,10 +406,10 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="statusTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="styleSheet">
             <string notr="true">#secAddressHelpBtn{border: none;}</string>
@@ -460,10 +460,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>This trade exchange rate</string>
+            <string>This trade's exchange rate</string>
            </property>
            <property name="statusTip">
-            <string>This trade exchange rate</string>
+            <string>This trade's exchange rate</string>
            </property>
            <property name="text">
             <string/>
@@ -540,7 +540,7 @@
          <string>Account:</string>
         </property>
        </widget>
-       <widget class="QWidget" name="layoutWidget3">
+       <widget class="control::MwcWidget" name="layoutWidget3">
         <property name="geometry">
          <rect>
           <x>285</x>
@@ -595,7 +595,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="widget_2" native="true">
+          <widget class="control::MwcWidget" name="widget_2" native="true">
            <property name="minimumSize">
             <size>
              <width>1</width>
@@ -625,7 +625,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="autoStart_2">
+       <widget class="control::MwcGroupBox" name="autoStart_2">
         <property name="geometry">
          <rect>
           <x>360</x>
@@ -640,7 +640,7 @@
         <property name="title">
          <string>Funds lock time</string>
         </property>
-        <widget class="QWidget" name="layoutWidget4">
+        <widget class="control::MwcWidget" name="layoutWidget4">
          <property name="geometry">
           <rect>
            <x>23</x>
@@ -651,7 +651,7 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
-           <widget class="QLabel" name="label_4">
+           <widget class="control::MwcLabel" name="label_4">
             <property name="minimumSize">
              <size>
               <width>55</width>
@@ -670,7 +670,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="mwcLockTimeLabel">
+           <widget class="control::MwcLabel" name="mwcLockTimeLabel">
             <property name="minimumSize">
              <size>
               <width>170</width>
@@ -684,7 +684,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="layoutWidget5">
+        <widget class="control::MwcWidget" name="layoutWidget5">
          <property name="geometry">
           <rect>
            <x>23</x>
@@ -695,7 +695,7 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
-           <widget class="QLabel" name="secLockCurrencyLabel">
+           <widget class="control::MwcLabel" name="secLockCurrencyLabel">
             <property name="minimumSize">
              <size>
               <width>55</width>
@@ -714,7 +714,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="secLockTimeLabel">
+           <widget class="control::MwcLabel" name="secLockTimeLabel">
             <property name="minimumSize">
              <size>
               <width>170</width>
@@ -729,7 +729,7 @@
          </layout>
         </widget>
        </widget>
-       <widget class="QGroupBox" name="autoStart">
+       <widget class="control::MwcGroupBox" name="autoStart">
         <property name="geometry">
          <rect>
           <x>2</x>
@@ -750,7 +750,7 @@
         <property name="title">
          <string>Number of confirmations</string>
         </property>
-        <widget class="QLabel" name="secBlocksLabel">
+        <widget class="control::MwcLabel" name="secBlocksLabel">
          <property name="geometry">
           <rect>
            <x>15</x>
@@ -769,7 +769,7 @@
           <string>BTC</string>
          </property>
         </widget>
-        <widget class="QPushButton" name="confNumberHelpButton">
+        <widget class="control::MwcPushButton" name="confNumberHelpButton">
          <property name="geometry">
           <rect>
            <x>254</x>
@@ -791,10 +791,10 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Click for help</string>
+          <string>Open help</string>
          </property>
          <property name="statusTip">
-          <string>Click for help</string>
+          <string>Open help</string>
          </property>
          <property name="styleSheet">
           <string notr="true">#confNumberHelpButton{border: none;}</string>
@@ -816,7 +816,7 @@
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QLabel" name="label_9">
+        <widget class="control::MwcLabel" name="label_9">
          <property name="geometry">
           <rect>
            <x>195</x>
@@ -863,7 +863,7 @@
           <number>512</number>
          </property>
         </widget>
-        <widget class="QLabel" name="label_8">
+        <widget class="control::MwcLabel" name="label_8">
          <property name="geometry">
           <rect>
            <x>193</x>
@@ -910,7 +910,7 @@
           <number>512</number>
          </property>
         </widget>
-        <widget class="QLabel" name="label_7">
+        <widget class="control::MwcLabel" name="label_7">
          <property name="geometry">
           <rect>
            <x>15</x>
@@ -930,7 +930,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="layoutWidget6">
+       <widget class="control::MwcWidget" name="layoutWidget6">
         <property name="geometry">
          <rect>
           <x>1</x>
@@ -967,10 +967,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Buy or Sell trade</string>
+            <string>Buy or sell trade</string>
            </property>
            <property name="statusTip">
-            <string>Buy or Sell trade</string>
+            <string>Buy or sell trade</string>
            </property>
            <item>
             <property name="text">
@@ -1012,10 +1012,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Amount of MWC coins to trade</string>
+            <string>Amount of MWC to trade</string>
            </property>
            <property name="statusTip">
-            <string>Amount of MWC coins to trade</string>
+            <string>Amount of MWC to trade</string>
            </property>
            <property name="maxLength">
             <number>32</number>
@@ -1198,6 +1198,26 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>control_desktop/MwcGroupBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButton</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

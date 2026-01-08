@@ -16,12 +16,23 @@
 
 namespace control {
 
-MwcLineEditNormal::MwcLineEditNormal(QWidget *parent) :
+MwcLineEdit::MwcLineEdit(QWidget *parent) :
     QLineEdit(parent)
 {}
 
+MwcLineEdit::MwcLineEdit(const QString & t, QWidget *parent ) :
+    QLineEdit(t, parent)
+{}
+
+MwcLineEdit::~MwcLineEdit() {}
+
+
+MwcLineEditNormal::MwcLineEditNormal(QWidget *parent) :
+    MwcLineEdit(parent)
+{}
+
 MwcLineEditNormal::MwcLineEditNormal(const QString & t, QWidget *parent ) :
-        QLineEdit(t, parent)
+        MwcLineEdit(t, parent)
 {}
 
 MwcLineEditNormal::~MwcLineEditNormal()

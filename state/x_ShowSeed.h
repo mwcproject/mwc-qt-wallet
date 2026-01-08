@@ -31,10 +31,7 @@ protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override {return false;}
     virtual QString getHelpDocName() override {return "seed.html";}
-
-
 private slots:
-    void recoverPassphrase( QVector<QString> seed );
 
 private:
 };

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 #include "listwithcolumns.h"
-#include <QHeaderView>
+#include "MwcHeaderView.h"
+#include "MwcScrollBar.h"
 #include <QApplication>
 #include <QTextEdit>
 
@@ -42,11 +43,10 @@ void ListWithColumns::setListLook() {
     // no sorting
     setSortingEnabled(false);
 
-    // Horizontal scrolling
-//    setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-//    setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    setVerticalScrollBar(new control::MwcScrollBar(Qt::Vertical, this));
+    setHorizontalScrollBar(new control::MwcScrollBar(Qt::Horizontal, this));
 
-
+    setVerticalHeader(new control::MwcHeaderView(Qt::Vertical, this));
     verticalHeader()->setVisible(false);
     // Decrease slightly horizontally size
     verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -54,6 +54,7 @@ void ListWithColumns::setListLook() {
     verticalHeader()->setDefaultSectionSize(ROW_HEIGHT);
     // Increase V size so
 
+    setHorizontalHeader(new control::MwcHeaderView(Qt::Horizontal, this));
     horizontalHeader()->setFixedHeight( ROW_HEIGHT );
 
 }

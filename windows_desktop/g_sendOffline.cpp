@@ -24,10 +24,11 @@
 
 namespace wnd {
 
-SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amount) :
+SendOffline::SendOffline(QWidget *parent, const QString & _selectedAccountName, const QString & _selectedAccountPath, int64_t _amount) :
     core::NavWnd(parent),
     ui(new Ui::SendOffline),
-    selectedAccount(_selectedAccount),
+    selectedAccountName(_selectedAccountName),
+    selectedAccountPath(_selectedAccountPath),
     amount(_amount)
 {
     ui->setupUi(this);
@@ -44,7 +45,7 @@ SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amo
     ui->contactNameLable->setText("");
     ui->contactNameLable->hide();
 
-    ui->fromAccount->setText("From account: " + selectedAccount );
+    ui->fromAccount->setText("From account: " + selectedAccountName );
     ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util->nano2one(QString::number(amount))) + " MWC" );
 }
 
@@ -68,12 +69,18 @@ void SendOffline::on_sendButton_clicked()
     util::TimeoutLockObject to("SendOffline");
 
     QString recipientWallet;
-        recipientWallet = ui->recipientAddress->text();
-        if ( !recipientWallet.isEmpty() && util->verifyAddress(recipientWallet) != "SP/Tor") {
-            control::MessageBox::messageText(this, "Unable to send", "Please specify valid recipient wallet Slatepack address");
-            ui->recipientAddress->setFocus();
-            return;
-        }
+    recipientWallet = ui->recipientAddress->text();
+    if (recipientWallet.isEmpty() && config->getGenerateProof()) {
+        control::MessageBox::messageText(this, "Unable to send", "Transaction proof is enabled. Please specify the recipient's Slatepack address.");
+        ui->recipientAddress->setFocus();
+        return;
+    }
+
+    if ( !recipientWallet.isEmpty() && util->verifyAddress(recipientWallet) != "SP/Tor") {
+        control::MessageBox::messageText(this, "Unable to send", "Please specify valid recipient wallet Slatepack address");
+        ui->recipientAddress->setFocus();
+        return;
+    }
 
     if ( !send->isNodeHealthy() ) {
         control::MessageBox::messageText(this, "Unable to send", "Your MWC Node, that wallet is connected to, is not ready.\n"
@@ -92,7 +99,7 @@ void SendOffline::on_sendButton_clicked()
         }
     }
 
-    if ( send->sendMwcOffline( selectedAccount, QString::number(amount), description, config->getSendLockOutput(), recipientWallet) )
+    if ( send->sendMwcOffline( selectedAccountName, selectedAccountPath, QString::number(amount), description, config->getSendLockOutput(), recipientWallet) )
         ui->progress->show();
 }
 

@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_tradedetails_w.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_tradedetails_w.h"
 #include "../bridge/wnd/swap_b.h"
 #include "../control_desktop/messagebox.h"
@@ -39,6 +42,9 @@ TradeDetails::TradeDetails(QWidget *parent, QString _swapId) :
     // Just want to match them.
     ui->executionPlan->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     ui->tradeJournal->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+    setVerticalScrollBar(new MwcScrollBar(Qt::Vertical, this));
+    setHorizontalScrollBar(new MwcScrollBar(Qt::Horizontal, this));
 
     swap->requestTradeDetails(swapId, "TradeDetails");
 }
@@ -69,6 +75,7 @@ void TradeDetails::updateData(const QVector<QString> & executionPlan,
         control::RichItem *itm = control::createMarkedItem(QString::number(i/3), ui->executionPlan, active, "",
                     control::LEFT_MARK_SIZE, control::LEFT_MARK_SIZE,
                     6, 8);
+        itm->setParent(ui->executionPlan);
 
         itm->hbox()
             .addWidget(control::createLabel(itm, false, past, active ? (currentAction.isEmpty() ? stage : currentAction) : stage) )
@@ -92,6 +99,7 @@ void TradeDetails::updateData(const QVector<QString> & executionPlan,
         control::RichItem *itm = control::createMarkedItem(QString::number(i/3), ui->executionPlan, false, "",
                                                            control::LEFT_MARK_SIZE, control::LEFT_MARK_SIZE,
                                                            6, 8);
+        itm->setParent(ui->executionPlan);
 
         itm->hbox()
                 .addWidget(control::createLabel(itm, true, false, message))
@@ -175,3 +183,4 @@ void TradeDetails::mouseDoubleClickEvent(QMouseEvent *event) {
 
 
 }
+#endif

@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_newswap3_w.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_newswap3_w.h"
 #include "../bridge/wnd/swap_b.h"
 #include "../bridge/util_b.h"
@@ -119,7 +122,7 @@ void NewSwap3::updateSwapReview() {
     reportStr += "Coins lock order: <b style=\"color:yellow;\">" + (swap->isLockMwcFirst() ? QString("I am locking MWC first") : (QString("Another party locking ") + secCur + " first")) + "</b>.</p>";
 
     reportStr += "<p>";
-    reportStr += "In case the trade is cancelled, the coins will be locked:<br>";
+    reportStr += "In case the trade is canceled, the coins will be locked:<br>";
     reportStr += "&emsp; &#9702; My <b style=\"color:yellow;\">MWC</b> will be locked for <b style=\"color:yellow;\">" + lockTime[0] + "</b>.<br>";
     reportStr += "&emsp; &#9702; Other party's <b style=\"color:yellow;\">"+secCur+"</b> will be locked for <b style=\"color:yellow;\">" + lockTime[1] + "</b>.</p>";
 
@@ -147,3 +150,4 @@ void NewSwap3::on_noteEdit_textEdited(const QString &text)
 }
 
 }
+#endif

@@ -17,15 +17,14 @@
 namespace control {
 
 MwcLineEditDlg::MwcLineEditDlg(QWidget *parent) :
-    QLineEdit(parent)
+    MwcLineEdit(parent)
 {}
 
 MwcLineEditDlg::MwcLineEditDlg(const QString & t, QWidget *parent ) :
-        QLineEdit(t, parent)
+        MwcLineEdit(t, parent)
 {}
 
 MwcLineEditDlg::~MwcLineEditDlg()
 {}
 
 }
-

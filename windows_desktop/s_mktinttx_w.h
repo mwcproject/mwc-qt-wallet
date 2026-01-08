@@ -15,6 +15,10 @@
 #ifndef S_MKTINTTX_W_H
 #define S_MKTINTTX_W_H
 
+#include "../features.h"
+
+#ifdef FEATURE_MKTPLACE
+
 #include "../core_desktop/navwnd.h"
 #include "../wallet/wallet.h"
 #include "../control_desktop/richbutton.h"
@@ -62,5 +66,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif // S_MKTINTTX_W_H

@@ -17,9 +17,14 @@
 //
 
 #include "v_viewoutputs_b.h"
+
+#include <QJsonArray>
+#include <QJsonDocument>
+
 #include "../BridgeManager.h"
 #include "../../state/v_ViewOutputs_s.h"
 #include "../../util/stringutils.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
@@ -39,46 +44,68 @@ ViewOutputs::~ViewOutputs() {
 
 // Switching to the progress window
 void ViewOutputs::startScanning(QString hashKey) {
+    logger::logInfo(logger::BRIDGE, "Call ViewOutputs::startScanning with hashKey=" + hashKey);
     lastViewingKey = hashKey;
     getState()->startScanning(hashKey);
 }
 
 void ViewOutputs::backFromOutputsView() {
+    logger::logInfo(logger::BRIDGE, "Call ViewOutputs::backFromOutputsView");
     getState()->backFromOutputsView();
 }
 
-void ViewOutputs::setSgnViewOutputs(const QVector<wallet::WalletOutput> & outputResult, int64_t total ) {
-    QVector<QString> outputs;
-    for (const wallet::WalletOutput & out : outputResult) {
-        outputs.push_back( out.toJson() );
+void ViewOutputs::setSgnViewOutputs(const wallet::ViewWallet & walletOutputs, int64_t height) {
+    QJsonArray outputs;
+
+    for (const wallet::ViewWalletOutputResult & o : walletOutputs.output_result) {
+
+        wallet::WalletOutput out = wallet::WalletOutput::create( o.commit,
+                                           QString::number(o.mmr_index),
+                                           QString::number(o.height),
+                                           o.lock_height>0 ? QString::number(o.lock_height) : "",
+                                           "Unspent",
+                                           o.is_coinbase,
+                                           QString::number(height - o.height),
+                                           o.value,
+                                           -1);
+
+        outputs.push_back(out.toJson());
     }
 
-    emit onSgnViewOutputs( lastViewingKey, outputs, util::zeroDbl2Dbl(util::nano2one(total)));
+    emit onSgnViewOutputs( lastViewingKey, outputs, util::zeroDbl2Dbl(util::nano2one( walletOutputs.total_balance)));
 }
 
 void ViewOutputs::generateOwnershipProofStart() {
+    logger::logInfo(logger::BRIDGE, "Call ViewOutputs::generateOwnershipProofStart");
     getState()->generateOwnershipProofStart();
 }
 
 void ViewOutputs::validateOwnershipProofStart() {
+    logger::logInfo(logger::BRIDGE, "Call ViewOutputs::validateOwnershipProofStart");
     getState()->validateOwnershipProofStart();
 }
 
 
 void ViewOutputs::back() {
+    logger::logInfo(logger::BRIDGE, "Call ViewOutputs::back");
     getState()->back();
 }
 
 void ViewOutputs::generate_proof(QString message, bool viewingKey, bool torAddress, bool mqsAddress) {
+    logger::logInfo(logger::BRIDGE, "Call ViewOutputs::generate_proof with message=" + message +
+        " viewingKey=" + QString::number(viewingKey) + " torAddress=" + QString::number(torAddress) +
+        " mqsAddress=" + QString::number(mqsAddress));
     getState()->generate_proof(message, viewingKey, torAddress, mqsAddress);
 }
 
 void ViewOutputs::validate_proof(QString proof) {
+    logger::logInfo(logger::BRIDGE, "Call ViewOutputs::validate_proof with proof=<hidden>");
     getState()->validate_proof(proof);
 }
 
 QString ViewOutputs::getLastViewViewingKey() {
-    return getState()->getLastViewViewingKey();
+    logger::logInfo(logger::BRIDGE, "Call ViewOutputs::getLastViewViewingKey");
+    return lastViewingKey;
 }
 
 }

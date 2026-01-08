@@ -17,6 +17,7 @@
 #include "../../state/state.h"
 #include "../../state/statemachine.h"
 #include "../../state/x_events.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 // Home state accessor
@@ -42,15 +43,18 @@ void Events::updateNonShownWarnings(bool hasNonShownWarns) {
 
 // Request is any new critical warnings arrived
 bool Events::hasNonShownWarnings() {
+    logger::logInfo(logger::BRIDGE, "Call Events::hasNonShownWarnings");
     return getEvents()->hasNonShownWarnings();
 }
 
 // Notify thet events window is closed. Last seen even waterwart will be updated
 void Events::eventsWndIsDeleted() {
+    logger::logInfo(logger::BRIDGE, "Call Events::eventsWndIsDeleted");
     return getEvents()->eventsWndIsDeleted();
 }
 
 QVector<QString> Events::getWalletNotificationMessages() {
+    logger::logInfo(logger::BRIDGE, "Call Events::getWalletNotificationMessages");
     QVector<notify::NotificationMessage> messages = getEvents()->getWalletNotificationMessages();
     QVector<QString> res;
     for (auto & msg : messages) {

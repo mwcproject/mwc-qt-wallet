@@ -18,6 +18,7 @@
 #include "../core/global.h"
 #include <QCoreApplication>
 #include "../core/WndManager.h"
+#include "../util/Log.h"
 
 namespace state {
 
@@ -38,11 +39,13 @@ NextStateRespond SelectMode::execute() {
 }
 
 config::WALLET_RUN_MODE SelectMode::getWalletRunMode() {
+    logger::logInfo(logger::STATE, "Call SelectMode::getWalletRunMode");
     return config::getWalletRunMode();
 }
 
 // Will require restart
 void SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE newRunMode ) {
+    logger::logInfo(logger::STATE, "Call SelectMode::updateWalletRunMode with newRunMode=" + QString::number(static_cast<int>(newRunMode)));
     if (config::getWalletRunMode() == newRunMode) {
         core::getWndManager()->messageTextDlg("Running Mode", "You are already running wallet in selected mode. Nothing need to done." );
         return;

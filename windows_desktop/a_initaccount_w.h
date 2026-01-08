@@ -43,7 +43,6 @@ private slots:
     void on_submitButton_clicked();
 
     void on_password2Edit_textChanged(const QString &arg1);
-    void on_runOnlineNodeButton_clicked();
     void on_changeDirButton_clicked();
 
     void on_cancelButton_clicked();

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "ui.h"
-#include "../core/HodlStatus.h"
 #include "../core/appcontext.h"
 #include "../core/global.h"
 #include "../core/WndManager.h"
@@ -33,14 +32,14 @@ static int calcSubstituteIndex( QVector<wallet::WalletOutput> & resultBucket, co
     double bestWeightedGain = 0.0;
     int bestIndex = -1;
 
-    const double testWeightedValue = testOutput.getWeightedValue();
+    const int64_t testWeightedValue = testOutput.valueNano;
 
     for (int k=0;k<resultBucket.size();k++) {
         const auto & out = resultBucket[k];
         if (out.valueNano - testOutput.valueNano > change)
             continue;
 
-        double weightedGain = out.getWeightedValue() - testWeightedValue;
+        double weightedGain = out.valueNano - testWeightedValue;
         if (weightedGain>bestWeightedGain) {
             bestWeightedGain = weightedGain;
             bestIndex = k;
@@ -74,7 +73,7 @@ static double optimizeBucket( QVector<wallet::WalletOutput> & resultBucket, cons
             while (idx>=0) {
                 wallet::WalletOutput delOutput = resultBucket[idx];
                 resultBucket[idx] = out;
-                Q_ASSERT( out.getWeightedValue() < delOutput.getWeightedValue() );
+                Q_ASSERT( out.valueNano < delOutput.valueNano );
                 change -= delOutput.valueNano;
                 change += out.valueNano;
                 Q_ASSERT(change>=0);
@@ -92,7 +91,7 @@ static double optimizeBucket( QVector<wallet::WalletOutput> & resultBucket, cons
 
     double resultWeightedSum = 0.0;
     for (const auto & out: resultBucket)
-        resultWeightedSum += out.getWeightedValue();
+        resultWeightedSum += out.valueNano;
 
     return resultWeightedSum;
 }
@@ -182,7 +181,7 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
 
 // in: nanoCoins < 0 - ALL
 // out: resultOutputs - what we want include into transaction. If
-void getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
+void getOutputsToSend2( const QString & accountPath, int outputsNumber, int64_t nanoCoins,
         wallet::Wallet * wallet,
         core::AppContext * appContext,
         QStringList & resultOutputs, uint64_t* txnFee ) {
@@ -199,7 +198,7 @@ void getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     //if (!appContext->isLockOutputEnabled())
     //    return true; // let mwc713 wallet handle it
 
-    QVector<wallet::WalletOutput> outputs = wallet->getwalletOutputs().value(accountName);
+    QVector<wallet::WalletOutput> outputs = wallet->getOutputs(accountPath, false);
 
     //QVector<wallet::WalletOutput> freeOuts;
     QMultiMap<int64_t, wallet::WalletOutput> freeOuts;
@@ -223,7 +222,6 @@ void getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
         allOutputs.push_back(o.outputCommitment);
         totalNanoCoins += o.valueNano;
-        o.weight = 1.0;
         freeOuts.insert(o.valueNano, o);  // inserts by value
     }
 
@@ -236,10 +234,10 @@ void getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 // Populates a multimap with outputs available for spending using the output's value as the key.
 //
 static void
-findSpendableOutputs(const QString& accountName, const wallet::Wallet* wallet, core::AppContext* appContext,
+findSpendableOutputs(const QString& accountPath, wallet::Wallet* wallet, core::AppContext* appContext,
                      QMultiMap<int64_t, wallet::WalletOutput>& spendableOutputs) {
 
-    QVector<wallet::WalletOutput>  outputs = wallet->getwalletOutputs().value(accountName);
+    QVector<wallet::WalletOutput>  outputs = wallet->getOutputs(accountPath, false);
     for ( wallet::WalletOutput o : outputs) {
         if ( o.status != "Unspent" ) // Interested only in Unspent outputs
             continue;
@@ -421,7 +419,7 @@ uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, 
 //     txnOutputList - list of output commitments to be used in transaction (from getOutputsToSend)
 //     changeOutputs - number of outputs to use for sender change outputs
 //
-uint64_t getTxnFee(const QString& accountName, int64_t amount, wallet::Wallet* wallet,
+uint64_t getTxnFee2(const QString& accountPath, int64_t amount, wallet::Wallet* wallet,
                    core::AppContext* appContext, uint64_t changeOutputs,
                    QStringList& txnOutputList) {
     // we should not have been called if the txn outputs have already been found
@@ -430,7 +428,7 @@ uint64_t getTxnFee(const QString& accountName, int64_t amount, wallet::Wallet* w
 
     uint64_t txnFee = 0;
     QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs;
-    findSpendableOutputs(accountName, wallet, appContext, spendableOutputs);
+    findSpendableOutputs(accountPath, wallet, appContext, spendableOutputs);
 
     if (spendableOutputs.size() > 0) {
         txnFee = getTxnFeeFromSpendableOutputs(amount, spendableOutputs, changeOutputs, 0, txnOutputList);
@@ -463,11 +461,11 @@ QString txnFeeToString(uint64_t nanoTxnFee) {
     return fee;
 }
 
-QString getAllSpendableAmount(const QString& accountName, wallet::Wallet* wallet, core::AppContext* appContext) {
+QString getAllSpendableAmount2(const QString& accountPath, wallet::Wallet* wallet, core::AppContext* appContext) {
     QString allSpendableAmount = "";
 
     QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs;
-    findSpendableOutputs(accountName, wallet, appContext, spendableOutputs);
+    findSpendableOutputs(accountPath, wallet, appContext, spendableOutputs);
     int64_t numSpendableOutputs = spendableOutputs.size();
     if (numSpendableOutputs > 0) {
         int64_t totalSpendableCoins = getTotalCoinsFromMap(spendableOutputs);

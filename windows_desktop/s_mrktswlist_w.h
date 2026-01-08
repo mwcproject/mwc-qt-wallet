@@ -15,6 +15,10 @@
 #ifndef S_MRKTSWLIST_W_H
 #define S_MRKTSWLIST_W_H
 
+#include "../features.h"
+
+#ifdef FEATURE_SWAP
+
 #include "../core_desktop/navwnd.h"
 #include "../control_desktop/richbutton.h"
 #include "../state/s_mktswap.h"
@@ -121,5 +125,5 @@ private:
 };
 
 }
-
+#endif
 #endif // S_MRKTSWLIST_W_H

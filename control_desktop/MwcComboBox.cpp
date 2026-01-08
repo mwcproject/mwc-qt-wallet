@@ -13,20 +13,30 @@
 // limitations under the License.
 
 #include "MwcComboBox.h"
+#include "MwcListView.h"
+#include <QTimer>
 
 namespace control {
 
-MwcComboBox::MwcComboBox(QWidget *parent) : QComboBox(parent) {}
+MwcComboBox::MwcComboBox(QWidget *parent) : QComboBox(parent) {
+}
 
 void MwcComboBox::showPopup() {
+
+    if (!popupSet) {
+        setView( new MwcListView(this) );
+        popupSet = true;
+    }
+
     QComboBox::showPopup();
+
 #ifdef Q_OS_WIN
-   // WIndows doesn;t need to udjust the popup, it is already works great
-   //popup->move(popup->x() + 10, popup->y());
+    // WIndows doesn;t need to udjust the popup, it is already works great
+    //popup->move(popup->x() + 10, popup->y());
 #else
-   QWidget *popup = this->findChild<QFrame *>();
+   // QWidget *popup = this->findChild<QFrame *>();
    // Using pixels. Will work for used styles that defined in pixels too
-   popup->move(popup->x() + 10, popup->y() + height());
+   // popup->move(popup->x() + 10, popup->y()/* + height()*/);
 #endif
 }
 

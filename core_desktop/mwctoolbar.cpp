@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "../features.h"
 #include "mwctoolbar.h"
 #include "ui_mwctoolbar.h"
 #include <QPainter>
@@ -24,15 +25,15 @@
 #include "../bridge/corewindow_b.h"
 #include "../core/global.h"
 #include "../control_desktop/messagebox.h"
+#include "core/WalletApp.h"
 
 using namespace bridge;
 
 namespace core {
 
 MwcToolbar::MwcToolbar(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::MwcToolbar)
-{
+    control::MwcWidget(parent),
+    ui(new Ui::MwcToolbar) {
     ui->setupUi(this);
 
     config = new Config(this);
@@ -41,15 +42,30 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
     stateMachine = new StateMachine(this);
     coreWindow = new CoreWindow(this);
 
-    if (config->isColdWallet() || !mwc::isSwapActive()) {
+    bool showSwap = false;
+    bool showMktplace = false;
+
+    if (!config->isColdWallet() && mwc::isSwapActive()) {
+#ifdef FEATURE_SWAP
+        showSwap = true;
+#endif
+#ifdef FEATURE_MKTPLACE
+        showMktplace = true;
+#endif
+    }
+
+    if (!showSwap) {
         ui->swapToolButton->hide();
+    }
+
+    if (!showMktplace) {
         ui->swapMarketplaceToolButton->hide();
     }
 
     QObject::connect( wallet, &Wallet::sgnWalletBalanceUpdated,
                       this, &MwcToolbar::onWalletBalanceUpdated, Qt::QueuedConnection );
-    QObject::connect( wallet, &Wallet::sgnLoginResult,
-                      this, &MwcToolbar::onLoginResult, Qt::QueuedConnection );
+    QObject::connect( wallet, &Wallet::sgnLogin,
+                      this, &MwcToolbar::onLogin, Qt::QueuedConnection );
     QObject::connect( wallet, &Wallet::sgnLogout,
                       this, &MwcToolbar::onLogout, Qt::QueuedConnection );
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
@@ -69,14 +85,28 @@ MwcToolbar::~MwcToolbar()
     delete ui;
 }
 
+static void checkButton(QToolButton *sendToolButton, bool checked) {
+    if (checked) {
+        sendToolButton->setChecked(true);
+    }
+    else {
+        sendToolButton->setChecked(false);
+        sendToolButton->clearFocus();
+    }
+}
+
 // state::STATE state
 void MwcToolbar::onUpdateButtonsState( int state ) {
-    ui->sendToolButton->setChecked( state==state::SEND );
-    ui->receiveToolButton->setChecked( state==state::RECEIVE_COINS );
-    ui->transactionToolButton->setChecked( state==state::TRANSACTIONS );
-    ui->swapToolButton->setChecked( state==state::SWAP );
-    ui->swapMarketplaceToolButton->setChecked( state==state::SWAP_MKT );
-    ui->finalizeToolButton->setChecked( state==state::FINALIZE );
+    checkButton( ui->sendToolButton, state==state::SEND );
+    checkButton( ui->receiveToolButton, state==state::RECEIVE_COINS );
+    checkButton( ui->transactionToolButton, state==state::TRANSACTIONS );
+#ifdef FEATURE_SWAP
+    checkButton( ui->swapToolButton, state==state::SWAP );
+#endif
+#ifdef FEATURE_MKTPLACE
+    checkButton( ui->swapMarketplaceToolButton, state==state::SWAP_MKT );
+#endif
+    checkButton( ui->finalizeToolButton, state==state::FINALIZE );
 }
 
 void MwcToolbar::paintEvent(QPaintEvent *)
@@ -110,9 +140,20 @@ void MwcToolbar::on_transactionToolButton_clicked()
 // Account info is updated
 void MwcToolbar::onWalletBalanceUpdated() {
     qDebug() << "get onWalletBalanceUpdated. Updating the balance";
-    ui->totalMwc->setText( wallet->getTotalMwcAmount() + " MWC" );
 
-    QString unconfirmed = wallet->getUnconfirmedAmount();
+    QVector<QString> amounts = wallet->getTotalAmount();
+
+    QString totalHtml = QString(R"(
+            <span style="font-size:20px;">%1</span>
+            <span style="font-size:15px;">%2</span>)")
+    .arg(amounts[0], "." + amounts[1]);
+
+    ui->totalMwc->setTextFormat(Qt::RichText);
+    ui->totalMwc->setText(totalHtml);
+
+    ui->mwc->setText("MWC");
+
+    QString unconfirmed = amounts[2];
     if (unconfirmed.isEmpty()) {
         ui->mwcUnconfFrame->hide();
     }
@@ -122,30 +163,38 @@ void MwcToolbar::onWalletBalanceUpdated() {
     }
 }
 
-void MwcToolbar::onLoginResult(bool ok) {
-    Q_UNUSED(ok)
+void MwcToolbar::onLogin() {
     ui->totalMwc->setText("");
+    ui->mwc->setText("");
 }
 void MwcToolbar::onLogout() {
     ui->totalMwc->setText("");
+    ui->mwc->setText("");
 }
 
 void MwcToolbar::on_swapToolButton_clicked()
 {
     if (mwc::isSwapActive()) {
+#ifdef FEATURE_SWAP
         stateMachine->setActionWindow(state::STATE::SWAP);
+#endif
     }
 }
 
 void MwcToolbar::on_swapMarketplaceToolButton_clicked()
 {
     if (mwc::isSwapActive()) {
+#ifdef FEATURE_MKTPLACE
         stateMachine->setActionWindow(state::STATE::SWAP_MKT);
+#endif
     }
 }
 
 void MwcToolbar::timerEvent(QTimerEvent *event)
 {
+    if (core::WalletApp::isExiting())
+        return;
+
     static int counter = 0;
     static int64_t lastNoGasErrorEvent = 0;
 

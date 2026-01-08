@@ -16,7 +16,8 @@
 #define MWC_QT_WALLET_G_SEND_B_H
 
 #include <QObject>
-#include "../../wallet/wallet.h"
+
+#include "wallet/wallet_objs.h"
 
 namespace bridge {
 
@@ -41,10 +42,10 @@ public:
     //   0 - ok
     //   1 - account error
     //   2 - amount error
-    Q_INVOKABLE int initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount, bool gotoNextPage );
+    Q_INVOKABLE int initialSendSelection( int sendSelectedMethod, QString accountPath, QString sendAmount, bool gotoNextPage );
     // Data that was collected by initialSendSelection. Can be used if gotoNextPage is false
     Q_INVOKABLE int64_t getTmpAmount();
-    Q_INVOKABLE QString getTmpAccountName();
+    Q_INVOKABLE QString getTmpAccountPath();
 
 
     // Check if Node is healthy to do send.
@@ -53,15 +54,15 @@ public:
     // Handle whole workflow to send offline
     // apiSecret - is not needed. Pass empty String
     // return true if some long process was started.
-    Q_INVOKABLE bool sendMwcOffline( QString account, QString amountNano, QString message, bool isLockLater, QString slatepackRecipientAddress);
+    Q_INVOKABLE bool sendMwcOffline( QString account, QString accountPath, QString amountNano, QString message, bool isLockLater, QString slatepackRecipientAddress);
 
     // Handle whole workflow to send online
     // return true if some long process was started.
-    Q_INVOKABLE bool sendMwcOnline( QString account, QString amountNano, QString address, QString apiSecret, QString message);
+    Q_INVOKABLE bool sendMwcOnline( QString account, QString accountPath, QString amountNano, QString address, QString message);
 
     // Return string representing spendable amount for account minus transaction fee
     // Returns "All" if the amount cannot be calculated
-    Q_INVOKABLE QString getSpendAllAmount( QString account);
+    Q_INVOKABLE QString getSpendAllAmount( QString accountPath);
 
 signals:
     void sgnShowSendResult( bool success, QString message );

@@ -41,8 +41,6 @@ protected:
     virtual void panelWndStarted() override;
 
 private slots:
-    void onSgnShowSeedData(QVector<QString> seed);
-
     void on_submitButton_clicked();
 private:
     Ui::NewSeed *ui;

@@ -18,6 +18,7 @@
 #include <QQmlApplicationEngine>
 #include <QMessageBox>
 #include "../state/state.h"
+#include "../util/Log.h"
 #include <QJsonDocument>
 #include <QStandardPaths>
 #include <QDir>
@@ -46,6 +47,8 @@ void MobileWndManager::init(QQmlApplicationEngine * _engine) {
 
 
 void MobileWndManager::messageTextDlg( QString title, QString message, double widthScale) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::messageTextDlg with title=" + title +
+        " message=" + message + " widthScale=" + QString::number(widthScale));
     if (engine== nullptr) {
         Q_ASSERT(false); // early crash, not much what we can do. May be do some logs (message is an error description)?
         return;
@@ -60,6 +63,8 @@ void MobileWndManager::messageTextDlg( QString title, QString message, double wi
 }
 
 void MobileWndManager::messageHtmlDlg( QString title, QString message, double widthScale)  {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::messageHtmlDlg with title=" + title +
+        " message=" + message + " widthScale=" + QString::number(widthScale));
     Q_UNUSED(widthScale)
 
     QVariant retValue;
@@ -71,6 +76,8 @@ void MobileWndManager::messageHtmlDlg( QString title, QString message, double wi
 WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                                                            QString btn1Tooltip, QString btn2Tooltip,
                                                            bool default1, bool default2, double widthScale, int *ttl_blocks) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::questionTextDlg with title=" + title +
+        " message=" + message + " btn1=" + btn1 + " btn2=" + btn2);
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
     Q_UNUSED(widthScale)
@@ -103,6 +110,8 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
 WndManager::RETURN_CODE MobileWndManager::questionHTMLDlg( QString title, QString message, QString btn1, QString btn2,
                                                            QString btn1Tooltip, QString btn2Tooltip,
                                                            bool default1, bool default2, double widthScale )  {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::questionHTMLDlg with title=" + title +
+        " message=" + message + " btn1=" + btn1 + " btn2=" + btn2);
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
     Q_UNUSED(title)
@@ -122,6 +131,8 @@ WndManager::RETURN_CODE MobileWndManager::questionHTMLDlg( QString title, QStrin
 WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                                                            QString btn1Tooltip, QString btn2Tooltip,
                                                            bool default1, bool default2, double widthScale, QString & passwordHash, WndManager::RETURN_CODE blockButton, int *ttl_blocks)  {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::questionTextDlg with title=" + title +
+        " message=" + message + " btn1=" + btn1 + " btn2=" + btn2 + " passwordHash=<hidden>");
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
     Q_UNUSED(default1)
@@ -146,6 +157,8 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
 
 // QFileDialog::getSaveFileName call
 QString MobileWndManager::getSaveFileName(const QString &caption, const QString &dir, const QString &filter) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::getSaveFileName with caption=" + caption +
+        " dir=" + dir + " filter=" + filter);
     Q_UNUSED(caption)
     Q_UNUSED(dir)
     Q_UNUSED(filter)
@@ -158,6 +171,8 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
 // QFileDialog::getLoadFileName call
 // Mobile migth never need that.
 QString MobileWndManager::getOpenFileName(const QString &caption, const QString &dir, const QString &filter) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::getOpenFileName with caption=" + caption +
+        " dir=" + dir + " filter=" + filter);
     Q_UNUSED(caption)
     Q_UNUSED(dir)
     Q_UNUSED(filter)
@@ -169,6 +184,8 @@ QString MobileWndManager::getOpenFileName(const QString &caption, const QString 
 
 // Ask for confirmation
 bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::sendConfirmationDlg with title=" + title +
+        " message=" + message + " passwordHash=<hidden>");
     Q_UNUSED(widthScale)
 
     if(mainWindow) {
@@ -186,20 +203,25 @@ bool MobileWndManager::sendConfirmationDlg( QString title, QString message, doub
 
 // Stopping wallet message
 void MobileWndManager::showWalletStoppingMessage(int taskTimeout) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::showWalletStoppingMessage with taskTimeout=" + QString::number(taskTimeout));
     QVariant retValue;
     QMetaObject::invokeMethod(mainWindow, "openWalletStoppingMessageDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, taskTimeout));
 }
 
 void MobileWndManager::hideWalletStoppingMessage() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::hideWalletStoppingMessage");
     QVariant retValue;
     QMetaObject::invokeMethod(mainWindow, "closeWalletStoppingMessageDlg", Q_RETURN_ARG(QVariant, retValue));
 }
 
 //---------------- Pages ------------------------
 void MobileWndManager::pageInitFirstTime() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageInitFirstTime");
     //Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageInputPassword with pageTitle=" + pageTitle +
+        " lockMode=" + QString::number(lockMode));
     Q_UNUSED(pageTitle)
 
     QJsonObject obj;
@@ -208,17 +230,22 @@ void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
     mainWindow->setProperty("currentState", state::STATE::INPUT_PASSWORD);
 }
 void MobileWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageInitAccount with path=" + path +
+        " restoredFromSeed=" + QString::number(restoredFromSeed));
     Q_UNUSED(path) // mobile doesn't need it
     Q_UNUSED(restoredFromSeed)  // mobile doesn't need it
     //Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageEnterSeed() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageEnterSeed");
     QJsonObject obj;
     obj["currentStep"] = 3;
     QVariant retValue;
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageNewSeed with pageTitle=" + pageTitle +
+        " hideSubmitButton=" + QString::number(hideSubmitButton));
     Q_UNUSED(pageTitle)
 
     QJsonObject obj;
@@ -233,6 +260,7 @@ void MobileWndManager::pageNewSeed(QString pageTitle, QVector<QString> seed, boo
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageNewSeedTest(int wordIndex) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageNewSeedTest with wordIndex=" + QString::number(wordIndex));
     QJsonObject obj;
     obj["currentStep"] = 2;
     obj["wordIndex"] = wordIndex;
@@ -240,6 +268,9 @@ void MobileWndManager::pageNewSeedTest(int wordIndex) {
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageProgressWnd with pageTitle=" + pageTitle +
+        " callerId=" + callerId + " header=" + header + " msgProgress=" + msgProgress + " msgPlus=" + msgPlus +
+        " cancellable=" + QString::number(cancellable));
     Q_UNUSED(cancellable)
 
     if (pageTitle.contains("Re-sync")) {
@@ -255,10 +286,13 @@ void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QStr
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageOutputs() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageOutputs");
 }
 void MobileWndManager::pageFileTransactionReceive(QString pageTitle,
                                      const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
                                      int nodeHeight) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageFileTransactionReceive with pageTitle=" + pageTitle +
+        " <fileNameOrSlatepack> transInfo.transactionId=" + transInfo.transactionId + " nodeHeight=" + QString::number(nodeHeight));
     Q_UNUSED(pageTitle)
 
     QJsonObject obj;
@@ -274,6 +308,9 @@ void MobileWndManager::pageFileTransactionReceive(QString pageTitle,
 void MobileWndManager::pageFileTransactionFinalize(QString pageTitle,
                                            const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
                                            int nodeHeight) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageFileTransactionFinalize with pageTitle=" + pageTitle +
+        " fileNameOrSlatepack=<hidden> transInfo.transactionId=" + transInfo.transactionId +
+        " nodeHeight=" + QString::number(nodeHeight));
     Q_UNUSED(pageTitle)
     QJsonObject obj;
     obj["fileNameOrSlatepack"] = fileNameOrSlatepack;
@@ -288,21 +325,27 @@ void MobileWndManager::pageFileTransactionFinalize(QString pageTitle,
 }
 
 void MobileWndManager::pageRecieve() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageRecieve");
     mainWindow->setProperty("currentState", state::STATE::RECEIVE_COINS);
     mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageListening() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageListening");
 //    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageFinalize() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageFinalize");
     mainWindow->setProperty("currentState", state::STATE::FINALIZE);
     mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageSendStarting() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendStarting");
     mainWindow->setProperty("currentState", state::STATE::SEND);
     mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount ) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendOnline with selectedAccount=" + selectedAccount +
+        " amount=" + QString::number(amount));
     QJsonObject obj;
     obj["isSendOnline"] = true;
     obj["selectedAccount"] = selectedAccount;
@@ -310,6 +353,7 @@ void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount )
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 void MobileWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendFile with selectedAccount=" + selectedAccount + " amount=" + QString::number(amount));
     QJsonObject obj;
     obj["isSendOnline"] = false;
     obj["selectedAccount"] = selectedAccount;
@@ -319,6 +363,8 @@ void MobileWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
 }
 
 void MobileWndManager::pageSendSlatepack( QString selectedAccount, int64_t amount ) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendSlatepack with selectedAccount=" + selectedAccount +
+        " amount=" + QString::number(amount));
     QJsonObject obj;
     obj["isSendOnline"] = false;
     obj["selectedAccount"] = selectedAccount;
@@ -328,12 +374,15 @@ void MobileWndManager::pageSendSlatepack( QString selectedAccount, int64_t amoun
 }
 
 void MobileWndManager::pageTransactions() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageTransactions");
     mainWindow->setProperty("currentState", state::STATE::TRANSACTIONS);
 }
 
 // slatepack - slatepack string value to show.
 // backStateId - state ID of the caller. On 'back' will switch to this state Id
 void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageShowSlatepack with <slatepack> backStateId=" + QString::number(backStateId) +
+        " txExtension=" + txExtension + " enableFinalize=" + QString::number(enableFinalize));
     QJsonObject obj;
     obj["slatepack"] = slatepack;
     obj["backStateId"] = backStateId;
@@ -344,37 +393,49 @@ void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QSt
 
 
 void MobileWndManager::pageAccounts() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageAccounts");
 }
 void MobileWndManager::pageAccountTransfer() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageAccountTransfer");
 }
 void MobileWndManager::pageNodeInfo() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageNodeInfo");
 }
 void MobileWndManager::pageContacts() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageContacts");
 }
 void MobileWndManager::pageEvents() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageEvents");
 }
 void MobileWndManager::pageWalletConfig() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageWalletConfig");
 }
 void MobileWndManager::pageNodeConfig() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageNodeConfig");
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageSelectMode() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSelectMode");
     Q_ASSERT(false); // implement me
 }
 
 void MobileWndManager::pageWalletHome() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageWalletHome");
     mainWindow->setProperty("currentState", state::STATE::WALLET_HOME);
 }
 
 void MobileWndManager::pageWalletSettings() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageWalletSettings");
     mainWindow->setProperty("currentState", state::STATE::WALLET_SETTINGS);
 }
 
 void MobileWndManager::pageAccountOptions() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageAccountOptions");
     mainWindow->setProperty("currentState", state::STATE::ACCOUNT_OPTIONS);
 }
 
 void MobileWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSwapList with selectIncoming=" + QString::number(selectIncoming) + " selectOutgoing=" + QString::number(selectOutgoing) + " selectBackup=" + QString::number(selectBackup) + " selectEthWallet=" + QString::number(selectEthWallet));
     Q_UNUSED(selectIncoming)
     Q_UNUSED(selectOutgoing)
     Q_UNUSED(selectBackup)
@@ -383,42 +444,51 @@ void MobileWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bo
 }
 
 void MobileWndManager::pageSwapNew1() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSwapNew1");
     Q_ASSERT(false); // implement me
 }
 
 void MobileWndManager::pageSwapNew2() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSwapNew2");
     Q_ASSERT(false); // implement me
 }
 
 void MobileWndManager::pageSwapNew3() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSwapNew3");
     Q_ASSERT(false); // implement me
 }
 
 void MobileWndManager::pageSwapEdit(QString swapId, QString stateCmd) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSwapEdit with swapId=" + swapId + " stateCmd=" + stateCmd);
     Q_UNUSED(swapId)
     Q_UNUSED(stateCmd)
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageSwapTradeDetails(QString swapId) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSwapTradeDetails with swapId=" + swapId);
     Q_UNUSED(swapId)
     Q_ASSERT(false); // implement me
 }
 
 void MobileWndManager::pageMarketplace(bool selectMyOffers, bool selectFee) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageMarketplace with selectMyOffers=" + QString::number(selectMyOffers) + " selectFee=" + QString::number(selectFee));
     Q_UNUSED(selectMyOffers)
     Q_UNUSED(selectFee)
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageNewUpdateOffer(QString myMsgId) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageNewUpdateOffer with myMsgId=" + myMsgId);
     Q_UNUSED(myMsgId)
     Q_ASSERT(false); // implement me
 }
 
 void MobileWndManager::showSwapBackupDlg() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::showSwapBackupDlg");
     Q_ASSERT(false); // implement me
 }
 
 void MobileWndManager::pageTransactionFee() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageTransactionFee");
     Q_ASSERT(false); // implement me
 }
 

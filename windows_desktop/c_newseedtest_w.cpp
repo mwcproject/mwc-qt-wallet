@@ -22,6 +22,7 @@
 #include "../util_desktop/widgetutils.h"
 #include "../bridge/util_b.h"
 #include "../bridge/wnd/c_newseed_b.h"
+#include "control_desktop/MwcListView.h"
 
 namespace wnd {
 
@@ -52,6 +53,8 @@ NewSeedTest::NewSeedTest(QWidget *parent, int wordNumber) :
         completer->setCompletionMode( QCompleter::PopupCompletion );
         completer->setModel( m );
         completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+        control::MwcListView * list = new control::MwcListView(this);
+        completer->setPopup( list );
 
         ui->wordEdit->setCompleter(completer);
     }

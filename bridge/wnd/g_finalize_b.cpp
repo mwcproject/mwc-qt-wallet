@@ -16,10 +16,13 @@
 #include "g_finalize_b.h"
 #include "../../state/state.h"
 #include "../../state/g_Finalize.h"
+#include "../../state/u_nodeinfo.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
 static state::Finalize * getState() { return (state::Finalize *) state::getState(state::STATE::FINALIZE); }
+static state::NodeInfo * getNodeInfo() { return (state::NodeInfo *) state::getState(state::STATE::NODE_INFO); }
 
 Finalize::Finalize(QObject * parent) :
         QObject(parent)
@@ -35,34 +38,30 @@ void Finalize::hideProgress() {
     emit sgnHideProgress();
 }
 
-// Start Processing file slate.
-void Finalize::uploadFileTransaction(QString uriFileName) {
-    getState()->uploadFileTransaction(uriFileName);
-}
-
-void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender ) {
-    getState()->uploadSlatepackTransaction( slatepack, slateJson, sender );
+void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender, bool switch2nextPage ) {
+    logger::logInfo(logger::BRIDGE, "Call Finalize::uploadSlatepackTransaction with <slatepack> <slateJson> sender=" + sender);
+    getState()->uploadSlatepackTransaction( slatepack, slateJson, sender, switch2nextPage );
 }
 
 // Check if the node healthy enough to do finalization.
 bool Finalize::isNodeHealthy() {
-    return getState()->isNodeHealthy();
+    logger::logInfo(logger::BRIDGE, "Call Finalize::isNodeHealthy");
+    return getNodeInfo()->isNodeHealthy();
 }
 
 bool Finalize::needResultTxFileName() {
+    logger::logInfo(logger::BRIDGE, "Call Finalize::needResultTxFileName");
     return getState()->needResultTxFileName();
 }
 
-// Files transaction page, continue with a file
-void Finalize::finalizeFile(QString fileName, QString resultTxFileName, bool fluff) {
-    getState()->finalizeFile(fileName, resultTxFileName, fluff);
-}
 // Files transaction page, continue with a Slatepack
-void Finalize::finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
-    getState()->finalizeSlatepack(slatepack, txUuid, resultTxFileName, fluff);
+void Finalize::finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff, int backStateId) {
+    logger::logInfo(logger::BRIDGE, "Call Finalize::finalizeSlatepack with <slatepack> txUuid=" + txUuid + " resultTxFileName=" + resultTxFileName + " fluff=" + QString(fluff ? "true" : "false"));
+    getState()->finalizeSlatepack(slatepack, txUuid, resultTxFileName, fluff, backStateId);
 }
 
 void Finalize::cancelFileFinalization() {
+    logger::logInfo(logger::BRIDGE, "Call Finalize::cancelFileFinalization");
     getState()->ftBack();
 }
 

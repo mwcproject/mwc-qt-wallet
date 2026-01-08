@@ -15,6 +15,7 @@
 #ifndef MWC_QT_WALLET_DESKTOPWNDMANAGER_H
 #define MWC_QT_WALLET_DESKTOPWNDMANAGER_H
 
+#include "../features.h"
 #include "../core/WndManager.h"
 
 namespace core {
@@ -51,12 +52,8 @@ public:
     virtual QString getOpenFileName(const QString &caption, const QString &dir, const QString &filter) override;
 
     // Ask for confirmation
-    virtual bool sendConfirmationSlatepackDlg( QString title, QString messageBody, double widthScale, int inputsNum, int * ttl, QString passwordHash ) override;
-    virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, int inputsNum, QString passwordHash ) override;
-
-    // Stopping wallet message
-    virtual void showWalletStoppingMessage(int taskTimeout) override;
-    virtual void hideWalletStoppingMessage() override;
+    virtual bool sendConfirmationSlatepackDlg( QString title, QString messageBody, double widthScale, int inputsNum, int * ttl ) override;
+    virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, int inputsNum ) override;
 
     //---------------- Pages ------------------------
     virtual void pageInitFirstTime() override;
@@ -78,12 +75,12 @@ public:
     virtual void pageListening() override;
     virtual void pageFinalize() override;
     virtual void pageSendStarting() override;
-    virtual void pageSendOnline( QString selectedAccount, int64_t amount ) override;
-    virtual void pageSendSlatepack( QString selectedAccount, int64_t amount ) override;
+    virtual void pageSendOnline( QString selectedAccountName, QString selectedAccountPath, int64_t amount ) override;
+    virtual void pageSendSlatepack( QString selectedAccountName, QString selectedAccountPath, int64_t amount ) override;
     virtual void pageTransactions() override;
     // slatepack - slatepack string value to show.
     // backStateId - state ID of the caller. On 'back' will switch to this state Id
-    virtual void pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) override;
+    virtual void pageShowSlatepack(QString slatepack, QString tx_uuid, int backStateId, QString txExtension, bool enableFinalize) override;
 
     virtual void pageAccounts() override;
     virtual void pageAccountTransfer() override;
@@ -100,26 +97,31 @@ public:
     virtual void pageAccountOptions() override;
 
     // Swap pages
+#ifdef FEATURE_SWAP
     virtual void pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) override;
     virtual void pageSwapNew1() override;
     virtual void pageSwapNew2() override;
     virtual void pageSwapNew3() override;
     virtual void pageSwapEdit(QString swapId, QString stateCmd) override;
     virtual void pageSwapTradeDetails(QString swapId) override;
+#endif
 
     // Swap marketplace
+#ifdef FEATURE_MKTPLACE
     virtual void pageMarketplace(bool selectMyOffers, bool selectFees) override;
     virtual void pageNewUpdateOffer(QString myMsgId) override;
     virtual void showSwapBackupDlg() override;
     virtual void pageTransactionFee() override;
+#endif
 
     // Show Keys view pages
     virtual void pageViewHash()  override;
     virtual void pageViewAccounts() override;
     virtual void pageGenerateOwnershipInput() override;
-    virtual void pageGenerateOwnershipResult() override;
+    virtual void pageGenerateOwnershipResult(const QString & proof) override;
     virtual void pageValidateOwnershipInput() override;
-    virtual void pageValidateOwnershipResult() override;
+    virtual void pageValidateOwnershipResult(const QString & network, const QString & message, const QString & viewingKey,
+                        const QString & torAddress, const QString & mqsAddress) override;
 private:
     void restoreLeftBarShownStatus();
 private:

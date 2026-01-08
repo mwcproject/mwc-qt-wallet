@@ -17,7 +17,7 @@
 
 namespace test {
 void testMessageMapper() {
-    notify::MessageMapper mapper(":/resource/mwc713_mappers.txt");
+    notify::MessageMapper mapper(":/resource/messsage_mappers.txt");
 
     Q_ASSERT( mapper.processMessage("Some normal message") == "Some normal message");
     Q_ASSERT(mapper.processMessage("Swap Error , Electrum Node error, Unable to contact the secondary ElectrumX client btc.test2.swap.mwc.mw:8000, Swap Rpc error: Unable connect to btc.test2.swap.mwc.mw:8000, Swap I/O: Connection refused (os error 61)") ==

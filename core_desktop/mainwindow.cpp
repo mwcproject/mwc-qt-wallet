@@ -25,6 +25,7 @@
 #include "../bridge/wallet_b.h"
 #include "../bridge/statemachine_b.h"
 #include "../bridge/util_b.h"
+#include "../bridge/heartbeat_b.h"
 #include "../bridge/wnd/swap_b.h"
 #include "../bridge/wnd/swapmkt_b.h"
 #include <QPushButton>
@@ -59,32 +60,32 @@ MainWindow::MainWindow(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     stateMachine = new bridge::StateMachine(this);
     util = new bridge::Util(this);
+    notification = new bridge::Notification(this);
+    heartBeat = new bridge::HeartBeat(this);
     if (mwc::isSwapActive()) {
+#ifdef FEATURE_SWAP
         swap = new bridge::Swap(this);
+#endif
+#ifdef FEATURE_MKTPLACE
         swapMarketplace = new bridge::SwapMarketplace(this);
+#endif
     }
 
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MainWindow::onSgnUpdateActionStates, Qt::QueuedConnection);
 
-    QObject::connect( wallet, &Wallet::sgnNewNotificationMessage,
+    QObject::connect( notification, &Notification::sgnNewNotificationMessage,
                       this, &MainWindow::onSgnNewNotificationMessage, Qt::QueuedConnection);
     QObject::connect(wallet, &Wallet::sgnConfigUpdate,
                      this, &MainWindow::onSgnConfigUpdate, Qt::QueuedConnection);
-    QObject::connect(wallet, &Wallet::sgnLoginResult,
-                     this, &MainWindow::onSgnLoginResult, Qt::QueuedConnection);
+    QObject::connect(wallet, &Wallet::sgnLogin,
+                     this, &MainWindow::onSgnLogin, Qt::QueuedConnection);
 
-    QObject::connect(wallet, &Wallet::sgnUpdateListenerStatus,
+    QObject::connect(heartBeat, &HeartBeat::sgnUpdateListenerStatus,
                      this, &MainWindow::onSgnUpdateListenerStatus, Qt::QueuedConnection);
 
-    QObject::connect(wallet, &Wallet::sgnUpdateNodeStatus,
+    QObject::connect(heartBeat, &HeartBeat::sgnSetNodeStatus,
                      this, &MainWindow::onSgnUpdateNodeStatus, Qt::QueuedConnection);
-
-    QObject::connect(wallet, &Wallet::sgnUpdateSyncProgress,
-                     this, &MainWindow::onSgnUpdateSyncProgress, Qt::QueuedConnection);
-
-    QObject::connect( wallet, &Wallet::sgnStartingCommand,
-                      this, &MainWindow::onSgnStartingCommand, Qt::QueuedConnection);
 
     QObject::connect( walletConfig, &WalletConfig::sgnWalletFeaturesChanged,
                       this, &MainWindow::onSgnWalletFeaturesChanged, Qt::QueuedConnection);
@@ -176,6 +177,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
     // Check if any swaps are running
     if (mwc::isAppNonClosed()) {
+#ifdef FEATURE_SWAP
         if (swap) {
             QVector<QString> critSwaps = swap->getRunningCriticalTrades();
             if (!critSwaps.isEmpty()) {
@@ -188,10 +190,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
                     swaps += s;
                 }
 
-                core::getWndManager()->messageTextDlg("Swap Trades in critical stage",
+                core::getWndManager()->messageTextDlg("Swap trades in critical stage",
                                                       "You have swap trades " + swaps +
-                                                      " in critical stage. The wallet must be online to monitor the trades status, otherwise you might loose your funds."
-                                                      " You can't close your wallet until they will be finished.");
+                                                      " in a critical stage. The wallet must be online to monitor trade status; otherwise you might lose your funds."
+                                                      " You can't close your wallet until they are finished.");
                 event->ignore();
                 return;
             }
@@ -202,8 +204,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
                         "Swap Trades",
                         "You have " +
                         QString::number(swapsNumber) + " trade" + (swapsNumber > 1 ? "s" : "") +
-                        " in progress. Wallet need to stay online to process the swaps.\n\n"
-                        "Are you sure you want to close the wallet even your trades are not finished?",
+                        " in progress. The wallet needs to stay online to process swaps.\n\n"
+                        "Are you sure you want to close the wallet even though your trades are not finished?",
                         "No", "Yes",
                         "Keep my wallet running",
                         "Close the wallet",
@@ -213,7 +215,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
                 }
             }
         }
-
+#endif
+#ifdef FEATURE_MKTPLACE
         if (swapMarketplace) {
             int offers = swapMarketplace->getMyOffersNum();
             if (offers > 0) {
@@ -233,6 +236,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
                 swapMarketplace->stashMyOffers();
             }
         }
+#endif
     }
 
     QSettings settings("MWC", "wmc-qt-wallet");
@@ -297,15 +301,6 @@ void MainWindow::onSgnNewNotificationMessage(int level, QString message) {
     notyfyMsgTimeout = QDateTime().currentDateTime().toMSecsSinceEpoch() + msgTimeout;
 }
 
-void MainWindow::onSgnStartingCommand(QString command) {
-    // We can print the current executing commnd into status line ONLY if normally we are using notification windows
-    if (statusMgr != nullptr) {
-        if (QDateTime().currentDateTime().toMSecsSinceEpoch() > notyfyMsgTimeout ) {
-            ui->statusBar->showMessage( command );
-        }
-    }
-}
-
 void MainWindow::updateLeftBar(bool show) {
     if (leftBarShown == show)
         return;
@@ -362,13 +357,18 @@ void MainWindow::onSgnUpdateListenerStatus(bool mwcOnline, bool tor) {
 }
 
 // Node info
-void MainWindow::onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-    Q_UNUSED(errMsg)
-    Q_UNUSED(totalDifficulty)
+void MainWindow::onSgnUpdateNodeStatus( QString embeddedNodeStatus,
+                             bool internalNode,
+                             bool online,  int nodeHeight, int peerHeight,
+                             QString totalDifficulty2show, int connection ) {
+    Q_UNUSED(embeddedNodeStatus);
+    Q_UNUSED(internalNode);
+    Q_UNUSED(totalDifficulty2show);
+
     if ( !online ) {
         setStatusButtonState( ui->nodeStatusButton, STATUS::RED, "" );
     }
-    else if (connections==0 || nodeHeight==0 || (peerHeight>0 && peerHeight-nodeHeight>5) ) {
+    else if (connection==0 || nodeHeight==0 || (peerHeight>0 && peerHeight-nodeHeight>5) ) {
         if (config::isColdWallet()) {
             if (nodeHeight==0) {
                 setStatusButtonState( ui->nodeStatusButton, STATUS::RED, "" );
@@ -386,19 +386,13 @@ void MainWindow::onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHei
     }
 }
 
-void MainWindow::onSgnUpdateSyncProgress(double progressPercent) {
-    onSgnNewNotificationMessage( int(bridge::MESSAGE_LEVEL::INFO),
-                             "Wallet state update, " + util::trimStrAsDouble( QString::number(progressPercent), 4 ) + "% complete"  );
-}
-
 void MainWindow::onSgnConfigUpdate() {
     updateNetworkName();
 }
 
-void MainWindow::onSgnLoginResult(bool ok) {
-    Q_UNUSED(ok)
+void MainWindow::onSgnLogin() {
     updateNetworkName();
-    if (ok && statusMgr == nullptr) {
+    if (statusMgr == nullptr) {
         // wait until first successful login to create the status window manager
         // we create the status window manager regardless of whether notification windows are enabled
         // as if they are disabled, they could later be enabled
@@ -413,7 +407,7 @@ void MainWindow::onSgnLoginResult(bool ok) {
         }
     }
     if (statusMgr != nullptr) {
-        statusMgr->onLoginResult(ok);
+        statusMgr->onLogin();
     }
 }
 
@@ -425,15 +419,16 @@ void MainWindow::onApplicationStateChange(Qt::ApplicationState state) {
 
 
 void MainWindow::updateListenerBtn() {
-    bool mqsStatus = wallet->getMqsListenerStatus();
-    bool torStatus = wallet->getTorListenerStatus();
+    QVector<bool> status = wallet->getListenerStatus();
+    bool mqsStatus = status[1];
+    bool torStatus = status[3];
 
     qDebug() << "updateListenerBtn: mqsStatus=" << mqsStatus << " torStatus=" << torStatus;
 
     bool listening = mqsStatus | torStatus;
     QString listenerNames;
     if (mqsStatus)
-        listenerNames +=  QString("MWC MQS");
+        listenerNames +=  QString("MWCMQS");
 
     if (torStatus) {
         if (!listenerNames.isEmpty())
@@ -536,23 +531,37 @@ void MainWindow::updateMenu() {
 
     ui->actionAtomicSwap->setEnabled(canSwitchState && isOnlineWallet);
 
-    if (!mwc::isSwapActive()) {
-        // we need to delete the menu items...
+    bool removeSwaps = false;
+    bool removeMktplace = false;
+
+    if (mwc::isSwapActive()) {
+#ifdef FEATURE_SWAP
+        removeSwaps = true;
+#endif
+#ifdef FEATURE_MKTPLACE
+        removeMktplace = true;
+#endif
+    }
+
+    // we need to delete the menu items...
+    if (removeSwaps) {
         ui->menuWallet->removeAction( ui->actionAtomicSwap );
+    }
+    if (removeMktplace) {
         ui->menuWallet->removeAction( ui->actionAtomicSwapMarketplace );
-        // remove doudle separators
-        QList<QAction*> actions = ui->menuWallet->actions();
-        bool prevIsSep = false;
-        for (QAction *action : actions) {
-            if (action->isSeparator()) {
-                if (prevIsSep) {
-                    ui->menuWallet->removeAction(action);
-                }
-                prevIsSep = true;
+    }
+    // remove double separators
+    QList<QAction*> actions = ui->menuWallet->actions();
+    bool prevIsSep = false;
+    for (QAction *action : actions) {
+        if (action->isSeparator()) {
+            if (prevIsSep) {
+                ui->menuWallet->removeAction(action);
             }
-            else {
-                prevIsSep = false;
-            }
+            prevIsSep = true;
+        }
+        else {
+            prevIsSep = false;
         }
     }
 }
@@ -614,13 +623,17 @@ void MainWindow::on_actionOutputs_triggered()
 void MainWindow::on_actionAtomicSwap_triggered()
 {
     if (mwc::isSwapActive()) {
+#ifdef FEATURE_SWAP
         stateMachine->setActionWindow(state::STATE::SWAP);
+#endif
     }
 }
 
 void MainWindow::on_actionAtomicSwapMarketplace_triggered() {
     if (mwc::isSwapActive()) {
+#ifdef FEATURE_MKTPLACE
         stateMachine->setActionWindow(state::STATE::SWAP_MKT);
+#endif
     }
 }
 
@@ -641,9 +654,9 @@ void MainWindow::on_actionContacts_triggered()
 
 void MainWindow::on_actionShow_passphrase_triggered()
 {
-    QString passwordHash = wallet->getPasswordHash();
+    QString password;
 
-    if ( !passwordHash.isEmpty() ) {
+    if ( !wallet->checkPassword("") ) {
         if (WndManager::RETURN_CODE::BTN2 !=
             control::MessageBox::questionText(this, "Wallet Password",
                                               "You are going to view wallet mnemonic passphrase.",
@@ -651,12 +664,12 @@ void MainWindow::on_actionShow_passphrase_triggered()
                                               "Cancel show mnemonic passphrase",
                                               "Verify the password and show the passphrase",
                                               false, true, 1.0,
-                                              passwordHash, WndManager::RETURN_CODE::BTN2))
+                                              &password, WndManager::RETURN_CODE::BTN2))
             return;
     }
 
     // passwordHash should contain raw password value form the messgage box
-    stateMachine->activateShowSeed( passwordHash );
+    stateMachine->activateShowSeed( password );
 }
 
 void MainWindow::on_actionViewing_Key_triggered()
@@ -722,4 +735,3 @@ void MainWindow::onSgnWalletFeaturesChanged() {
 
 
 }
-

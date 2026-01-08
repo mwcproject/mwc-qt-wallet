@@ -17,8 +17,8 @@
 #include <QFile>
 #include <QCompleter>
 #include <QStandardItemModel>
+#include "../control_desktop/MwcListView.h"
 #include "../control_desktop/messagebox.h"
-#include <QListView>
 
 namespace dlg {
 
@@ -53,10 +53,10 @@ AddBip39Word::AddBip39Word(QWidget *parent, int wordNumber) :
             completer->setModel( m );
             completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
 
-            // By some reasons QListView can't be loaded form the stylesheet. I guess it is caches.
-            // That is why we are creting our own and set style for it
-            QListView * list = new QListView(this);
-            list->setStyleSheet("QListView {color: #6F00D6;background: white;selection-color: #6F00D6;selection-background-color: #cc9afb;}");
+            // By some reasons the list can't be loaded from the stylesheet. I guess it is cached.
+            // That is why we are creating our own and set style for it.
+            control::MwcListView * list = new control::MwcListView(this);
+            list->setStyleSheet( getDlgStyle());
             completer->setPopup( list );
 
             ui->wordEdit->setCompleter(completer);

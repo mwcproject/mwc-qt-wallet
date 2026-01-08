@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ShowTransactionDlg</class>
- <widget class="QDialog" name="ShowTransactionDlg">
+ <widget class="control::MwcDialog" name="ShowTransactionDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Transaction Details</string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -32,7 +32,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget1">
+  <widget class="control::MwcWidget" name="layoutWidget1" native="true">
    <property name="geometry">
     <rect>
      <x>459</x>
@@ -44,6 +44,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_6">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_5">
@@ -60,7 +72,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Tx Id</string>
+       <string>Tx ID</string>
       </property>
      </widget>
     </item>
@@ -94,7 +106,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget2">
+  <widget class="control::MwcWidget" name="layoutWidget2" native="true">
    <property name="geometry">
     <rect>
      <x>370</x>
@@ -106,6 +118,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_10">
@@ -156,7 +180,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget3">
+  <widget class="control::MwcWidget" name="layoutWidget3" native="true">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -168,6 +192,18 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_9">
@@ -189,7 +225,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Amount, MWC</string>
+       <string>Amount (MWC)</string>
       </property>
      </widget>
     </item>
@@ -239,7 +275,7 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget4">
+  <widget class="control::MwcWidget" name="layoutWidget4" native="true">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -249,6 +285,18 @@
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_7">
       <property name="spacing">
@@ -342,7 +390,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Open kernel details with MWC block explorer</string>
+         <string>Open kernel details in the MWC block explorer</string>
         </property>
         <property name="text">
          <string>View</string>
@@ -369,7 +417,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_2">
+  <widget class="control::MwcWidget" name="layoutWidget_2" native="true">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -381,6 +429,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_9">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_6">
@@ -431,7 +491,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_3">
+  <widget class="control::MwcWidget" name="layoutWidget_3" native="true">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -443,6 +503,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_10">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_13">
@@ -493,7 +565,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_4">
+  <widget class="control::MwcWidget" name="layoutWidget_4" native="true">
    <property name="geometry">
     <rect>
      <x>177</x>
@@ -505,6 +577,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_11">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_14">
@@ -555,7 +639,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_5">
+  <widget class="control::MwcWidget" name="layoutWidget_5" native="true">
    <property name="geometry">
     <rect>
      <x>510</x>
@@ -567,6 +651,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_12">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_15">
@@ -617,7 +713,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_6">
+  <widget class="control::MwcWidget" name="layoutWidget_6" native="true">
    <property name="geometry">
     <rect>
      <x>690</x>
@@ -629,6 +725,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_13">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_16">
@@ -679,7 +787,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_8">
+  <widget class="control::MwcWidget" name="layoutWidget_8" native="true">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -691,6 +799,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_15">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_18">
@@ -741,7 +861,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget5">
+  <widget class="control::MwcWidget" name="layoutWidget5" native="true">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -753,6 +873,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="out_label2">
@@ -803,7 +935,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget6">
+  <widget class="control::MwcWidget" name="layoutWidget6" native="true">
    <property name="geometry">
     <rect>
      <x>37</x>
@@ -815,6 +947,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_20">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="out_label1">
@@ -865,7 +1009,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget7">
+  <widget class="control::MwcWidget" name="layoutWidget7" native="true">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -877,6 +1021,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_21">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="out_label3">
@@ -927,7 +1083,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget8">
+  <widget class="control::MwcWidget" name="layoutWidget8" native="true">
    <property name="geometry">
     <rect>
      <x>500</x>
@@ -939,6 +1095,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_22">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="out_label4">
@@ -955,7 +1123,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Confirms</string>
+       <string>Confirmations</string>
       </property>
      </widget>
     </item>
@@ -989,7 +1157,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget9">
+  <widget class="control::MwcWidget" name="layoutWidget9" native="true">
    <property name="geometry">
     <rect>
      <x>730</x>
@@ -1001,6 +1169,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_19">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="out_label6">
@@ -1051,7 +1231,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget10">
+  <widget class="control::MwcWidget" name="layoutWidget10" native="true">
    <property name="geometry">
     <rect>
      <x>620</x>
@@ -1063,6 +1243,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_18">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="out_label5">
@@ -1079,7 +1271,7 @@
        </size>
       </property>
       <property name="text">
-       <string>CoinBase</string>
+       <string>Coinbase</string>
       </property>
      </widget>
     </item>
@@ -1144,7 +1336,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget11">
+  <widget class="control::MwcWidget" name="layoutWidget11" native="true">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -1156,6 +1348,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_7">
@@ -1206,16 +1410,28 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_10">
+  <widget class="control::MwcWidget" name="layoutWidget_10" native="true">
    <property name="geometry">
     <rect>
      <x>37</x>
      <y>280</y>
      <width>796</width>
-     <height>65</height>
+     <height>75</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_32">
       <property name="spacing">
@@ -1255,7 +1471,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Private note for transaction. Note is only visible in MWC Qt wallet.</string>
+         <string>Private note for transaction. Note is only visible in MWC Qt Wallet.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -1270,7 +1486,7 @@
          <bool>false</bool>
         </property>
         <property name="placeholderText">
-         <string>Enter note for transaction</string>
+         <string>Private note for transaction. Note is only visible in MWC Qt Wallet.</string>
         </property>
        </widget>
       </item>
@@ -1278,7 +1494,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget12">
+  <widget class="control::MwcWidget" name="layoutWidget12" native="true">
    <property name="geometry">
     <rect>
      <x>38</x>
@@ -1290,6 +1506,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <property name="spacing">
      <number>5</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
     </property>
     <item>
      <widget class="control::MwcLabelSmall" name="label_4">
@@ -1352,7 +1580,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget13">
+  <widget class="control::MwcWidget" name="layoutWidget13" native="true">
    <property name="geometry">
     <rect>
      <x>38</x>
@@ -1362,6 +1590,18 @@
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_14">
       <item>
@@ -1455,7 +1695,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Open output details with MWC block explorer</string>
+         <string>Open output details in the MWC block explorer</string>
         </property>
         <property name="text">
          <string>View</string>
@@ -1482,11 +1722,6 @@
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
@@ -1495,6 +1730,17 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
@@ -1506,6 +1752,12 @@
    <class>control::MwcLineEditDlg</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEditDlg.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

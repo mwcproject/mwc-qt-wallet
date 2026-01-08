@@ -15,12 +15,16 @@
 #include "e_outputs_w.h"
 #include "ui_e_outputs.h"
 #include <QDebug>
+#include <QJsonArray>
+
 #include "../control_desktop/messagebox.h"
 #include "../dialogs_desktop/e_showoutputdlg.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/e_outputs_b.h"
+#include "zz_utils.h"
+#include "control_desktop/richitem.h"
 
 namespace wnd {
 
@@ -52,12 +56,8 @@ Outputs::Outputs(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     outputs = new bridge::Outputs(this);
 
-    QObject::connect( wallet, &bridge::Wallet::sgnOutputs,
-                      this, &Outputs::onSgnOutputs, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
                       this, &Outputs::onSgnWalletBalanceUpdated, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnNewNotificationMessage,
-                      this, &Outputs::onSgnNewNotificationMessage, Qt::QueuedConnection);
 
     QObject::connect(ui->outputsTable, &control::RichVBox::onItemActivated,
                      this, &Outputs::onItemActivated, Qt::QueuedConnection);
@@ -68,9 +68,10 @@ Outputs::Outputs(QWidget *parent) :
     bool showAll = config->isShowOutputAll();
     ui->showUnspent->setText( QString("Show Spent: ") + (showAll ? "Yes" : "No") );
 
-    QString accName = updateAccountsData();
+    showIntegrityAccount = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+    updateAccountsData(wallet, ui->accountComboBox, !showIntegrityAccount, false);
 
-    requestOutputs(accName, false);
+    updateOutputs(false);
 }
 
 void Outputs::panelWndStarted() {
@@ -104,6 +105,7 @@ void Outputs::updateShownData(bool resetScrollData) {
         bool mark = calcMarkFlag(out);
 
         control::RichItem * itm = control::createMarkedItem(QString::number(i), ui->outputsTable, mark, "" );
+        itm->setParent(ui->outputsTable);
 
         QWidget * markWnd = (QWidget *) itm->getCurrentWidget();
 
@@ -261,36 +263,13 @@ bool Outputs::updateOutputState(int idx, bool lock) {
     return false;
 }
 
-QString Outputs::currentSelectedAccount() {
-    return ui->accountComboBox->currentData().toString();
-}
-
-void Outputs::onSgnOutputs( QString account, bool showSpent, QString height, QVector<QString> outputs) {
-    Q_UNUSED(height);
-
-    if (account != currentSelectedAccount() || showSpent != config->isShowOutputAll() )
-        return;
-
-    ui->progressFrame->hide();
-    ui->tableFrame->show();
-
-    allData.clear();
-
-    for (const QString & s : outputs) {
-        OutputData out;
-        out.output = wallet::WalletOutput::fromJson(s);
-        allData.push_back( out );
-    }
-
-    updateShownData(false);
-}
-
-void Outputs::on_refreshButton_clicked() {
-    requestOutputs(currentSelectedAccount(), false);
+// return account <name,path>
+QPair<QString,QString> Outputs::currentSelectedAccount() {
+    return accountComboData2AccountPath(ui->accountComboBox->currentData().toString());
 }
 
 // Request and reset page counter
-void Outputs::requestOutputs(QString account, bool resetScrollPos) {
+void Outputs::updateOutputs(bool resetScrollPos) {
     allData.clear();
 
     ui->progressFrame->show();
@@ -298,56 +277,42 @@ void Outputs::requestOutputs(QString account, bool resetScrollPos) {
 
     updateShownData(resetScrollPos);
 
-    wallet->requestOutputs(account, config->isShowOutputAll(), true);
+    QJsonArray outputs = wallet->getOutputs(currentSelectedAccount().second, config->isShowOutputAll());
+
+    ui->progressFrame->hide();
+    ui->tableFrame->show();
+
+    allData.clear();
+
+    for (const auto & s : outputs) {
+        OutputData out;
+        out.output = wallet::WalletOutput::fromJson(s.toObject());
+        allData.push_back( out );
+    }
+
+    updateShownData(false);
 }
 
 void Outputs::on_accountComboBox_activated(int index) {
     Q_UNUSED(index)
     // Selecting the active account
-    QString selectedAccount = currentSelectedAccount();
+    QString selectedAccount = currentSelectedAccount().second;
     if (!selectedAccount.isEmpty()) {
-        wallet->switchAccount(selectedAccount);
-        requestOutputs(selectedAccount, true);
+        wallet->switchAccountById(selectedAccount);
+        updateOutputs(true);
     }
 }
 
 void Outputs::onSgnWalletBalanceUpdated() {
-    updateAccountsData();
+    updateAccountsData(wallet, ui->accountComboBox, !showIntegrityAccount, false);
+    updateOutputs(false);
 }
-
-QString Outputs::updateAccountsData() {
-
-    QVector<QString> accounts = wallet->getWalletBalance(true,false,true);
-    QString selectedAccount = wallet->getCurrentAccountName();
-
-    int selectedAccIdx = 0;
-
-    ui->accountComboBox->clear();
-
-    bool hide_integrity_account = !QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-
-    int idx = 0;
-    for (int i=1; i<accounts.size(); i+=2) {
-        if ( hide_integrity_account && accounts[i-1] == "integrity")
-            continue;
-
-        if (accounts[i-1] == selectedAccount)
-            selectedAccIdx = idx;
-
-        ui->accountComboBox->addItem(accounts[i], accounts[i-1]);
-        idx++;
-    }
-    ui->accountComboBox->setCurrentIndex(selectedAccIdx);
-    return currentSelectedAccount();
-}
-
 
 void Outputs::on_showUnspent_clicked() {
     bool showAll = ! config->isShowOutputAll();
     config->setShowOutputAll( showAll );
     ui->showUnspent->setText( QString("Show Spent: ") + (showAll ? "Yes" : "No") );
-
-    on_refreshButton_clicked();
+    updateOutputs(true);
 }
 
 // return "N/A, YES, "NO"
@@ -377,13 +342,6 @@ bool Outputs::showLockMessage() {
     return lockMessageWasShown;
 }
 
-void Outputs::onSgnNewNotificationMessage(int level, QString message) {
-    Q_UNUSED(level)
-    if (message.contains("Changing status for output")) {
-        on_refreshButton_clicked();
-    }
-}
-
 void Outputs::onItemActivated(QString itemId) {
     util::TimeoutLockObject to("Events");
 
@@ -394,7 +352,6 @@ void Outputs::onItemActivated(QString itemId) {
 
         bool locked = config->isLockedOutput(out.outputCommitment);
 
-        QString account = currentSelectedAccount();
         QString outputNote = config->getOutputNote(out.outputCommitment);
         dlg::ShowOutputDlg showOutputDlg(this, out,
                                          outputNote,

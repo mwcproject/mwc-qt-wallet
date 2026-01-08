@@ -34,16 +34,15 @@ class ValidateOwnershipProofResult : public core::NavWnd
 {
     Q_OBJECT
 public:
-    explicit ValidateOwnershipProofResult(QWidget *parent = nullptr);
+    explicit ValidateOwnershipProofResult(QWidget *parent, const QString &  network, const QString &  message, const QString &  viewingKey,
+        const QString &  torAddress, const QString &  mqsAddress);
     ~ValidateOwnershipProofResult();
 
 private slots:
     void on_back_clicked();
-    void sgnValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
 
 private:
     Ui::ValidateOwnershipProofResult *ui;
-    bridge::Wallet * wallet = nullptr;
     bridge::ViewOutputs * viewAcounts = nullptr;
 };
 

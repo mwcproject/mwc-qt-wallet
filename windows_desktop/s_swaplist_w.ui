@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SwapList</class>
- <widget class="QWidget" name="SwapList">
+ <widget class="control::MwcWidget" name="SwapList">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>1109</width>
-    <height>750</height>
+    <height>792</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -159,7 +159,7 @@
         <string>Show completed swap trades</string>
        </property>
        <property name="text">
-        <string>Completed / Cancelled</string>
+        <string>Completed / Canceled</string>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -282,7 +282,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="restoreTradeHolder" native="true">
+    <widget class="control::MwcWidget" name="restoreTradeHolder" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -309,7 +309,7 @@
        <widget class="control::MwcLabelNormal" name="label">
         <property name="text">
          <string>
-Critical hardware failures (such as a hard disk failure) during a trade could result in a loss of funds. We strongly suggest backing up your trades to a non local system drive (such as a usb drive or cloud storage). In the case of such a hardware failure, trades can be recovered by first recovering your wallet from seed, and then restoring your trade.
+Critical hardware failures (such as a hard disk failure) during a trade could result in a loss of funds. We strongly suggest backing up your trades to a non-local system drive (such as a USB drive or cloud storage). In the case of such a hardware failure, trades can be recovered by first recovering your wallet from seed, and then restoring your trade.
 
 Please note that swap trade files are encrypted so you can restore it into the wallet with the same seed.</string>
         </property>
@@ -372,10 +372,10 @@ Please note that swap trade files are encrypted so you can restore it into the w
              </size>
             </property>
             <property name="toolTip">
-             <string>Swap trades backup directory.</string>
+             <string>Swap trades backup directory</string>
             </property>
             <property name="statusTip">
-             <string>Swap trades backup directory.</string>
+             <string>Swap trades backup directory</string>
             </property>
             <property name="maxLength">
              <number>64</number>
@@ -397,10 +397,10 @@ Please note that swap trade files are encrypted so you can restore it into the w
              </size>
             </property>
             <property name="toolTip">
-             <string>Select directory to backup swap trades</string>
+             <string>Select a directory to back up swap trades</string>
             </property>
             <property name="statusTip">
-             <string>Select directory to backup swap trades</string>
+             <string>Select a directory to back up swap trades</string>
             </property>
             <property name="text">
              <string>Select</string>
@@ -474,7 +474,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="ethWalletHolder" native="true">
+    <widget class="control::MwcWidget" name="ethWalletHolder" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -510,7 +510,10 @@ Please note that swap trade files are encrypted so you can restore it into the w
          </spacer>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0,0,0,0,0,0,0">
+          <property name="spacing">
+           <number>1</number>
+          </property>
           <item>
            <spacer name="verticalSpacer_3">
             <property name="orientation">
@@ -768,7 +771,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="refreshBtnsHolder" native="true">
+    <widget class="control::MwcWidget" name="refreshBtnsHolder" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -822,10 +825,10 @@ Please note that swap trade files are encrypted so you can restore it into the w
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start new Swap Trade</string>
+         <string>Start new swap trade</string>
         </property>
         <property name="statusTip">
-         <string>Start new Swap Trade</string>
+         <string>Start new swap trade</string>
         </property>
         <property name="styleSheet">
          <string notr="true">#newTradeButton{border:none;}</string>
@@ -888,10 +891,10 @@ Please note that swap trade files are encrypted so you can restore it into the w
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Refresh Swap Trades status</string>
+         <string>Refresh swap trade status</string>
         </property>
         <property name="statusTip">
-         <string>Refresh Swap Trades status</string>
+         <string>Refresh swap trade status</string>
         </property>
         <property name="styleSheet">
          <string notr="true">#refreshButton{border:none;}</string>
@@ -977,7 +980,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -1016,11 +1019,6 @@ Please note that swap trade files are encrypted so you can restore it into the w
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
@@ -1031,9 +1029,30 @@ Please note that swap trade files are encrypted so you can restore it into the w
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButtonRound</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::RichVBox</class>
@@ -1042,19 +1061,9 @@ Please note that swap trade files are encrypted so you can restore it into the w
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>control::MwcPushButtonRound</class>
-   <extends>QPushButton</extends>
-   <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcToolButtonUnderscore</class>
    <extends>QToolButton</extends>
    <header>control_desktop/MwcToolButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcComboBox</class>
-   <extends>QComboBox</extends>
-   <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_newswap1_w.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_newswap1_w.h"
 #include "../bridge/wnd/swap_b.h"
 #include "../bridge/wallet_b.h"
@@ -47,6 +50,7 @@ NewSwap1::NewSwap1(QWidget *parent) :
 
     updateSecCurrencyData();
 
+    fdggfd
     onSgnWalletBalanceUpdated();
 
     ui->mwcAmountEdit->setText(swap->getMwc2Trade());
@@ -242,6 +246,8 @@ void NewSwap1::updateSecCurrencyStatus() {
 
 
 void NewSwap1::onSgnWalletBalanceUpdated() {
+    check if wallet is not busy
+
     // init accounts
     ui->accountComboBox->clear();
 
@@ -392,3 +398,4 @@ void NewSwap1::on_sendAddressEdit_textEdited(const QString & arg1)
 }
 
 }
+#endif

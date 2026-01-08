@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>FileTransactionFinalize</class>
- <widget class="QWidget" name="FileTransactionFinalize">
+ <widget class="control::MwcWidget" name="FileTransactionFinalize">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -58,7 +58,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="primaryFrame" native="true">
+      <widget class="control::MwcWidget" name="primaryFrame" native="true">
        <property name="minimumSize">
         <size>
          <width>778</width>
@@ -188,7 +188,7 @@
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="label">
+       <widget class="control::MwcLabel" name="label">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -283,16 +283,16 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Don't finalize now, your transaction will not be cancelled</string>
+         <string>Don't finalize now; your transaction will not be canceled.</string>
         </property>
         <property name="statusTip">
-         <string>Don't finalize now, your transaction will not be cancelled</string>
+         <string>Don't finalize now; your transaction will not be canceled.</string>
         </property>
         <property name="text">
          <string>Cancel</string>
         </property>
        </widget>
-       <widget class="QWidget" name="resultLocationFrame" native="true">
+       <widget class="control::MwcWidget" name="resultLocationFrame" native="true">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -326,10 +326,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Filename of the transaction ready to publish via an Online Node</string>
+          <string>Slatepack ready to publish via an Online Node</string>
          </property>
          <property name="statusTip">
-          <string>Filename of the transaction ready to publish via an Online Node</string>
+          <string>Slatepack ready to publish via an Online Node</string>
          </property>
          <property name="text">
           <string>Select</string>
@@ -589,7 +589,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="widget_2" native="true">
+         <widget class="control::MwcWidget" name="widget_2" native="true">
           <property name="minimumSize">
            <size>
             <width>1</width>
@@ -667,6 +667,16 @@
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

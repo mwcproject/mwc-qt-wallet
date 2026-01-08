@@ -27,6 +27,7 @@
 #include "../bridge/wnd/y_selectmode_b.h"
 #include "../core/Config.h"
 #include "../core_desktop/DesktopWndManager.h"
+#include "core/WalletApp.h"
 
 namespace wnd {
 
@@ -104,6 +105,9 @@ void InitAccount::on_password1Edit_textChanged(const QString &text) {
 }
 
 void InitAccount::timerEvent(QTimerEvent *event) {
+    if (core::WalletApp::isExiting())
+        return;
+
     Q_UNUSED(event)
 
     QString passWarnText = ui->strengthLabel->text();
@@ -187,20 +191,6 @@ void InitAccount::on_submitButton_clicked() {
             ui->radioMainNet->isChecked() ? state::InitAccount::MWC_NETWORK::MWC_MAIN_NET
                                           : state::InitAccount::MWC_NETWORK::MWC_FLOO_NET,
             instanceName);
-}
-
-void wnd::InitAccount::on_runOnlineNodeButton_clicked() {
-    util::TimeoutLockObject to("InitAccount");
-    if (core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Running Mode",
-                                                                                 "You are switching to 'Online Node'.\nOnline Node can be used as a data provider for the Cold Wallet.",
-                                                                                 "Cancel", "Continue",
-                                                                                 "Don't switch to Online Node, keep my wallet as it is",
-                                                                                 "Continue and restart as Online Node",
-                                                                                 false, true)) {
-        // Restarting wallet in a right mode...
-        // First, let's upadte a config
-        selectMode->updateWalletRunMode(int(config::WALLET_RUN_MODE::ONLINE_NODE));
-    }
 }
 
 void InitAccount::on_changeDirButton_clicked() {

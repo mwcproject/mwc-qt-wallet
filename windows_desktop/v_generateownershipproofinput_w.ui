@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>GenerateOwnershipProofInput</class>
- <widget class="QWidget" name="GenerateOwnershipProofInput">
+ <widget class="control::MwcWidget" name="GenerateOwnershipProofInput">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -81,7 +81,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Ownership proof enables you to securely demonstrate control over your viewing key, Tor address, and MWCMQS address by signing a message. The recipient will be able to see the message and the corresponding proofs for the selected items.
+         <string>Ownership proof enables you to securely demonstrate control over your viewing key, Slatepack/Tor address, and MWCMQS address by signing a message. The recipient will be able to see the message and the corresponding proofs for the selected items.
 Be mindful when sending your proof along with the viewing key - once shared,  your wallet's privacy is compromised,  making all your transactions visible to anyone who possesses the key.</string>
         </property>
         <property name="wordWrap">
@@ -168,7 +168,7 @@ Be mindful when sending your proof along with the viewing key - once shared,  yo
          <string>Back</string>
         </property>
        </widget>
-       <widget class="QGroupBox" name="selected_frame">
+       <widget class="control::MwcGroupBox" name="selected_frame">
         <property name="geometry">
          <rect>
           <x>450</x>
@@ -237,7 +237,7 @@ Be mindful when sending your proof along with the viewing key - once shared,  yo
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="text">
-            <string>MWC MQS</string>
+            <string>MWCMQS</string>
            </property>
            <property name="checked">
             <bool>false</bool>
@@ -259,7 +259,7 @@ Be mindful when sending your proof along with the viewing key - once shared,  yo
          </item>
         </layout>
        </widget>
-       <widget class="QTextEdit" name="message2sign">
+       <widget class="control::MwcTextEdit" name="message2sign">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -340,6 +340,21 @@ Be mindful when sending your proof along with the viewing key - once shared,  yo
    <class>control::MwcCheckBox</class>
    <extends>QCheckBox</extends>
    <header>control_desktop/MwcCheckBox.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>control_desktop/MwcGroupBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

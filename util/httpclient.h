@@ -24,33 +24,24 @@ class QNetworkReply;
 
 namespace util {
 
-// Http calls funtionality for the any class
+// Http client, SYNC and must be run in QT thread with event loop
 class HttpClient : public QObject {
 Q_OBJECT
-protected:
+public:
     enum HTTP_CALL {
         GET, POST
     };
 
-    HttpClient();
+    HttpClient(QObject * parent);
 
-    void sendRequest(HTTP_CALL call, const QString &url,
-                     const QString &tag,
-                     const QVector<QString> &params,
-                     const QByteArray &body = "", //
-                     const QString &param1="", const QString &param2="",
-                     const QString &param3="", const QString &param4="");
-
-    virtual void onProcessHttpResponse(bool requestOk, const QString & tag, QJsonObject & jsonRespond,
-                                       const QString & param1,
-                                       const QString & param2,
-                                       const QString & param3,
-                                       const QString & param4) = 0;
-
-private slots:
-    void replyFinished(QNetworkReply* reply);
-
-protected:
+    // Sync call, will wait for the response. Call from another QT thread with a loop events
+    QString sendRequest(HTTP_CALL call, const QString & url,
+                              const QVector<QString> & queryParams, // key/value
+                              const QVector<QString> & headers, // key/value
+                              const QByteArray & body,
+                              int timeoutMs,
+                              bool logRequest);
+private:
     QNetworkAccessManager * nwManager = nullptr;
 };
 

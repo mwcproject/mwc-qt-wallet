@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "g_finalize_w.h"
+
+#include <QJsonDocument>
+
 #include "ui_g_finalize.h"
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
@@ -22,6 +25,7 @@
 #include "../core/global.h"
 #include "../dialogs_desktop/g_inputslatepackdlg.h"
 #include "../bridge/wallet_b.h"
+#include "util/message_mapper.h"
 
 namespace wnd {
 
@@ -36,9 +40,6 @@ Finalize::Finalize(QWidget *parent) :
     util = new bridge::Util(this);
     wallet = new bridge::Wallet(this);
 
-    QObject::connect(wallet, &bridge::Wallet::sgnDecodeSlatepack,
-                     this, &wnd::Finalize::onSgnDecodeSlatepack, Qt::QueuedConnection);
-
     ui->slatepack_status->setText("");
 
     updateButtons();
@@ -49,19 +50,6 @@ Finalize::~Finalize()
     delete ui;
 }
 
-/*
-void Finalize::on_pasteSlatepackBtn_clicked()
-{
-    util::TimeoutLockObject to( "FinalizeUpload" );
-
-    dlg::InputSlatepackDlg inputSlateDlg("SendResponse", "Send response slate",
-                                         util::FileTransactionType::FINALIZE,  this);
-
-    if (inputSlateDlg.exec()  == QDialog::Accepted ) {
-        finalize->uploadSlatepackTransaction( inputSlateDlg.getSlatepack(), inputSlateDlg.getSlateJson(), inputSlateDlg.getSenderAddress() );
-    }
-}*/
-
 void Finalize::on_slatepackEdit_textChanged() {
     isSpValid = false;
     updateButtons();
@@ -71,7 +59,7 @@ void Finalize::on_slatepackEdit_textChanged() {
 }
 
 void Finalize::on_continueButton_clicked() {
-    finalize->uploadSlatepackTransaction( slatepack, slateJson, sender);
+    finalize->uploadSlatepackTransaction( slatepack, slateJson, sender, true);
 }
 
 void Finalize::updateButtons() {
@@ -84,39 +72,23 @@ void Finalize::initiateSlateVerification(const QString &slate2check) {
         return;
     }
 
-    bool notInProgress = spInProgress.isEmpty();
-    spInProgress = slate2check;
-    if (notInProgress) {
-        wallet->decodeSlatepack(slate2check, "Finalize");
-    }
-}
-
-
-void Finalize::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
-    Q_UNUSED(recipient)
-
-    if (tag != "Finalize")
-        return;
-
-    if (spInProgress!=slatepack) {
-        // data was chnaged - need to reprocess
-        wallet->decodeSlatepack(spInProgress, "Finalize");
-        return;
-    }
+    QJsonObject decSp = wallet->decodeSlatepack(slate2check);
+    wallet::DecodedSlatepack decodedSp = wallet::DecodedSlatepack::fromJson(decSp);
 
     isSpValid = false;
-    spInProgress = "";
     ui->slatepack_status->setText("");
-    if (!error.isEmpty()) {
-        ui->slatepack_status->setText("<b>" + error + "</b>");
+    if (! decodedSp.error.isEmpty()) {
+        ui->slatepack_status->setText("<b>" + decodedSp.error + "</b>");
     }
     else {
-        if ("SendResponse" != content) {
-            ui->slatepack_status->setText( "<b>Wrong slatepack content, expected SendResponse slatepack, get "+content+"</b>" );
+        if ("SendResponse" != decodedSp.content) {
+            ui->slatepack_status->setText( "<b>Wrong slatepack content, expected SendResponse slatepack, get "+decodedSp.content+"</b>" );
         }
         else {
             // Validating Json
-            QVector<QString> slateParseRes = util->parseSlateContent(slateJson, int(util::FileTransactionType::FINALIZE), sender );
+            QString slateJson = QJsonDocument( decodedSp.slate ).toJson(QJsonDocument::Compact);
+            QVector<QString> slateParseRes = util->parseSlateContent( slateJson,
+                        int(util::FileTransactionType::FINALIZE), decodedSp.sender );
             Q_ASSERT(slateParseRes.size() == 1 || slateParseRes.size() >= 2);
             if (slateParseRes.size() == 1) {
                 // parser reported error
@@ -125,11 +97,11 @@ void Finalize::onSgnDecodeSlatepack(QString tag, QString error, QString slatepac
             else {
                 QString spDesk;
                 QString senderStr;
-                if (sender == "None") {
+                if (decodedSp.sender.isEmpty()) {
                     spDesk = "non encrypted Slatepack";
                 } else {
                     spDesk = "encrypted Slatepack";
-                    senderStr = ", receiver address " + sender;
+                    senderStr = ", receiver address " + decodedSp.sender;
                 }
 
                 // mwc is on nano units
@@ -137,18 +109,11 @@ void Finalize::onSgnDecodeSlatepack(QString tag, QString error, QString slatepac
 
                 ui->slatepack_status->setText("Finalizing " + spDesk + ", transaction " + slateParseRes[0] + senderStr);
                 isSpValid = true;
-                this->slatepack = slatepack;
+                this->slatepack = slate2check;
                 this->slateJson = slateJson;
-                this->sender = sender;
+                this->sender = decodedSp.sender;
             }
         }
-    }
-
-    QString textSp = ui->slatepackEdit->toPlainText().trimmed();
-
-    if (slatepack != textSp) {
-        initiateSlateVerification(textSp);
-        isSpValid = false;
     }
 
     updateButtons();

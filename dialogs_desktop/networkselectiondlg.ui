@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NetworkSelectionDlg</class>
- <widget class="QDialog" name="NetworkSelectionDlg">
+ <widget class="control::MwcDialog" name="NetworkSelectionDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,12 +23,12 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Select Network</string>
   </property>
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QRadioButton" name="radioFloonet">
+  <widget class="control::MwcRadioButton" name="radioFloonet">
    <property name="geometry">
     <rect>
      <x>198</x>
@@ -85,7 +85,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioMainNet">
+  <widget class="control::MwcRadioButton" name="radioMainNet">
    <property name="geometry">
     <rect>
      <x>198</x>
@@ -162,6 +162,16 @@ Please select MWC network that this wallet was connected to.</string>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>control_desktop/MwcRadioButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

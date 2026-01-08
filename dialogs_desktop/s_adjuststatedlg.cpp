@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_adjuststatedlg.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_adjuststatedlg.h"
 #include "../bridge/wnd/swap_b.h"
 
@@ -84,3 +87,4 @@ void AdjustStateDlg::on_cancelButton_clicked() {
 }
 
 }
+#endif

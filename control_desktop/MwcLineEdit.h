@@ -19,7 +19,15 @@
 
 namespace control {
 
-class MwcLineEditNormal : public QLineEdit {
+class MwcLineEdit : public QLineEdit {
+Q_OBJECT
+public:
+    explicit MwcLineEdit(QWidget *parent = Q_NULLPTR);
+    explicit MwcLineEdit(const QString & t, QWidget *parent = Q_NULLPTR);
+    virtual ~MwcLineEdit() override;
+};
+
+class MwcLineEditNormal : public MwcLineEdit {
 Q_OBJECT
 public:
     explicit MwcLineEditNormal(QWidget *parent = Q_NULLPTR);

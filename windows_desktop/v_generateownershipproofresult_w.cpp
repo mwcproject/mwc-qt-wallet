@@ -23,7 +23,7 @@
 
 namespace wnd {
 
-GenerateOwnershipProofResult::GenerateOwnershipProofResult(QWidget *parent) :
+GenerateOwnershipProofResult::GenerateOwnershipProofResult(QWidget *parent, const QString & proof) :
         core::NavWnd(parent),
         ui(new Ui::GenerateOwnershipProofResult) {
 
@@ -33,28 +33,18 @@ GenerateOwnershipProofResult::GenerateOwnershipProofResult(QWidget *parent) :
     viewAcounts = new bridge::ViewOutputs(this);
     util = new bridge::Util(this);
 
-    ui->save->setEnabled(false);
-
-    QObject::connect(wallet, &bridge::Wallet::sgnGenerateOwnershipProof,
-                     this, &GenerateOwnershipProofResult::onGenerateOwnershipProof, Qt::QueuedConnection);
+    if (!proof.isEmpty()) {
+        ui->proof_text->setText(proof);
+        ui->save->setEnabled(true);
+    }
+    else {
+        ui->save->setEnabled(false);
+    }
 }
 
 GenerateOwnershipProofResult::~GenerateOwnershipProofResult() {
     delete ui;
 }
-
-void GenerateOwnershipProofResult::onGenerateOwnershipProof(QString proof, QString error) {
-    if (!error.isEmpty()) {
-        control::MessageBox::messageText(this, "Error", "Unable to generate ownership proof.\n\nError:" + error);
-        viewAcounts->back();
-    }
-
-    if (!proof.isEmpty()) {
-        ui->proof_text->setText(proof);
-        ui->save->setEnabled(true);
-    }
-}
-
 
 void GenerateOwnershipProofResult::on_back_clicked()
 {

@@ -27,11 +27,8 @@ public:
 
     void hideProgress();
 
-    // Finalize file slate.
-    Q_INVOKABLE void uploadFileTransaction(QString uriFileName);
-
     // Finalize slatepack slate.
-    Q_INVOKABLE void uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender );
+    Q_INVOKABLE void uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender, bool switch2nextPage );
 
     // Check if the node healthy enough to do finalization.
     Q_INVOKABLE bool isNodeHealthy();
@@ -40,10 +37,9 @@ public:
 
     Q_INVOKABLE void cancelFileFinalization();
 
-    // Files transaction page, continue with a file
-    Q_INVOKABLE void finalizeFile(QString fileName, QString resultTxFileName, bool fluff);
     // Files transaction page, continue with a Slatepack
-    Q_INVOKABLE void finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
+    // if backStateId<0 - State's valie will be used
+    Q_INVOKABLE void finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff, int backStateId);
 signals:
     void sgnHideProgress();
 

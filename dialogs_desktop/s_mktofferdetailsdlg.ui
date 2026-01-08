@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MktOfferDetailsDlg</class>
- <widget class="QDialog" name="MktOfferDetailsDlg">
+ <widget class="control::MwcDialog" name="MktOfferDetailsDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Offer Details</string>
   </property>
   <widget class="control::MwcLabelLarge" name="title">
    <property name="geometry">
@@ -71,7 +71,7 @@
     <enum>Qt::StrongFocus</enum>
    </property>
    <property name="toolTip">
-    <string>Return back to marketplace</string>
+    <string>Return to the marketplace</string>
    </property>
    <property name="text">
     <string>Back</string>
@@ -171,6 +171,11 @@
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

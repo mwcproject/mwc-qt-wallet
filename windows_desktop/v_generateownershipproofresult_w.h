@@ -32,14 +32,13 @@ namespace wnd {
 class GenerateOwnershipProofResult : public core::NavWnd {
     Q_OBJECT
 public:
-    explicit GenerateOwnershipProofResult(QWidget *parent = nullptr);
+    explicit GenerateOwnershipProofResult(QWidget *parent, const QString & proof);
 
     ~GenerateOwnershipProofResult();
 
 private slots:
     void on_back_clicked();
     void on_save_clicked();
-    void onGenerateOwnershipProof(QString proof, QString error);
 
 private:
     Ui::GenerateOwnershipProofResult *ui;

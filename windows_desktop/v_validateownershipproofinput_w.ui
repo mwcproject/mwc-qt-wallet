@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ValidateOwnershipProofInput</class>
- <widget class="QWidget" name="ValidateOwnershipProofInput">
+ <widget class="control::MwcWidget" name="ValidateOwnershipProofInput">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -142,7 +142,7 @@
          <string>Back</string>
         </property>
        </widget>
-       <widget class="QTextEdit" name="proof_text">
+       <widget class="control::MwcTextEdit" name="proof_text">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -250,6 +250,16 @@
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

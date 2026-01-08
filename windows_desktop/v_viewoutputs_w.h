@@ -17,6 +17,7 @@
 
 #include "e_outputs_w.h"
 #include "../core_desktop/navwnd.h"
+#include <QJsonArray>
 
 namespace Ui {
 class ViewOutputs;
@@ -43,7 +44,7 @@ private:
 private slots:
     void on_backButton_clicked();
 
-    void onSgnViewOutputs( QString viewingKey, QVector<QString> outputs, QString totalAmount);
+    void onSgnViewOutputs( QString viewingKey, QJsonArray outputs, QString totalAmount);
 
     void onItemActivated(QString itemId);
 private:

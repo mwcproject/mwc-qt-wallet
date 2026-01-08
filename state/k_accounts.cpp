@@ -22,20 +22,14 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/k_accounts_b.h"
+#include "node/node_client.h"
+#include "../util/Log.h"
 
 namespace state {
 
 Accounts::Accounts(StateContext * context) :
     State(context, STATE::ACCOUNTS)
 {
-    connect( context->wallet, &wallet::Wallet::onLoginResult, this, &Accounts::onLoginResult, Qt::QueuedConnection );
-
-    connect(context->wallet, &wallet::Wallet::onNodeStatus,
-                     this, &Accounts::onNodeStatus, Qt::QueuedConnection);
-
-    startingTime = 0;
-
-    startTimer(61*1000);
 }
 
 Accounts::~Accounts() {}
@@ -52,14 +46,30 @@ NextStateRespond Accounts::execute() {
 }
 
 void Accounts::doTransferFunds() {
+    logger::logInfo(logger::STATE, "Call Accounts::doTransferFunds");
     // Calling the next page
     context->stateMachine->setActionWindow( STATE::ACCOUNT_TRANSFER, true );
 }
 
 void Accounts::deleteAccount( QString accountName ) {
+    logger::logInfo(logger::STATE, "Call Accounts::deleteAccount with accountName=" + accountName);
     // Delete is rename. Checking for names collision
 
-    QVector<wallet::AccountInfo> allAccounts = context->wallet->getWalletBalance(false);
+    QVector<wallet::Account> allAccounts = context->wallet->listAccounts();
+
+    QString accountPath;
+    for (const auto & a : allAccounts) {
+        if (a.label == accountName) {
+            accountPath = a.path;
+            break;
+        }
+    }
+
+    if (accountPath.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Incorrect account name",
+                                         "Internal error. Not found account to delete." );
+        return;
+    }
 
     QString newName;
 
@@ -67,7 +77,7 @@ void Accounts::deleteAccount( QString accountName ) {
         newName = mwc::DEL_ACCONT_PREFIX + accountName + (t==0?"":("_" + QString::number(t)));
         bool collision = false;
         for ( auto & acc : allAccounts ) {
-            if (acc.accountName ==  newName) {
+            if (acc.label == newName) {
                 collision = true;
                 break;
             }
@@ -75,56 +85,8 @@ void Accounts::deleteAccount( QString accountName ) {
         if (!collision)
             break;
     }
-    context->wallet->renameAccount( accountName, newName );
+    context->wallet->renameAccountById( accountPath, newName );
 }
-
-void Accounts::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
-
-    // Skipping first 5 seconds after start. Let's mwc-node get online
-    if ( startingTime==0 || QDateTime::currentMSecsSinceEpoch() - startingTime < 5000 )
-        return;
-
-    if ( !context->wallet->isWalletRunningAndLoggedIn() ) {
-        startingTime=0;
-        return;
-    }
-
-
-    if ( isNodeHealthy() ) {
-        if (!lastNodeIsHealty) {
-            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                              "MWC-Node that wallet connected to is healthy now. Wallet can validate stored data with blockchain.");
-            lastNodeIsHealty = true;
-        }
-        else {
-            context->wallet->updateWalletBalance(true, false);
-        }
-    }
-    else {
-        if (lastNodeIsHealty) {
-            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::WARNING,
-                                              "Wallet connected to not healthy MWC-Node. Your balance, transactions and output status might be not accurate");
-            lastNodeIsHealty = false;
-        }
-        context->wallet->updateWalletBalance(false, false);
-    };
-
-}
-
-void Accounts::onLoginResult(bool ok) {
-    Q_UNUSED(ok)
-    startingTime = QDateTime::currentMSecsSinceEpoch();
-}
-
-
-void Accounts::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-    Q_UNUSED(errMsg)
-    nodeIsHealthy = online &&
-                    ((config::isColdWallet() || connections > 0) && totalDifficulty > 0 && nodeHeight > peerHeight - 5);
-}
-
-
 
 }
 

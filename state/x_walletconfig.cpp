@@ -52,6 +52,7 @@ NextStateRespond WalletConfig::execute() {
 
 // State can block the state change. Wallet config is the first usage.
 bool WalletConfig::canExitState(STATE nextWindowState) {
+    logger::logInfo(logger::STATE, "Call WalletConfig::canExitState with nextWindowState=" + QString::number(static_cast<int>(nextWindowState)));
     if (nextWindowState == WALLET_CONFIG)
         return false; // Config is a single page, no reasons to switch
 
@@ -76,57 +77,48 @@ bool WalletConfig::canExitState(STATE nextWindowState) {
     return true;
 }
 
-bool WalletConfig::setWalletConfig(const wallet::WalletConfig & config, bool guiWalletRestartExpected) {
-    if (context->wallet->setWalletConfig(config, false)) {
-        // update the window manager with the latest data path
-
-        for (auto b : bridge::getBridgeManager()->getCoreWindow())
-            b->setDataPath(config.getDataPath());
-
-        // restarting the wallet...
-        if (guiWalletRestartExpected)
-            return false; // no need to restart the mwc713. Whole wallet need to be restarted soon
-
-        context->stateMachine->executeFrom( STATE::NONE );
-        return true;
-    }
-    return false;
-}
-
-
 core::SendCoinsParams  WalletConfig::getSendCoinsParams() const {
+    //logger::logInfo(logger::STATE, "Call WalletConfig::getSendCoinsParams");
     return context->appContext->getSendCoinsParams();
 }
 
 // account refresh will be requested...
 void WalletConfig::setSendCoinsParams(const core::SendCoinsParams & params) {
+    logger::logInfo(logger::STATE, "Call WalletConfig::setSendCoinsParams with params");
     context->appContext->setSendCoinsParams(params);
-    context->wallet->updateWalletBalance(false,false); // Number of outputs might change, requesting update in background
+    context->wallet->emitWalletBalanceUpdated(); // Number of outputs might change, requesting update in background
 }
 
 double WalletConfig::getGuiScale() const {
+    //logger::logInfo(logger::STATE, "Call WalletConfig::getGuiScale");
     return context->appContext->getGuiScale();
 }
 
 double WalletConfig::getInitGuiScale() const {
+    //logger::logInfo(logger::STATE, "Call WalletConfig::getInitGuiScale");
     return context->appContext->getInitGuiScale();
 }
 
 void WalletConfig::updateGuiScale(double scale) {
+    logger::logInfo(logger::STATE, "Call WalletConfig::updateGuiScale with scale=" + QString::number(scale));
     context->appContext->setGuiScale(scale);
 }
 
 void WalletConfig::restartMwcQtWallet() {
+    logger::logInfo(logger::STATE, "Call WalletConfig::restartMwcQtWallet");
     // Stopping wallet first
     util::requestRestartMwcQtWallet();
     QCoreApplication::quit();
 }
 
 bool WalletConfig::getWalletLogsEnabled() {
+    //logger::logInfo(logger::STATE, "Call WalletConfig::getWalletLogsEnabled");
     return context->appContext->isLogsEnabled();
 }
 
 void WalletConfig::updateWalletLogsEnabled(bool enabled, bool needCleanupLogs) {
+    logger::logInfo(logger::STATE, "Call WalletConfig::updateWalletLogsEnabled with enabled=" + QString(enabled ? "true" : "false") +
+        " needCleanupLogs=" + QString(needCleanupLogs ? "true" : "false"));
     context->appContext->setLogsEnabled(enabled);
 
     logger::enableLogs(enabled);
@@ -137,22 +129,27 @@ void WalletConfig::updateWalletLogsEnabled(bool enabled, bool needCleanupLogs) {
 }
 
 bool WalletConfig::isOutputLockingEnabled() {
+    //logger::logInfo(logger::STATE, "Call WalletConfig::isOutputLockingEnabled");
     return context->appContext->isLockOutputEnabled();
 }
 
 void WalletConfig::setOutputLockingEnabled(bool lockingEnabled) {
-    context->appContext->setLockOutputEnabled(lockingEnabled);
+    logger::logInfo(logger::STATE, "Call WalletConfig::setOutputLockingEnabled with lockingEnabled=" + QString(lockingEnabled ? "true" : "false"));
+    context->appContext->setLockOutputEnabled(lockingEnabled, context->wallet);
 }
 
 bool WalletConfig::getNotificationWindowsEnabled() {
+    //logger::logInfo(logger::STATE, "Call WalletConfig::getNotificationWindowsEnabled");
     return context->appContext->getNotificationWindowsEnabled();
 }
 
 void WalletConfig::setNotificationWindowsEnabled(bool enabled) {
+    logger::logInfo(logger::STATE, "Call WalletConfig::setNotificationWindowsEnabled with enabled=" + QString(enabled ? "true" : "false"));
     context->appContext->setNotificationWindowsEnabled(enabled);
 }
 
 bool WalletConfig::updateTimeoutValue(int timeout) {
+    logger::logInfo(logger::STATE, "Call WalletConfig::updateTimeoutValue with timeout=" + QString::number(timeout));
     util::ConfigReader reader;
     QString configFN = config::getMwcGuiWalletConf();
     if ( !reader.readConfig( configFN ) ) {

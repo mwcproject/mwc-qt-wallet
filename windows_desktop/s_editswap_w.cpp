@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_editswap_w.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_editswap_w.h"
 #include "../bridge/wnd/swap_b.h"
 #include "../bridge/config_b.h"
@@ -325,3 +328,5 @@ void EditSwap::on_noteEdit_textEdited(const QString &str) {
 }
 
 }
+
+#endif

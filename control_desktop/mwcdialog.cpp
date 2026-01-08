@@ -26,22 +26,16 @@
 
 namespace control {
 
-//  Note, parent for modal doalog doesn't work. The dialog will not come up
-/*static QWidget * getParent(QWidget * parent) {
-    if (parent==nullptr) {
-        core::DesktopWndManager * wndMan = (core::DesktopWndManager*) core::getWndManager();
-        return wndMan->getCurrentWnd();
-    }
-    return parent;
-}*/
+static QString dlgStyle;
 
 MwcDialog::MwcDialog( QWidget * parent )// : QDialog( getParent(parent) )
 {
+    if (dlgStyle.isEmpty())
     { // Apply style sheet
         QFile file(":/resource_desktop/dialogs_style.css");
         if (file.open(QFile::ReadOnly | QFile::Text)) {
-               QTextStream ts( &file );
-               setStyleSheet( ts.readAll() );
+            QTextStream ts( &file );
+            dlgStyle = ts.readAll();
         }
         else {
             qDebug() << "Failed to read Dialogs stylesheet";
@@ -49,6 +43,8 @@ MwcDialog::MwcDialog( QWidget * parent )// : QDialog( getParent(parent) )
             QApplication::quit();
         }
     }
+
+    setStyleSheet( dlgStyle );
 
     setWindowFlags(Qt::FramelessWindowHint);
     setModal(true);
@@ -58,6 +54,9 @@ MwcDialog::MwcDialog( QWidget * parent )// : QDialog( getParent(parent) )
 
 MwcDialog::~MwcDialog() {}
 
+const QString & MwcDialog::getDlgStyle() const {
+    return dlgStyle;
+}
 
 void MwcDialog::mousePressEvent(QMouseEvent *event)
 {
@@ -65,11 +64,11 @@ void MwcDialog::mousePressEvent(QMouseEvent *event)
     {
         cursor = QPoint(0,0);
 
-        QPoint pos = event->globalPos();
+        QPoint pos = event->globalPosition().toPoint();
         QRect rc = geometry();
         rc = rc.marginsRemoved( QMargins(5,5,5,5) );
         if ( rc.contains(pos) ) {
-            cursor = event->globalPos() - geometry().topLeft();
+            cursor = event->globalPosition().toPoint() - geometry().topLeft();
             event->accept();
         }
     }
@@ -80,7 +79,7 @@ void MwcDialog::mouseMoveEvent(QMouseEvent *event)
     if(event->buttons() & Qt::LeftButton)
     {
         if (cursor.x()!=0 && cursor.y()!=0 ) {
-            move(event->globalPos() - cursor);
+            move(event->globalPosition().toPoint() - cursor);
             event->accept();
         }
     }

@@ -58,16 +58,10 @@ public:
 
 private slots:
     void on_accountComboBox_activated(int index);
-    void on_refreshButton_clicked();
     void on_showUnspent_clicked();
 
     void onSgnWalletBalanceUpdated();
-    void onSgnOutputs( QString account, bool showSpent, QString height, QVector<QString> outputs);
-
-    void onSgnNewNotificationMessage(int level, QString message);
-
     void onItemActivated(QString itemId);
-
 protected:
     virtual void richButtonPressed(control::RichButton * button, QString coockie) override;
 
@@ -78,15 +72,13 @@ private:
 
     bool updateOutputState(int idx, bool lock);
 
-    void requestOutputs(QString account, bool resetScrollPos);
+    void updateOutputs(bool resetScrollPos);
 
-    QString currentSelectedAccount();
+    // return account <name,path>
+    QPair<QString,QString> currentSelectedAccount();
 
     // return enable state for the buttons
     void updateShownData(bool resetScrollData);
-
-    // return selected account
-    QString updateAccountsData();
 
     // return "N/A, YES, "NO"
     QString calcLockedState(const wallet::WalletOutput & output);
@@ -100,8 +92,8 @@ private:
     bridge::Outputs * outputs = nullptr; // needed as output windows active flag
 
     QVector<OutputData> allData; // all outputs
-
     bool canLockOutputs = false;
+    bool showIntegrityAccount = false;
 
     static bool lockMessageWasShown;
 };

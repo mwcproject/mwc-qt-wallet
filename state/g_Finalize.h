@@ -33,24 +33,14 @@ public:
     Finalize( StateContext * context);
     virtual ~Finalize() override;
 
-    void uploadFileTransaction(QString uriFileName);
-
-    void uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender );
+    void uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender, bool switch2nextPage );
 
 public:
     // wnd::FileTransactionWndHandler
     void ftBack();
     // Expected that user already made all possible appruvals
-    void finalizeFile(QString fileName, QString resultTxFileName, bool fluff);
-    void finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
-
+    void finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff, int backStateId);
     bool needResultTxFileName();
-
-    QString getResultTxPath();
-    void updateResultTxPath(QString path);
-
-    bool isNodeHealthy() const {return nodeIsHealthy;}
-
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override;
@@ -58,19 +48,9 @@ protected:
 
     void finalizeForColdWallet(const util::FileTransactionInfo & trInfo);
 private slots:
-    void onFinalizeFile( bool success, QStringList errors, QString fileName );
-    void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
-    void onAllTransactions( QVector<wallet::WalletTransaction> Transactions);
-    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 private:
-    // We can use transactions to obtain additional data about send to address, transaction Date
-    QVector<wallet::WalletTransaction> allTransactions;
-    int lastNodeHeight = 0;
-
     // History of submitted file transactions
     QMap<QString, util::FileTransactionInfo> file2TransactionsInfo;
-
-    bool nodeIsHealthy = false;
     bool atInitialPage = true;
 };
 

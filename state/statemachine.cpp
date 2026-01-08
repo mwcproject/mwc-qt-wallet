@@ -13,20 +13,19 @@
 // limitations under the License.
 
 #include "statemachine.h"
+#include "../core/global.h"
 #include "a_initaccount.h"
 #include "a_inputpassword.h"
 #include "../core/appcontext.h"
 #include "k_accounts.h"
 #include "k_AccountTransfer.h"
 #include "x_events.h"
-#include "h_hodl.h"
 #include "e_Receive.h"
 #include "e_listening.h"
 #include "e_transactions.h"
 #include "e_outputs.h"
 #include "w_contacts.h"
 #include "x_walletconfig.h"
-#include "m_airdrop.h"
 #include "a_StartWallet.h"
 #include "g_Send.h"
 #include "x_ShowSeed.h"
@@ -45,6 +44,8 @@
 #include "s_swap.h"
 #include "s_mktswap.h"
 #include "v_ViewOutputs_s.h"
+#include "zz_heart_beat.h"
+#include "core/WalletApp.h"
 
 namespace state {
 
@@ -112,12 +113,18 @@ StateMachine::StateMachine()
     // Since Mobile is not ready yet, we don't want that to be included
 
     if (mwc::isSwapActive()) {
+#ifdef FEATURE_SWAP
         states[STATE::SWAP] = new Swap(context);
+#endif
+#ifdef FEATURE_MKTPLACE
         states[STATE::SWAP_MKT] = new SwapMarketplace(context);
+#endif
     }
 
     states[ STATE::VIEW_ACCOUNTS ] = new ViewOutputs(context);
 #endif
+
+    states[ STATE::HEART_BEAT ] = new HeartBeat(context);
 
     startTimer(1000);
 }
@@ -327,12 +334,18 @@ bool StateMachine::processState(State* st) {
 void StateMachine::timerEvent(QTimerEvent *event) {
     Q_UNUSED(event)
 
+    if (core::WalletApp::isExiting())
+        return;
+
     // No locking make sense for the node.
-    if (config::isOnlineNode())
+    if (config::isOnlineNode() || !getStateContext()->wallet->isInit())
+        return;
+
+    if (getStateContext()->wallet->isBusy())
         return;
 
     // no password - no locks.
-    if(!getStateContext()->wallet->hasPassword())
+    if(getStateContext()->wallet->checkPassword(""))
         return;
 
     // Check if timer expired and we need to logout...
@@ -348,7 +361,7 @@ void StateMachine::timerEvent(QTimerEvent *event) {
 
 // logout now
 void StateMachine::logout() {
-    if(!getStateContext()->wallet->hasPassword()) {
+    if(getStateContext()->wallet->checkPassword("")) {
         core::getWndManager()->messageTextDlg("Logout", "Your wallet doesn't protected with a password. Because of that you can't do a logout.");
         return;
     }

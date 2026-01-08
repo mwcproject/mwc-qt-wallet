@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "swap_b.h"
+
+#ifdef FEATURE_SWAP
+
 #include "../../wallet/wallet.h"
 #include "../../state/state.h"
 #include "../../state/s_swap.h"
@@ -21,6 +24,7 @@
 #include "../../util/address.h"
 #include "../../core/MessageMapper.h"
 #include "tries/mwc713inputparser.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
@@ -76,11 +80,13 @@ Swap::~Swap() {}
 
 // Return back to the trade list page
 void Swap::pageTradeList() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::pageTradeList");
     getSwap()->pageTradeList(false, false, false, false);
 }
 
 // request the list of swap trades
 void Swap::requestSwapTrades(QString cookie) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::requestSwapTrades with cookie=" + cookie);
     getWallet()->requestSwapTrades(cookie);
 }
 
@@ -113,22 +119,26 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
 // Cancel the trade. Send signal to the cancel the trade.
 // Trade cancelling might take a while.
 void Swap::cancelTrade(QString swapId) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::cancelTrade with swapId=" + swapId);
     getWallet()->cancelSwapTrade(swapId);
 }
 
 
 // Switch to editTrade Window
 void Swap::viewTrade(QString swapId, QString stateCmd) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::viewTrade with swapId=" + swapId + " stateCmd=" + stateCmd);
     getSwap()->viewTrade(swapId, stateCmd);
 }
 
 // Switch to trade Details Window
 void Swap::showTradeDetails(QString swapId) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::showTradeDetails with swapId=" + swapId);
     getSwap()->showTradeDetails(swapId);
 }
 
 // Deleting swapId
 void Swap::deleteSwapTrade(QString swapId) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::deleteSwapTrade with swapId=" + swapId);
     getWallet()->deleteSwapTrade(swapId);
 }
 
@@ -143,6 +153,7 @@ void Swap::onCancelSwapTrade(QString swapId, QString error) {
 // Requesting all details about the single swap Trade
 // Respond will be with sent back with sgnRequestTradeDetails
 void Swap::requestTradeDetails(QString swapId, QString cookie) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::requestTradeDetails with swapId=" + swapId + " cookie=" + cookie);
     int expBkId = getAppContext()->getSwapBackStatus(swapId);
     bool waiting4backup = /*getAppContext()->getSwapEnforceBackup() &&*/ expBkId==0;
 
@@ -152,12 +163,14 @@ void Swap::requestTradeDetails(QString swapId, QString cookie) {
 // Requesting Eth Info
 // Respond will be with sent back with sgnRequestEthInfo
 void Swap::requestEthInfo() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::requestEthInfo");
     getWallet()->requestEthInfo();
 }
 
 // Requesting Eth Send
 // Respond will be with sent back with sgnRequestEthInfo
 void Swap::requestEthSend(QString dest, QString currency, QString amount) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::requestEthSend with dest=" + dest + " currency=" + currency + " amount=" + amount);
     getWallet()->requestEthSend(dest, currency, amount);
 }
 
@@ -302,15 +315,18 @@ void Swap::onRequestEthSend(bool result, QString errMsg) {
 
 // Check if this Trade is running in auto mode now
 bool Swap::isRunning(QString swapId) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::isRunning with swapId=" + swapId);
     return getSwap()->isTradeRunning(swapId);
 }
 
 // Number of trades that are in progress
 QVector<QString> Swap::getRunningTrades() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getRunningTrades");
     return getSwap()->getRunningTrades();
 }
 
 QVector<QString> Swap::getRunningCriticalTrades() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getRunningCriticalTrades");
     return getSwap()->getRunningCriticalTrades();
 }
 
@@ -321,6 +337,9 @@ void Swap::adjustSwapData( QString swapId, QString call_tag,
                                   QString electrumUri1,
                                   QString tag )
 {
+    logger::logInfo(logger::BRIDGE, "Call Swap::adjustSwapData with swapId=" + swapId + " call_tag=" + call_tag +
+        " destinationMethod=" + destinationMethod + " destinationDest=" + destinationDest + " secondaryAddress=" +
+        secondaryAddress + " secondaryFee=" + secondaryFee + " electrumUri1=" + electrumUri1 + " tag=" + tag);
     getWallet()->adjustSwapData( swapId, call_tag, destinationMethod, destinationDest, secondaryAddress, secondaryFee, electrumUri1, tag );
 }
 
@@ -357,12 +376,14 @@ void Swap::onNewSwapTrade(QString currency, QString swapId) {
 // Backup/export swap trade data into the file
 // Respond with sgnBackupSwapTradeData
 void Swap::backupSwapTradeData(QString swapId, QString backupFileName) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::backupSwapTradeData with swapId=" + swapId + " backupFileName=" + backupFileName);
     getWallet()->backupSwapTradeData(swapId, backupFileName);
 }
 
 // Import/restore swap trade data from the file
 // Respond with sgnRestoreSwapTradeData
 void Swap::restoreSwapTradeData(QString filename) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::restoreSwapTradeData with filename=" + filename);
     getWallet()->restoreSwapTradeData(filename);
 }
 
@@ -377,13 +398,16 @@ void Swap::onRestoreSwapTradeData(QString swapId, QString importedFilename, QStr
 
 // Switch to New Trade Window
 void Swap::initiateNewTrade() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::initiateNewTrade");
     getSwap()->initiateNewTrade();
 }
 
 void Swap::showNewTrade1() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::showNewTrade1");
     getSwap()->showNewTrade1();
 }
 void Swap::showNewTrade2() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::showNewTrade2");
     getSwap()->showNewTrade2();
 }
 
@@ -391,6 +415,9 @@ void Swap::showNewTrade2() {
 // Response: sgnApplyNewTrade1Params(bool ok, QString errorMessage)
 void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mwcAmount, QString secAmount,
                                       QString secAddress, QString sendToAddress, bool lockMwcFirst ) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::applyNewTrade1Params with account=" + account + " secCurrency=" + secCurrency +
+        " mwcAmount=" + mwcAmount + " secAmount=" + secAmount + " secAddress=" + secAddress +
+        " sendToAddress=" + sendToAddress + " lockMwcFirst=" + QString(lockMwcFirst ? "true" : "false"));
 
     QString addrType;
 
@@ -415,7 +442,7 @@ void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mw
                 break;
             }
             default: {
-                emit sgnApplyNewTrade1Params(false, "Automated swaps working only with MQS and TOR addresses.");
+                emit sgnApplyNewTrade1Params(false, "Automated swaps work only with MWCMQS and Tor addresses.");
                 return;
 
             }
@@ -452,6 +479,10 @@ void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mw
 // Response: sgnApplyNewTrade2Params(bool ok, QString errorMessage)
 void Swap::applyNewTrade2Params(QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks,
                                       double secTxFee, QString electrumXUrl) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::applyNewTrade2Params with secCurrency=" + secCurrency +
+        " offerExpTime=" + QString::number(offerExpTime) + " redeemTime=" + QString::number(redeemTime) +
+        " mwcBlocks=" + QString::number(mwcBlocks) + " secBlocks=" + QString::number(secBlocks) +
+        " secTxFee=" + QString::number(secTxFee) + " electrumXUrl=" + electrumXUrl);
 
     QString sendToAddress = getSwap()->getBuyerAddress();
     QPair< QString, util::ADDRESS_TYPE > addressRes = util::verifyAddress(sendToAddress);
@@ -534,6 +565,7 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
 // Create and start a new swap. The data must be submitted by that moment
 // Response: sgnCreateStartSwap(bool ok, QString errorMessage)
 void Swap::createStartSwap() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::createStartSwap");
     getSwap()->createStartSwap();
 }
 
@@ -543,111 +575,141 @@ void Swap::onCreateStartSwap(bool ok, QString errorMessage) {
 
 // Account that is related to this swap trade
 QString Swap::getAccount() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getAccount");
     return getSwap()->getAccount();
 }
 void Swap::setAccount(QString accountName) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::setAccount with accountName=" + accountName);
     getSwap()->setAccount(accountName);
 }
 
 // List of the secondary currencies that wallet support
 QVector<QString> Swap::secondaryCurrencyList() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::secondaryCurrencyList");
     return getSwap()->secondaryCurrencyList();
 }
 
 // Check if this trade is created from accepted Marketplace offer
 bool Swap::isMktTrade() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::isMktTrade");
     return getSwap()->isMktTrade();
 }
 
 QString Swap::getCurrentSecCurrency() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getCurrentSecCurrency");
     return getSwap()->getCurrentSecCurrency();
 }
 
 QString Swap::getCurrentSecCurrencyFeeUnits() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getCurrentSecCurrencyFeeUnits");
     return getSwap()->getCurrentSecCurrencyFeeUnits();
 }
 
 void Swap::setCurrentSecCurrency(QString secCurrency) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::setCurrentSecCurrency with secCurrency=" + secCurrency);
     getSwap()->setCurrentSecCurrency(secCurrency);
 }
 
 QString Swap::getMwc2Trade() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getMwc2Trade");
     return getSwap()->getMwc2Trade();
 }
 
 QString Swap::getSec2Trade() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSec2Trade");
     return getSwap()->getSec2Trade();
 }
 
 QString Swap::getSecAddress() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecAddress");
     return getSwap()->getSecAddress();
 }
 
 bool    Swap::isLockMwcFirst() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::isLockMwcFirst");
     return getSwap()->isLockMwcFirst();
 }
 
 QString Swap::getBuyerAddress() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getBuyerAddress");
     return getSwap()->getBuyerAddress();
 }
 
 // Return pairs of the expiration interval combo:
 // <Interval is string> <Value in minutes>
 QVector<QString> Swap::getExpirationIntervals() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getExpirationIntervals");
     return getSwap()->getExpirationIntervals();
 }
 
 double Swap::getSecMinAmount(QString secCurrency) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecMinAmount with secCurrency=" + secCurrency);
     return getSwap()->getSecMinAmount(secCurrency);
 }
 
 int Swap::getOfferExpirationInterval() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getOfferExpirationInterval");
     return getSwap()->getOfferExpirationInterval();
 }
 int Swap::getSecRedeemTime() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecRedeemTime");
     return getSwap()->getSecRedeemTime();
 }
 double Swap::getSecTransactionFee() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecTransactionFee");
     return getSwap()->getSecTransactionFee();
 }
 double Swap::getSecMinTransactionFee() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecMinTransactionFee");
     return getSwap()->getSecMinTransactionFee();
 }
 double Swap::getSecMaxTransactionFee() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecMaxTransactionFee");
     return getSwap()->getSecMaxTransactionFee();
 }
 
 double Swap::getSecTransactionFee(QString secCurrency) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecTransactionFee with secCurrency=" + secCurrency);
     return getSwap()->getSecTransactionFee(secCurrency);
 }
 double Swap::getSecMinTransactionFee(QString secCurrency) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecMinTransactionFee with secCurrency=" + secCurrency);
     return getSwap()->getSecMinTransactionFee(secCurrency);
 }
 double Swap::getSecMaxTransactionFee(QString secCurrency) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecMaxTransactionFee with secCurrency=" + secCurrency);
     return getSwap()->getSecMaxTransactionFee(secCurrency);
 }
 
 int Swap::getMwcConfNumber(double mwcAmount) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getMwcConfNumber with mwcAmount=" + QString::number(mwcAmount));
     return getSwap()->getMwcConfNumber(mwcAmount);
 }
 int Swap::getSecConfNumber(QString secCurrency) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecConfNumber with secCurrency=" + secCurrency);
     return getSwap()->getSecConfNumber(secCurrency);
 }
 
 int Swap::getMwcConfNumber() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getMwcConfNumber");
     return getSwap()->getMwcConfNumber();
 }
 
 int Swap::getSecConfNumber() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecConfNumber");
     return getSwap()->getSecConfNumber();
 }
 
 QString Swap::getElectrumXprivateUrl() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getElectrumXprivateUrl");
     return getSwap()->getElectrumXprivateUrl();
 }
 
 // Calculate the locking time for a NEW not yet created swap offer.
 QVector<QString> Swap::getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks ) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getLockTime with secCurrency=" + secCurrency +
+        " offerExpTime=" + QString::number(offerExpTime) + " redeemTime=" + QString::number(redeemTime) +
+        " mwcBlocks=" + QString::number(mwcBlocks) + " secBlocks=" + QString::number(secBlocks));
     return getSwap()->getLockTime( secCurrency, offerExpTime, redeemTime, mwcBlocks, secBlocks );
 }
 
@@ -655,6 +717,7 @@ bool isSwapDone(const QString & stateCmd) {
     return stateCmd.endsWith("Cancelled") || stateCmd.endsWith("Refunded")  || stateCmd.endsWith("Complete");
 }
 bool Swap::isSwapDone(QString stateCmd) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::isSwapDone with stateCmd=" + stateCmd);
     return bridge::isSwapDone(stateCmd);
 }
 
@@ -676,6 +739,8 @@ bool isSwapCancellable(const QString & stateCmd, bool marketplaceTrade) {
         return !nonCancelableStates.contains(stateCmd);
 }
 bool Swap::isSwapCancellable(QString stateCmd, bool marketplaceTrade) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::isSwapCancellable with stateCmd=" + stateCmd +
+        " marketplaceTrade=" + QString(marketplaceTrade ? "true" : "false"));
     return bridge::isSwapCancellable(stateCmd, marketplaceTrade);
 }
 
@@ -728,6 +793,7 @@ int  getSwapBackup(const QString & stateCmd) {
 }
 
 int Swap::getSwapBackup(QString stateCmd) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSwapBackup with stateCmd=" + stateCmd);
     return bridge::getSwapBackup(stateCmd);
 }
 
@@ -736,15 +802,18 @@ bool isSwapWatingToAccept(const QString & stateCmd) {
 }
 
 bool Swap::isSwapWatingToAccept(QString stateCmd) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::isSwapWatingToAccept with stateCmd=" + stateCmd);
     return bridge::isSwapWatingToAccept(stateCmd);
 }
 
 // Accept a new trade and start run it. By that moment the trade must abe reviews and all set
 void Swap::acceptTheTrade(QString swapId) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::acceptTheTrade with swapId=" + swapId);
     getSwap()->acceptTheTrade(swapId);
 }
 
 QString Swap::getSecondaryFee(QString secCurrency) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getSecondaryFee with secCurrency=" + secCurrency);
     double fee = getSwap()->getSecondaryFee(secCurrency);
     if (fee<=0.0)
         return "";
@@ -754,26 +823,29 @@ QString Swap::getSecondaryFee(QString secCurrency) {
 
 // Tweak the swap trade state. ONLY for dev help usage.
 void Swap::adjustTradeState(QString swapId, QString newState) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::adjustTradeState with swapId=" + swapId + " newState=" + newState);
     getWallet()->adjustTradeState(swapId, newState);
 }
 
 // Verify swap trades backup dir. In case of error, it shows the message.
 // Return true if current backup dir is valid. Otherwise - false
 bool Swap::verifyBackupDir(QString backupDir, bool showErrorMessage) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::verifyBackupDir with backupDir=" + backupDir +
+        " showErrorMessage=" + QString(showErrorMessage ? "true" : "false"));
     return getSwap()->verifyBackupDir(backupDir, showErrorMessage);
 }
 
 
 QString Swap::getNote() {
+    logger::logInfo(logger::BRIDGE, "Call Swap::getNote");
     return getSwap()->getNote();
 }
 
 void Swap::setNote(QString note) {
+    logger::logInfo(logger::BRIDGE, "Call Swap::setNote with note=" + note);
     getSwap()->setNote(note);
 }
 
-
-
 }
 
-
+#endif

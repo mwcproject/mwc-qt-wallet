@@ -30,6 +30,12 @@ public:
 
     // Append notification
     Q_INVOKABLE void appendNotificationMessage(MESSAGE_LEVEL level, QString message);
+
+signals:
+    // Updates from the notification system
+    void sgnNewNotificationMessage(int level, QString message); // level: bridge::MESSAGE_LEVEL values
+private slots:
+    void onSgnNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message); // level: bridge::MESSAGE_LEVEL
 };
 
 }

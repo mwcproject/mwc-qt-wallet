@@ -34,42 +34,25 @@ bool isOnlineNode();
 bool isColdWallet();
 
 
-void setMwc713conf( QString conf );
 void setMwcGuiWalletConf( QString conf );
 
 /**
  * COnfiguration for mwc-mq-wallet
- * @param mwcPath               - path to mwc-node.  Not used now
- * @param wallet713path         - path to mwc713
- * @param mwczipPath            - path to mwczip, small tool to zip files
  * @param mainStyleSheetPath    - path to main (non modal) stylesheet
  * @param dialogsStyleSheetPath - path to modal dialogs stylesheet (changes set to the main stylesheet)
- * @param airdropUrlMainNetUrl  - Airdrop server claims URL for main net
- * @param airdropUrlTestNetUrl  - Airdrop server claims URL for floo net
  * @param logoutTimeMs          - Automatic locking for the wallet
  * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
  */
-void setConfigData(WALLET_RUN_MODE runMode, QString mwcPath, QString wallet713path,
-                   QString mwczipPath, QString torPath,
+void setConfigData(WALLET_RUN_MODE runMode,
                    int64_t logoutTimeMs,
                    double timeoutMultiplier,
                    int sendTimeoutMs);
 
-// For Unit tests only
-void setMwcZipPath(const QString & mwcZipPath);
-
-
 // Note, workflow for config not enforced. Please don't abuse it
-const QString & getMwc713conf();
 const QString & getMwcGuiWalletConf();
 
-const QString & getMwcPath(); // Not using now because so far there is no local node is running
-const QString & getWallet713path();
-const QString & getMwcZipPath();
-const QString & getTorPath();
-
 int64_t         getLogoutTimeMs();
-void         setLogoutTimeMs(int64_t timeMs);
+void            setLogoutTimeMs(int64_t timeMs);
 
 double          getTimeoutMultiplier();
 void            increaseTimeoutMultiplier();

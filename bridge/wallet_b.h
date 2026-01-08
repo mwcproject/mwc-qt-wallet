@@ -22,6 +22,7 @@
 #include <QObject>
 #include "../core/Notification.h"
 #include "../wallet/wallet.h"
+#include <QJsonArray>
 
 namespace bridge {
 
@@ -31,253 +32,125 @@ public:
     explicit Wallet(QObject * parent = nullptr);
     ~Wallet();
 
-    // return true if MQS is online
-    Q_INVOKABLE bool getMqsListenerStatus();
-    // return true if Tor is online
-    Q_INVOKABLE bool getTorListenerStatus();
+    // Return true if wallet has this password. Wallet might not have password (has empty password) if it was created manually.
+    // Expected that the wallet is already open,
+    Q_INVOKABLE bool checkPassword(QString password);
 
-    // Request start/stop listeners. Feedback should come with sgnUpdateListenerStatus
-    Q_INVOKABLE void requestStartMqsListener();
-    Q_INVOKABLE void requestStopMqsListener();
-    Q_INVOKABLE void requestStartTorListener();
-    Q_INVOKABLE void requestStopTorListener();
+    // Return 4 values:
+    // [0]  mqs_started
+    // [1]  mqs_healthy
+    // [2]  tor_started
+    // [3]  tor_healthy
+    Q_INVOKABLE QVector<bool> getListenerStatus();
 
-    // Return: signal  sgnRepost(int id, QString err)
-    Q_INVOKABLE void repost(QString account, int id, bool fluff);
-
-    // Return a password hash for that wallet
-    Q_INVOKABLE QString getPasswordHash();
-
-    // return Total MWC amount as String. Formatted for GUI
-    Q_INVOKABLE QString getTotalMwcAmount();
-
-    // return Unconfirmed MWC amount as String. Formatted for GUI
-    // Empty string if there are no unconfirmed coins
-    Q_INVOKABLE QString getUnconfirmedAmount();
-
-    // Get MQS address and index
-    // Return: signal  sgnMwcAddressWithIndex
-    Q_INVOKABLE void requestMqsAddress();
-    // Change MWC box address to another from the chain. idx - index in the chain.
-    // Return: signal  sgnMwcAddressWithIndex
-    Q_INVOKABLE void requestChangeMqsAddress(int idx);
-    // Generate next box address for the next index
-    // Return: signal  sgnMwcAddressWithIndex
-    Q_INVOKABLE void requestNextMqsAddress();
-    // Get last known MQS address. It is good enough for cases when you don't expect address to be changed
+    // Request MQS address
     Q_INVOKABLE QString getMqsAddress();
-    // Get last known Tor address. It is good enough for cases when you don't expect address to be changed
-    Q_INVOKABLE QString getTorAddress();
 
-    // Request a wallet address for file/http transactions
-    // Return: signal  sgnFileProofAddress
-    Q_INVOKABLE void requestFileProofAddress();
+    // Request Tor address
+    Q_INVOKABLE QString getTorSlatepackAddress();
+
+    // request current address index
+    Q_INVOKABLE int getAddressIndex();
+
+    // Note, set address index does update the MQS and Tor addresses
+    // The Listeners, if running, will be restarted automatically
+    Q_INVOKABLE void setAddressIndex(int index);
 
     // Request accounts info
-    // includeAccountName - add Account names
-    // includeSpendableInfo - add String about Spendables
-    // includeAccountFullInfo - add account full info
-    Q_INVOKABLE QVector<QString> getWalletBalance(bool includeAccountName, bool includeSpendableInfo,  bool includeAccountFullInfo);
-    // Get current account name for the wallet
-    Q_INVOKABLE QString getCurrentAccountName();
-    // Change current account
-    Q_INVOKABLE void switchAccount( QString accountName );
+    // includeAccountName - return Account names
+    // includeAccountFullInfo - return account full info
+    Q_INVOKABLE QVector<QString> getWalletBalance(bool includeAccountName, bool includeAccountPath, bool includeSpendableInfo, bool includeAccountFullInfo);
 
-    // Initiate wallet balance update. Please note, update happens in the backgorund and on events.
-    // When done onWalletBalanceUpdated will be called.
-    Q_INVOKABLE void requestWalletBalanceUpdate();
+    // return current account path
+    Q_INVOKABLE QString getCurrentAccountId();
 
-    // Request list of outputs for the account.
-    // Respond will be with sgnOutputs
-    Q_INVOKABLE void requestOutputs(QString account, bool show_spent, bool enforceSync);
+    // Switch to different account
+    Q_INVOKABLE void switchAccountById(QString accountPath);
+
+    // Show outputs for the wallet
+    Q_INVOKABLE QJsonArray getOutputs(QString accountPath, bool show_spent);
+
+    // Show outputs for the wallet
+    Q_INVOKABLE QJsonArray getOutputsByCommits(QString accountPath, QVector<QString> commits);
+
+    // Set account that will receive the funds
+    Q_INVOKABLE void setReceiveAccountById(QString accountPath);
+    Q_INVOKABLE QString getReceiveAccountPath();
+
+    // Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
+    Q_INVOKABLE QJsonObject decodeSlatepack(QString slatepackContent);
 
     // Show all transactions for current account
-    // Respond: sgnTransactions( QString account, QString height, QVector<QString> Transactions);
-    Q_INVOKABLE void requestTransactions(QString account, bool enforceSync);
+    Q_INVOKABLE QJsonArray getTransactions( QString accountPath );
 
-    // get Extended info for specific transaction
-    // Respond:  sgnTransactionById( bool success, QString account, QString height, QString transaction,
-    //                            QVector<QString> outputs, QVector<QString> messages );
-    Q_INVOKABLE void requestTransactionById(QString account, QString txIdxOrUUID );
+    // Request single transaction by UUID, any account
+    Q_INVOKABLE QJsonObject getTransactionByUUID( QString tx_uuid );
 
-    // Cancel transaction by id
-    // Respond: sgnCancelTransacton( bool success, QString trIdx, QString errMessage )
-    Q_INVOKABLE void requestCancelTransacton(QString account, QString txIdx);
-
-    // Set acount to receive the coins
-    Q_INVOKABLE void setReceiveAccount(QString account);
-    // Get current account that receive coins
-    Q_INVOKABLE QString getReceiveAccount();
-
-
-    // Generating transaction proof for transaction.
-    // Respond: sgnExportProofResult( bool success, QString fn, QString msg );
-    Q_INVOKABLE void generateTransactionProof( QString transactionId, QString resultingFileNameURI );
+    // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
+    // Return error or JsonObject
+    Q_INVOKABLE QString generateTransactionProof( QString transactionUuid );
 
     // Verify the proof for transaction
-    // Respond: sgnVerifyProofResult( bool success, QString msg );
-    Q_INVOKABLE void verifyTransactionProof( QString uriProofFileName );
-
-    // Request Node status
-    // Return true if task was scheduled (wallet is unlocked)
-    // Respond: sgnNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections )
-    Q_INVOKABLE bool requestNodeStatus();
-
-    // Create another account, note no delete exist for accounts
-    // Check Signal:  sgnAccountCreated
-    Q_INVOKABLE void createAccount( QString accountName );
-
-    // Rename account
-    // Check Signal: sgnAccountRenamed(bool success, QString errorMessage);
-    Q_INVOKABLE void renameAccount(QString oldName, QString newName);
-
-    // Decode the slatepack data
-    // Check Signal: sgnDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
-    Q_INVOKABLE void decodeSlatepack(QString slatepackContent, QString tag);
-
-    // Finalize a slatepack.
-    // Check Signal sgnFinalizeSlatepack
-    Q_INVOKABLE void finalizeSlatepack( QString slatepack, bool fluff, QString tag );
-
-    // Request Vieing Key (rewind_hash)
-    // Check Signal: sgnGetViewingKey
-    Q_INVOKABLE void getViewingKey();
+    // Return error or JsonObject
+    Q_INVOKABLE QString verifyTransactionProof( QString proof );
 
     // Check if slatepack data does exist
     Q_INVOKABLE bool hasSendSlatepack(QString txUUID);
     Q_INVOKABLE bool hasReceiveSlatepack(QString txUUID);
+    Q_INVOKABLE bool hasFinalizedData(QString txUUID);
 
     // Request to show the slatepack data
     Q_INVOKABLE void viewSendSlatepack(QString txUUID);
     Q_INVOKABLE void viewReceiveSlatepack(QString txUUID);
 
+    // Cancel TX by UUID (in case of multi accouns, we want to cancel both)
+    // Return error string
+    Q_INVOKABLE QString cancelTransacton(QString txUUID);
+
+    // Repost the transaction.
+    // Return Error
+    Q_INVOKABLE QString repostTransaction(QString txUUID, bool fluff);
+
+    // Rename account
+    Q_INVOKABLE void renameAccountById( QString accountPath, QString newAccountName);
+
+    // Create another account, note no delete exist for accounts
+    // Return account path
+    Q_INVOKABLE QString createAccount( const QString & accountName );
+
+    // Get rewind hash
+    Q_INVOKABLE QString viewRewindHash();
+
+    // Return Total MWC and Unconfirmed MWC
+    // [0] - total MWC whole
+    // [1] - total MWC full fractions (9 digits)
+    // [2] - unconfirmed
+    Q_INVOKABLE QVector<QString> getTotalAmount();
+
+    Q_INVOKABLE bool requestFaucetMWC();
 signals:
-    // Wallet notification about what is the command that is starting.
-    // Note, on idle it sends "empty" String. Not all commands sending an update
-    void sgnStartingCommand(QString actionName);
-
-    // Updates from the wallet and notification system
-    void sgnNewNotificationMessage(int level, QString message); // level: bridge::MESSAGE_LEVEL values
     void sgnConfigUpdate();
-    // keybaseOnline  is absolete, always false
-    void sgnUpdateListenerStatus(bool mwcOnline, bool tor);
-    void sgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, double totalDifficulty, int connections );
-    void sgnUpdateSyncProgress(double progressPercent);
-    void sgnWalletBalanceUpdated();
-    void sgnLoginResult(bool ok);
+    void sgnLogin();
     void sgnLogout();
-
-    // Some of listeners was started, stopped
-    // kbTry  is absolete, allways false value
-    void sgnListenerStartStop(bool mqTry, bool tor);
-
-    // Get MWC MQ address with index
-    void sgnMwcAddressWithIndex(QString mwcAddress, int idx);
-
-    // Get Tor address. Address will be assigned when Tor listener is started.
-    // Empty address will be assigned when Tor listener is stopped.
-    void sgnTorAddress(QString tor);
-
-    // Get wallet provable address. Please note, address will be changed
-    // When address index will be changed. Normally it is the same as a tor address
-    void sgnFileProofAddress(QString proofAddress);
-
-    // Outputs requested form the wallet.
-    // outputs are in Json format, see wallet::WalletOutput for details
-    void sgnOutputs( QString account, bool showSpent, QString height, QVector<QString> outputs);
-
-    //  Transactions from the requestTransactions request
-    // Transactions are in Json format, see wallet::WalletTransaction for details
-    void sgnTransactions( QString account, QString height, QVector<QString> transactions);
-    // Transaction from getTransactionById request
-    // transaction: JSON for wallet::WalletTransaction
-    // outputs: JSON for  wallet::WalletOutput
-    void sgnTransactionById( bool success, QString account, QString height, QString transaction,
-                            QVector<QString> outputs, QVector<QString> messages );
-    // Respond from cancelTransacton
-    void sgnCancelTransacton( bool success, QString account, QString trIdx, QString errMessage );
-
-    // respond from generateTransactionProof
-    void sgnExportProofResult( bool success, QString fn, QString msg );
-
-    // respond from verifyTransactionProof
-    void sgnVerifyProofResult( bool success, QString fn, QString msg );
-
-    // Node status respond,  requestNodeStatus()
-    void sgnNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, QString totalDifficulty, int connections );
-
-    // New account is created, createAccount
-    void sgnAccountCreated( QString newAccountName);
-    // Account is renamed, renameAccount
-    void sgnAccountRenamed(bool success, QString errorMessage);
-
-    // respond from repost.  OK is err is empty
-    void sgnRepost(int txIdx, QString err);
-
-    // response form DecodeSlatepack. Ok if error is empty
-    void sgnDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
-
-    // response to FinalizeSlatepack
-    void sgnFinalizeSlatepack( QString tagId, QString error, QString txUuid );
-
-    // response to getViewingKey
-    void sgnGetViewingKey(QString viewingKey, QString error);
-
-    // response from generateOwnershipProof
-    void sgnGenerateOwnershipProof(QString proof, QString error);
-
-    // response from validateOwnershipProof
-    void sgnValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
+    void sgnScanProgress( QString responseId, QJsonObject statusMessage );
+    void sgnScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
+    void sgnSend( bool success, QString error, QString tx_uuid, QString tag );
+    void sgnSlateReceivedFrom(QString slate, QString mwc, QString fromAddr, QString message );
+    void sgnScanRewindHash( QString responseId, QJsonObject walletOutputs, QString errors );
+    void sgnWalletBalanceUpdated();
 
 private slots:
-    void onStartingCommand(QString actionName);
-
-    // Signals that comes from wallet & notification system
-    void onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message);
     void onConfigUpdate();
-    void onListeningStartResults( bool mqTry, bool tor,
-                                  QStringList errorMessages, bool initialStart ); // error messages, if get some
-    void onListeningStopResult(bool mqTry, bool tor,
-                               QStringList errorMessages );
-    void onUpdateListenerStatus(bool mqsOnline, bool torOnline);
-    void onUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-    void onUpdateSyncProgress(double progressPercent);
-    void onWalletBalanceUpdated();
-    void onLoginResult(bool ok);
+    void onLogin();
     void onLogout();
-    void onMwcAddressWithIndex(QString mwcAddress, int idx);
-    void onTorAddress(QString tor);
-    void onFileProofAddress(QString address);
-    void onOutputs( QString account, bool showSpent, int64_t height, QVector<wallet::WalletOutput> outputs);
-
-    void onTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> Transactions);
-    void onCancelTransacton( bool success, QString account, int64_t trIdx, QString errMessage );
-    void onTransactionById( bool success, QString account, int64_t height, wallet::WalletTransaction transaction,
-                                QVector<wallet::WalletOutput> outputs, QVector<QString> messages );
-
-    void onExportProof( bool success, QString fn, QString msg );
-    void onVerifyProof( bool success, QString fn, QString msg );
-    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-
-    void onAccountCreated( QString newAccountName);
-    void onAccountRenamed(bool success, QString errorMessage);
-
-    void onRepost(int txIdx, QString err);
-
-    void onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
-
-    void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
-
-    void onViewRewindHash(QString rewindHash, QString error);
-
-    void onGenerateOwnershipProof(QString proof, QString error);
-
-    void onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
+    void onScanProgress( QString responseId, QJsonObject statusMessage );
+    void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
+    void onSend( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag );
+    void onSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message );
+    void onScanRewindHash( QString responseId, wallet::ViewWallet walletOutputs, QString errors );
+    void onWalletBalanceUpdated();
 
 private:
-#ifdef WALLET_MOBILE
-    QString proofResultURI;
-#endif
 };
 
 }

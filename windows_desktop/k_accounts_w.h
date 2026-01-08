@@ -50,9 +50,6 @@ private slots:
     void on_accountList_itemDoubleClicked(QTableWidgetItem *item);
 
     void onSgnWalletBalanceUpdated();
-    void onSgnAccountCreated( QString newAccountName);
-    // Account is renamed, renameAccount
-    void onSgnAccountRenamed(bool success, QString errorMessage);
 
 private:
     void initTableHeaders();
@@ -61,7 +58,6 @@ private:
     void renameAccount(int idx);
 
     void updateButtons();
-    void startWaiting();
 private:
     Ui::Accounts *ui;
     bridge::Config * config = nullptr;
@@ -69,7 +65,7 @@ private:
     bridge::Accounts * accState = nullptr; // place holder
     bridge::Util * util = nullptr;
 
-    QVector<QString> accounts; // current shown data
+    QVector<QPair<QString,QString>> accounts; // current shown data: Account name/path
 };
 
 }

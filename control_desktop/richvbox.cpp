@@ -17,6 +17,8 @@
 #include <QScrollBar>
 #include <QTimer>
 
+#include "MwcScrollBar.h"
+
 namespace control {
 
 RichVBox::RichVBox(QWidget *parent) : QScrollArea(parent)
@@ -27,6 +29,8 @@ RichVBox::RichVBox(QWidget *parent) : QScrollArea(parent)
 //    setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+    setVerticalScrollBar(new MwcScrollBar(Qt::Vertical, this));
 
     vlist = new QWidget (this);
     vlist->setStyleSheet( "border: transparent; padding: 0px" );
@@ -51,6 +55,7 @@ RichVBox::RichVBox(QWidget *parent) : QScrollArea(parent)
 
 void RichVBox::clearAll(bool resetScrollValue) {
     if (resetScrollValue) {
+        verticalScrollBar()->setValue(0);
         scrollValue = 0;
         needSetValue = false;
     }
@@ -72,7 +77,7 @@ void RichVBox::clearAll(bool resetScrollValue) {
 }
 
 
-RichVBox & RichVBox::addItem(RichItem * item) {
+RichVBox & RichVBox::addItem(QWidget * item) {
     item->setParent(this);
 
     layout->addWidget(item);
@@ -87,15 +92,20 @@ RichVBox & RichVBox::apply() {
     return *this;
 }
 
-void RichVBox::itemClicked(QString id, RichItem * item) {
+// Update layouts
+void RichVBox::updateLayouts() {
+    layout->invalidate();
+}
+
+void RichVBox::itemClicked(QString id, QWidget * item) {
     Q_UNUSED(item);
     emit onItemClicked(id);
 }
-void RichVBox::itemDblClicked(QString id, RichItem * item) {
+void RichVBox::itemDblClicked(QString id, QWidget * item) {
     Q_UNUSED(item);
     emit onItemDblClicked(id);
 }
-void RichVBox::itemFocus(QString id, RichItem * item) {
+void RichVBox::itemFocus(QString id, IRichFocusable * item) {
     if (focusItem != item ) {
         if (focusItem != nullptr) {
             focusItem->setFocusState(false);
@@ -106,12 +116,15 @@ void RichVBox::itemFocus(QString id, RichItem * item) {
 
     emit onItemFocus(id);
 }
-void RichVBox::itemActivated(QString id, RichItem * item) {
+void RichVBox::itemActivated(QString id, QWidget * item) {
     Q_UNUSED(item);
     emit onItemActivated(id);
 }
 
 void RichVBox::onHorzValueChanged(int value) {
+    if (needSetValue)
+        return;
+
     if (value == 0) {
         QScrollBar * sb = verticalScrollBar();
         if (sb != nullptr) {
@@ -138,6 +151,9 @@ void RichVBox::onHorzRangeChanged(int min, int max) {
             int maxV = sb->maximum();
             if (minV>=0 && minV<maxV && scrollValue>=minV && scrollValue<=maxV ) {
                 sb->setValue(scrollValue);
+            }
+            else {
+                needSetValue = true;
             }
         }
     }

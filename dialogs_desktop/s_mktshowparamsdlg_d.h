@@ -15,9 +15,12 @@
 #ifndef S_MKTSHOWPARAMSDLG_D_H
 #define S_MKTSHOWPARAMSDLG_D_H
 
+#include "../features.h"
+
+#ifdef FEATURE_MKTPLACE
+
 #include "../control_desktop/mwcdialog.h"
 
-/*
 namespace Ui {
 class MktShowParamsDlg;
 }
@@ -53,6 +56,7 @@ private:
     double maxMwcAmount;
 };
 
-}*/
+}
 
+#endif
 #endif // S_MKTSHOWPARAMSDLG_D_H

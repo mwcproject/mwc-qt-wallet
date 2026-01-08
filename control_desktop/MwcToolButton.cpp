@@ -17,10 +17,17 @@
 
 namespace control {
 
+// ----------------- MwcToolButton --------------------
+
+MwcToolButton::MwcToolButton(QWidget *parent) :
+        QToolButton(parent) {}
+
+MwcToolButton::~MwcToolButton() {}
+
 // ----------------- NavMenuButton --------------------
 
 MwcToolButtonUnderscore::MwcToolButtonUnderscore(QWidget *parent) :
-        QToolButton(parent) {}
+        MwcToolButton(parent) {}
 
 MwcToolButtonUnderscore::~MwcToolButtonUnderscore() {}
 

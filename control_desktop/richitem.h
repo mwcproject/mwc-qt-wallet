@@ -18,6 +18,8 @@
 #include <QFrame>
 #include <QLabel>
 
+#include "richvbox.h"
+
 namespace control {
 
 class RichVBox;
@@ -44,7 +46,7 @@ const int     FONT_SMALL  = 12;
 
 // Rich Item should provide ability to dynamically construct complex list items that allow to show information better then traditional lists
 // with columns
-class RichItem : public QFrame
+class RichItem : public QFrame, public IRichFocusable
 {
     Q_OBJECT
 public:
@@ -78,7 +80,7 @@ public:
     ///////////////////////////////
     void setParent(RichVBox * p) {eventsHandler=p;}
 
-    void setFocusState(bool focus);
+    virtual void setFocusState(bool focus) override;
 signals:
 
 protected:

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>IntegrityTransactions</class>
- <widget class="QWidget" name="IntegrityTransactions">
+ <widget class="control::MwcWidget" name="IntegrityTransactions">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -122,7 +122,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="widget" native="true">
+             <widget class="control::MwcWidget" name="widget" native="true">
               <property name="minimumSize">
                <size>
                 <width>1</width>
@@ -273,6 +273,11 @@
    <extends>QWidget</extends>
    <header>control_desktop/richvbox.h</header>
    <container>1</container>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -48,9 +48,6 @@ private slots:
     void on_resultTransFileNameSelect_clicked();
 
     void onSgnHideProgress();
-
-    void sgnTransactionById( bool success, QString account, QString height, QString transaction,
-                             QVector<QString> outputs, QVector<QString> messages );
 private:
     Ui::FileTransactionFinalize *ui;
     bridge::Wallet * wallet = nullptr;

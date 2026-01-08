@@ -510,7 +510,7 @@ Item {
                 const account = accountItems.get(accountComboBox.currentIndex).account
                 const sendAmount = textfield_amount.text.trim()
                 config.setSendMethod(selectedSendMethod)
-                const res = send.initialSendSelection( selectedSendMethod, account, sendAmount );
+                const res = send.initialSendSelection( selectedSendMethod, accountPath, sendAmount );
                 if (res === 1)
                     accountComboBox.focus = true
                 else if (res === 2)

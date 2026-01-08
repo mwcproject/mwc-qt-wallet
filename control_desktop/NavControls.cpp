@@ -20,20 +20,20 @@ namespace control {
 // --------------  NavPushButton  -------------------
 
 NavPushButton::NavPushButton(QWidget *parent) :
-        QToolButton(parent) {}
+        MwcToolButton(parent) {}
 
 NavPushButton::~NavPushButton() {}
 
 // ----------------- NavMenuButton --------------------
 
 NavMenuButton::NavMenuButton(QWidget *parent) :
-        QPushButton(parent) {}
+        MwcPushButton(parent) {}
 
 NavMenuButton::NavMenuButton(const QString &text, QWidget *parent) :
-        QPushButton(text, parent) {}
+        MwcPushButton(text, parent) {}
 
 NavMenuButton::NavMenuButton(const QIcon &icon, const QString &text, QWidget *parent) :
-        QPushButton(icon, text, parent) {}
+        MwcPushButton(icon, text, parent) {}
 
 NavMenuButton::~NavMenuButton() {}
 

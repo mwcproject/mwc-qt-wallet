@@ -157,8 +157,8 @@ public:
     Q_INVOKABLE void setTradeAcceptedFlag(QString swapId, bool accepted);
 
     // Setting is MWC Node prohibited to use TOR
-    Q_INVOKABLE bool getNoTorForEmbeddedNode();
-    Q_INVOKABLE void setNoTorForEmbeddedNode(bool noTor);
+    //Q_INVOKABLE bool getNoTorForEmbeddedNode();
+    //Q_INVOKABLE void setNoTorForEmbeddedNode(bool noTor);
 
     // Slatepack format, selected value
     Q_INVOKABLE int getSendMethod();
@@ -178,10 +178,8 @@ public:
     Q_INVOKABLE void setSwapMktSelling(int buySellBoth);
     Q_INVOKABLE void setSwapMktCurrency(QString currency);
 
-    Q_INVOKABLE QString getTorBridgeConection();
-    Q_INVOKABLE QString getTorClientOptions();
-
-    Q_INVOKABLE void setTorBridgeConectionClientOptions(QString bridge, QString client);
+    Q_INVOKABLE bool isFaucetRequested();
+    Q_INVOKABLE void faucetRequested();
 };
 
 }

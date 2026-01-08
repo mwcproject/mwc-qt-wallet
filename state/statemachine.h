@@ -41,6 +41,8 @@ public:
     // Check if current state agree to switch the state
     bool canSwitchState(STATE nextWindowState);
 
+    void resetCurrentState() {currentState = STATE::NONE;}
+
     void executeFrom( STATE nextState );
 
     // set current action winodow if possible

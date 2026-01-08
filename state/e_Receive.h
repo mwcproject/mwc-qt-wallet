@@ -30,42 +30,28 @@ public:
     Receive( StateContext * context );
     virtual ~Receive() override;
 
-    void signTransaction( QString uriFileName );
     void signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress);
 
 public:
     void ftBack();
-    void receiveFile(QString uriFileName, QString description);
     void receiveSlatepack(QString slatepack, QString description);
 
-    bool needResultTxFileName() {return false;}
+    bool needResultTxFileName();
 
-    QString getResultTxPath() {return "";}
-    virtual void updateResultTxPath(QString path) {Q_UNUSED(path)}
+    QString getResultTxPath();
 
-    virtual bool isNodeHealthy() const {return true;}
+    virtual void updateResultTxPath(QString path);
+    virtual bool isNodeHealthy() const;
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override;
     virtual QString getHelpDocName() override;
 
     bool isActive() const;
-private slots:
-    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-    void onReceiveFile( bool success, QStringList errors, QString inFileName );
-    void onReceiveSlatepack( QString tagId, QString error, QString slatepack, QString txId );
 
-#ifdef WALLET_MOBILE
-    void sgnOnFileReady( int eventCode, QString fileUri );
-#endif
 private:
-    int lastNodeHeight = 0;
     bool signingFile = false; // what is signing now. File or Slatepack.
     bool atInitialPage = true;
-#ifdef WALLET_MOBILE
-    QString scrFileName;
-    QtAndroidService * androidDevice = nullptr;
-#endif
 };
 
 

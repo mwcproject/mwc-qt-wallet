@@ -20,20 +20,8 @@
 
 namespace node {
 
-struct MwcNodeConfig {
-    QString network; // Network full name as it is defined in the config
-    QString host;
-    QString port;
-    QString secret;
-
-    void setData(QString network, QString host, QString port, QString secret);
-};
-
 // return: <success, data/error>
 QPair<bool,QString> getMwcNodePath(const QString & nodeDataPath, const QString & network);
-
-// Update first and then get.
-MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QString & network, bool tor );
 
 }
 

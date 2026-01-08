@@ -27,6 +27,7 @@ class Config;
 class Wallet;
 class NodeInfo;
 class Util;
+class HeartBeat;
 }
 
 namespace wnd {
@@ -41,26 +42,21 @@ public:
 private:
     // Empty string to hide warning...
     void showWarning(QString warning);
-    void showNodeLogs();
     void updateNodeReadyButtons(bool nodeIsReady);
 
 private slots:
     void on_refreshButton_clicked();
-    void on_changeNodeButton_clicked();
-    void on_showLogsButton_clicked();
-    void on_showLogsButton_5_clicked();
-    void on_showLogsButton_9_clicked();
     void on_saveBlockchianData_clicked();
-    void on_loadBlockchainData_2_clicked();
+    void on_loadBlockchainData_clicked();
     void on_publishTransaction_clicked();
+    void on_resyncNodeData_clicked();
 
-    void onSgnSetNodeStatus( QString localNodeStatus,
-                                     bool online,  QString errMsg, int nodeHeight, int peerHeight,
-                                     QString totalDifficulty2show, int connections);
-    void onSgnUpdateEmbeddedMwcNodeStatus( QString status );
+    void onSgnSetNodeStatus( QString embeddedNodeStatus,
+                            bool internalNode,
+                            bool online,  int nodeHeight, int peerHeight,
+                            QString totalDifficulty2show, int connections);
     void onSgnHideProgress();
 
-    void on_resyncNodeData_clicked();
 
 private:
 
@@ -70,8 +66,8 @@ private:
     bridge::Wallet * wallet = nullptr;
     bridge::NodeInfo * nodeInfo = nullptr;
     bridge::Util * util = nullptr;
+    bridge::HeartBeat * heartBeat = nullptr;
 
-    wallet::MwcNodeConnection::NODE_CONNECTION_TYPE connectionType;
     QString currentWarning = "?";
 
     // Cache for latest error. We don't want spam user with messages about the node connection

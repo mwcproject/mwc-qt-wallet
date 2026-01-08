@@ -15,6 +15,10 @@
 #ifndef S_SWAPLIST_W_H
 #define S_SWAPLIST_W_H
 
+#include "../features.h"
+
+#ifdef FEATURE_SWAP
+
 #include "../core_desktop/navwnd.h"
 #include "../control_desktop/richbutton.h"
 #include <QMap>
@@ -165,5 +169,5 @@ private:
 };
 
 }
-
+#endif
 #endif // S_SWAPLIST_W_H

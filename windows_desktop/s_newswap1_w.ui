@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NewSwap1</class>
- <widget class="QWidget" name="NewSwap1">
+ <widget class="control::MwcWidget" name="NewSwap1">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -240,7 +240,7 @@
         <number>0</number>
        </property>
        <item row="2" column="0">
-        <widget class="QLabel" name="receiveLabel">
+        <widget class="control::MwcLabel" name="receiveLabel">
          <property name="text">
           <string>XXX receiving address:</string>
          </property>
@@ -274,10 +274,10 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>This trade exchange rate</string>
+          <string>This trade's exchange rate</string>
          </property>
          <property name="statusTip">
-          <string>This trade exchange rate</string>
+          <string>This trade's exchange rate</string>
          </property>
          <property name="text">
           <string/>
@@ -361,10 +361,10 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Specify who is lock coins first</string>
+        <string>Specify who locks coins first</string>
        </property>
        <property name="statusTip">
-        <string>Specify who is lock coins first</string>
+        <string>Specify who locks coins first</string>
        </property>
        <property name="text">
         <string>I agree to lock MWC first</string>
@@ -418,10 +418,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Address of other party wallet that you are swapping with</string>
+            <string>Address of the other party's wallet</string>
            </property>
            <property name="statusTip">
-            <string>Address of other party wallet that you are swapping with</string>
+            <string>Address of the other party's wallet</string>
            </property>
            <property name="placeholderText">
             <string>Send offer to ...</string>
@@ -464,7 +464,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QWidget" name="widget" native="true">
+          <widget class="control::MwcWidget" name="widget" native="true">
            <property name="minimumSize">
             <size>
              <width>500</width>
@@ -596,7 +596,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_2" native="true">
+        <widget class="control::MwcWidget" name="widget_2" native="true">
          <property name="minimumSize">
           <size>
            <width>1</width>
@@ -665,10 +665,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Cancel and return back</string>
+          <string>Cancel and return</string>
          </property>
          <property name="statusTip">
-          <string>Cancel and return back</string>
+          <string>Cancel and return</string>
          </property>
          <property name="text">
           <string>Cancel</string>
@@ -804,6 +804,16 @@
    <class>control::MwcCheckBox</class>
    <extends>QCheckBox</extends>
    <header>control_desktop/MwcCheckBox.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

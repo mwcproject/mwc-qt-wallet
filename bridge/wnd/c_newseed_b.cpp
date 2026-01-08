@@ -17,6 +17,7 @@
 #include "../../state/state.h"
 #include "../../state/statemachine.h"
 #include "../../state/a_initaccount.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
@@ -30,22 +31,21 @@ NewSeed::~NewSeed() {
     getBridgeManager()->removeNewSeed(this);
 }
 
-void NewSeed::showSeedData(const QVector<QString> & seed) {
-    emit sgnShowSeedData(seed);
-}
-
 // Done looking at a new seed. Let's go forward
 Q_INVOKABLE void NewSeed::doneWithNewSeed() {
+    logger::logInfo(logger::BRIDGE, "Call NewSeed::doneWithNewSeed");
     getState()->doneWithNewSeed();
 }
 
 // Submit a new word from the user input
 Q_INVOKABLE void NewSeed::submitSeedWord(QString word) {
+    logger::logInfo(logger::BRIDGE, "Call NewSeed::submitSeedWord with <word>");
     getState()->submitSeedWord(word);
 }
 
 // Restart seed verification
 Q_INVOKABLE void NewSeed::restartSeedVerification() {
+    logger::logInfo(logger::BRIDGE, "Call NewSeed::restartSeedVerification");
     getState()->restartSeedVerification();
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Transactions</class>
- <widget class="QWidget" name="Transactions">
+ <widget class="control::MwcWidget" name="Transactions">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -148,7 +148,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="widget" native="true">
+             <widget class="control::MwcWidget" name="widget" native="true">
               <property name="minimumSize">
                <size>
                 <width>1</width>
@@ -195,7 +195,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,2,0">
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,2">
          <property name="spacing">
           <number>10</number>
          </property>
@@ -229,10 +229,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Upload any wallet-generated proof file to verify that a transaction happened</string>
+            <string>Upload a wallet-generated proof file to verify that a transaction occurred.</string>
            </property>
            <property name="statusTip">
-            <string>Upload any wallet-generated proof file to verify that a transaction happened</string>
+            <string>Upload a wallet-generated proof file to verify that a transaction occurred.</string>
            </property>
            <property name="text">
             <string>Validate Proof File</string>
@@ -279,10 +279,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Export all transactions to a .CSV file.</string>
+            <string>Export all transactions to a CSV file.</string>
            </property>
            <property name="statusTip">
-            <string>Export all transactions to a .CSV file.</string>
+            <string>Export all transactions to a CSV file.</string>
            </property>
            <property name="text">
             <string>Export .CSV</string>
@@ -304,40 +304,6 @@
             </size>
            </property>
           </spacer>
-         </item>
-         <item>
-          <widget class="control::MwcPushButtonNormal" name="refreshButton">
-           <property name="minimumSize">
-            <size>
-             <width>180</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>180</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>Refresh transactions status</string>
-           </property>
-           <property name="statusTip">
-            <string>Refresh transactions status</string>
-           </property>
-           <property name="text">
-            <string>Refresh</string>
-           </property>
-           <property name="autoDefault">
-            <bool>true</bool>
-           </property>
-          </widget>
          </item>
         </layout>
        </item>
@@ -367,6 +333,12 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::RichVBox</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/richvbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
@@ -376,11 +348,10 @@
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::RichVBox</class>
+   <customwidget>
+   <class>control::MwcWidget</class>
    <extends>QWidget</extends>
-   <header>control_desktop/richvbox.h</header>
-   <container>1</container>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

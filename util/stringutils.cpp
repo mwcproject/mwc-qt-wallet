@@ -142,7 +142,6 @@ QString trimStrAsDouble(const QString & dblStr, int maxLen) {
 }
 
 
-// convert int64_t strign into shorter version
 // abcdefgh  => abc...
 QString string2shortStrR( QString str, int lenLimit ) {
     if ( str.length() < lenLimit )
@@ -223,20 +222,20 @@ static int calcOffsetFromUTC() {
 }
 
 // Convert mwc713 UTC time to this wallet time. Time template is different.
-QString mwc713time2ThisTime(QString mwc713TimeStr) {
-    if (mwc713TimeStr.isEmpty())
-        return mwc713TimeStr;
+QString utcTime2LocalTime(QString utcTimeStr) {
+    if (utcTimeStr.isEmpty())
+        return utcTimeStr;
 
     static int offsetFromUTC = calcOffsetFromUTC();
 
-    QDateTime time = QDateTime::fromString(mwc713TimeStr, mwc::DATETIME_TEMPLATE_MWC713 );
+    QDateTime time = QDateTime::fromString(utcTimeStr, Qt::ISODate );
     time = time.addSecs(offsetFromUTC);
 
     QString res = time.toString( mwc::DATETIME_TEMPLATE_THIS);
 
     // Return original string if time wan't converted. It is a usecase for Json data conversion
-    if (res.isEmpty() && !mwc713TimeStr.isEmpty())
-        return mwc713TimeStr;
+    if (res.isEmpty() && !utcTimeStr.isEmpty())
+        return utcTimeStr;
 
     return res;
 }

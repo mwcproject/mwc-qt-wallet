@@ -12,7 +12,7 @@ core--MwcToolbar {
     background-color: #6F00D6;
 }
 
-QStatusBar {
+control--MwcStatusBar {
     background-color: qlineargradient(x1: 1, y1: 0, x2: 1, y2: 0,
                                   stop: 0 #6F00D6, stop: 0.3 #6F00D6, stop: 0.9 #9E00E7, stop: 1 #9E00E7);
 
@@ -33,16 +33,16 @@ core--StatusWnd {
 }
 
 /* Needed for Windows */
-QWidget {
+control--MwcWidget {
     border: none;
 }
 
-QStatusBar::item {
+control--MwcStatusBar::item {
     border: none;
 }
 
 /* MWC tool bar buttons */
-QToolButton {
+control--MwcToolButton {
     border: none;
     background-color: #6F00D6;
     border-radius: 6px;
@@ -56,28 +56,28 @@ QToolButton {
     padding: 7px;
 }
 
-QToolButton:selected {
+control--MwcToolButton:selected {
     background-color: #5300CF;
 }
 
-QToolButton:pressed {
+control--MwcToolButton:pressed {
     background-color: #5300CF;
 }
 
-QToolButton:checked {
+control--MwcToolButton:checked {
     background: rgba(255, 255, 255, 0.3);
 }
 
-QToolButton::disabled {
+control--MwcToolButton::disabled {
     background-color: #E2CCF7;
 }
 
-QToolButton:enabled:!checked::hover
+control--MwcToolButton:enabled:!checked::hover
 {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-QToolButton:focus {
+control--MwcToolButton:focus {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
@@ -106,7 +106,7 @@ control--MwcToolButtonUnderscore:enabled:!checked::hover
 }
 
 
-/*QDialog {
+/*control--MwcDialog {
     color: white;
     font-family: Open Sans;
     font-style: normal;
@@ -116,14 +116,14 @@ control--MwcToolButtonUnderscore:enabled:!checked::hover
     background-color: white
 }*/
 
-QLabel {
+control--MwcLabel {
     color: white;
     font-family: Open Sans;
     font-style: normal;
     font-weight: normal;
 }
 
-QLabel::disabled {
+control--MwcLabel::disabled {
     color: #E2CCF7;
 }
 
@@ -147,29 +147,33 @@ control--MwcLabelLarge {
 }
 
 /* popup for completer */
-QListView {
+control--MwcListView {
     color: white;
     font-family: Open Sans;
     font-style: normal;
     font-weight: normal;
 
-    border: transparent;
-    background: #6F00D6;
+    /*border: transparent;*/
+    border: 2px solid #CCFF33;
+    border-radius: 4px;
+
+    background: #7517cd;
 
     selection-color: white;
-    selection-background-color: #3600C9;
+    selection-background-color: #5f00b8;
 
     font-size: 15px;
+    padding: 5px 5px 5px 10px;
 }
 
-QListView::item {
-  height: 30px;
+control--MwcListView::item {
+  height: 20px;
   padding: 10px;
 }
 
 /* ------------------------------ */
 
-QLineEdit {
+control--MwcLineEdit {
     color: white;
     font-family: Open Sans;
     font-style: normal;
@@ -182,22 +186,22 @@ QLineEdit {
 }
 
 /* By some reasons Windows needs that for placeholder */
-QLineEdit[text=""] {
+control--MwcLineEdit[text=""] {
     color: white;
 }
 
-QLineEdit::disabled {
+control--MwcLineEdit::disabled {
     color: rgba(255, 255, 255, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.5);
     background-color: transparent;
 }
 
-QLineEdit:enabled:!focus::hover
+control--MwcLineEdit:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-QLineEdit:focus {
+control--MwcLineEdit:focus {
     border: 2px solid #CCFF33;
     background: rgba(255, 255, 255, 0.15);
 }
@@ -210,7 +214,7 @@ control--MwcLineEditNormal {
 
 /* ------------------------------ */
 
-QTextEdit {
+control--MwcTextEdit {
     color: white;
     font-family: Open Sans;
     font-style: normal;
@@ -226,25 +230,25 @@ QTextEdit {
     padding: 10px 6px 10px 15px;
 }
 
-QTextEdit::disabled {
+control--MwcTextEdit::disabled {
     color: rgba(255, 255, 255, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.5);
     background-color: transparent;
 }
 
 
-QTextEdit:focus {
+control--MwcTextEdit:focus {
     border: 2px solid #CCFF33;
     background: rgba(255, 255, 255, 0.15);
 }
 
-QTextEdit:enabled:!focus::hover
+control--MwcTextEdit:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* ------------------------------ */
-QPlainTextEdit {
+control--MwcPlainTextEdit {
     color: white;
     font-family: Open Sans;
     font-style: normal;
@@ -259,21 +263,21 @@ QPlainTextEdit {
 }
 
 /* By some reasons Windows needs that for placeholder */
-QPlainTextEdit[text=""] {
+control--MwcPlainTextEdit[text=""] {
     color: white;
 }
 
-QPlainTextEdit:enabled:!focus::hover
+control--MwcPlainTextEdit:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-QPlainTextEdit:focus {
+control--MwcPlainTextEdit:focus {
     border: 2px solid #CCFF33;
     background: rgba(255, 255, 255, 0.15);
 }
 
-QPlainTextEdit::disabled {
+control--MwcPlainTextEdit::disabled {
     color: rgba(255, 255, 255, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.5);
     background-color: transparent;
@@ -320,7 +324,7 @@ control--MwcTextEditDlg:enabled:!focus::hover
 
 /* --------------------------------------- */
 
-QPushButton
+control--MwcPushButton
 {
     color: white;
     font-family: Open Sans;
@@ -332,24 +336,24 @@ QPushButton
     background: transparent;
 }
 
-QPushButton:enabled:!focus::hover
+control--MwcPushButton:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.15);
 }
 
-QPushButton:focus {
+control--MwcPushButton:focus {
     background: #FFFFFF;
     color: #6F00D6;
 }
 
-QPushButton:disabled {
+control--MwcPushButton:disabled {
     /*    border: 2px solid gray;
         color: gray;*/
     color: rgba(255, 255, 255, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-QPushButton:pressed {
+control--MwcPushButton:pressed {
     background: rgba(255, 255, 255, 0.3);
 }
 
@@ -428,49 +432,52 @@ control--MwcStatusLine:enabled:focus {
 }
 
 /* ------------------ Scroll bars ------------------------ */
-QScrollBar {
+control--MwcScrollBar {
     border: 1px solid rgba(255, 255, 255, 0.2);
     background: transparent;
     margin: 0 0 0 0;
 }
 
-QScrollBar:vertical {
+control--MwcScrollBar:vertical {
     width: 15px;
 }
 
-QScrollBar:horizontal {
+control--MwcScrollBar:horizontal {
     height: 15px;
 }
 
-QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+control--MwcScrollBar::handle:vertical, control--MwcScrollBar::handle:horizontal {
     background: rgba(255, 255, 255, 0.2);
     min-height: 20px;
     border: transparent;
     border-radius: 9px;
 }
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical ,QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+control--MwcScrollBar::add-line:vertical, control--MwcScrollBar::sub-line:vertical ,control--MwcScrollBar::add-line:horizontal, control--MwcScrollBar::sub-line:horizontal {
     border: none;
     background: none;
     height: 0px;
 }
 
-QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical, QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
+control--MwcScrollBar::up-arrow:vertical, control--MwcScrollBar::down-arrow:vertical, control--MwcScrollBar::up-arrow:horizontal, control--MwcScrollBar::down-arrow:horizontal {
     border: none;
     background: none;
 }
 
-QAbstractScrollArea::corner {
+/*control--MwcTextEdit::corner,
+control--MwcPlainTextEdit::corner,
+control--MwcTextBrowser::corner,
+control--MwcListView::corner {
     background: transparent;
 }
 
 /* -------------- Progress bar ---------------- */
-QProgressBar {
+control--MwcProgressBar {
     border: 2px solid white;
     border-radius: 6px;
     background: white;
 }
 
-QProgressBar::chunk {
+control--MwcProgressBar::chunk {
     background-color: #6F00D6;
     width: 1px;
 }
@@ -553,8 +560,8 @@ control--MwcComboBox::disabled {
     background-color: transparent;
 }
 
-/* ----------  QRadioButton  ------------*/
-QRadioButton {
+/* ----------  control--MwcRadioButton  ------------*/
+control--MwcRadioButton {
     color: white;
     font-family: Open Sans;
     font-style: normal;
@@ -566,20 +573,20 @@ QRadioButton {
     background: none;
 }
 
-QRadioButton:focus {
+control--MwcRadioButton:focus {
     border: none;
 }
 
-QRadioButton::indicator {
+control--MwcRadioButton::indicator {
     width: 18px;
     height: 18px;
 }
 
-QRadioButton::indicator:unchecked {
+control--MwcRadioButton::indicator:unchecked {
     image: url(:/img/RadioOff.svg);
 }
 
-QRadioButton::indicator:checked {
+control--MwcRadioButton::indicator:checked {
     image: url(:/img/RadioOn.svg);
 }
 
@@ -617,12 +624,12 @@ ListWithColumns::item:selected
     background-color: mediumpurple;
 }
 /* header for table view */
-QHeaderView
+control--MwcHeaderView
 {
     background: transparent;
 }
 
-QHeaderView::section {
+control--MwcHeaderView::section {
     background-color: transparent;
 
     color: white;
@@ -696,9 +703,9 @@ QToolTip {
     background: #9E00E7;
 }
 
-/* ---------  QCheckBox  ------- */
+/* ---------  control--MwcCheckBox  ------- */
 
-QCheckBox {
+control--MwcCheckBox {
     color: white;
     font-family: Open Sans;
     font-style: normal;
@@ -710,50 +717,50 @@ QCheckBox {
     background: none;
 }
 
-QCheckBox::disabled {
+control--MwcCheckBox::disabled {
     color: #E2CCF7;
 }
 
-QCheckBox::indicator {
+control--MwcCheckBox::indicator {
     width: 18px;
     height: 18px;
 }
 
-QCheckBox::indicator:unchecked {
+control--MwcCheckBox::indicator:unchecked {
     image: url(:/img/CheckOff.svg);
 }
 
-QCheckBox::indicator:checked {
+control--MwcCheckBox::indicator:checked {
     image: url(:/img/CheckOn.svg);
 }
 
-QCheckBox::indicator:disabled:unchecked {
+control--MwcCheckBox::indicator:disabled:unchecked {
     image: url(:/img/disabledCheckOff.svg);
 }
 
-QCheckBox::indicator:disabled:checked {
+control--MwcCheckBox::indicator:disabled:checked {
     image: url(:/img/disabledCheckOn.svg);
 }
 
-QTabWidget::tab-bar {
+control--MwcTabWidget::tab-bar {
 	left: 52px;
 }
 
-QTabWidget::pane {
+control--MwcTabWidget::pane {
     border: none;
 }
 
-QWidget#tab_main {
+control--MwcWidget#tab_main {
     background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
                                   stop: 0 #9E00E7, stop: 0.9 #3600C9, stop: 1 #3600C9);
 }
 
-QWidget#tab_wallet {
+control--MwcWidget#tab_wallet {
     background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
                                   stop: 0 #9E00E7, stop: 0.9 #3600C9, stop: 1 #3600C9);
 }
 
-QTabBar::tab{
+control--MwcTabBar::tab{
     color: white;
     border-right: 2px solid #FFFFFF;
     background: transparent;
@@ -763,24 +770,24 @@ QTabBar::tab{
     padding-right: 5px;
     margin-bottom: 10px;
 }
-QTabBar::tab:last{
+control--MwcTabBar::tab:last{
     border:none;
 }
 
-QTabBar::tab:!focus:hover{
+control--MwcTabBar::tab:!focus:hover{
     font-weight:medium;
 }
 
-QTabBar::tab:focus {
+control--MwcTabBar::tab:focus {
     font-weight:medium;
     text-decoration: underline;
 }
 
-QTabBar::tab:selected{
+control--MwcTabBar::tab:selected{
     font-weight:bold;
 }
 
-QGroupBox {
+control--MwcGroupBox {
     color: white;
     font-size: 13px;
     font: bold;
@@ -789,24 +796,24 @@ QGroupBox {
     margin-top: 6px;
 }
 
-QGroupBox::title {
+control--MwcGroupBox::title {
     subcontrol-origin: margin;
     left: 7px;
     padding: 0px 5px 0px 5px;
 }
 
-QMenuBar {
+control--MwcMenuBar {
     color: white;
     font-family: Open Sans;
     font-style: normal;
     font-weight: normal;
     font-size: 15px;
 }
-QMenuBar::item:selected { /* when selected using mouse or keyboard */
+control--MwcMenuBar::item:selected { /* when selected using mouse or keyboard */
     background: #9759d0;
 }
 
-QMenu {
+control--MwcMenu {
     background-color: #9759d0;
     color: white;
     font-family: Open Sans;
@@ -815,11 +822,11 @@ QMenu {
     font-size: 15px;
 }
 
-QMenu::item:disabled {
+control--MwcMenu::item:disabled {
     color: #cc9afb;
 }
 
-QMenu::item:selected {
+control--MwcMenu::item:selected {
     background: #E2CCF7;
     color: #3600C9;
 }

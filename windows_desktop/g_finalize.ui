@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>FinalizeUpload</class>
- <widget class="QWidget" name="FinalizeUpload">
+ <widget class="control::MwcWidget" name="FinalizeUpload">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -66,7 +66,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QWidget" name="widget" native="true">
+          <widget class="control::MwcWidget" name="widget" native="true">
            <property name="minimumSize">
             <size>
              <width>400</width>
@@ -79,7 +79,7 @@
              <height>90</height>
             </size>
            </property>
-           <widget class="QLabel" name="label">
+           <widget class="control::MwcLabel" name="label">
             <property name="geometry">
              <rect>
               <x>78</x>
@@ -132,7 +132,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QTextEdit" name="slatepackEdit">
+        <widget class="control::MwcTextEdit" name="slatepackEdit">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -167,7 +167,7 @@
           <bool>false</bool>
          </property>
          <property name="placeholderText">
-          <string>Please paste the slatepack content below</string>
+          <string>Please paste the Slatepack content below.</string>
          </property>
         </widget>
        </item>
@@ -310,6 +310,21 @@
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -27,6 +27,7 @@ class Wallet;
 class Receive;
 class Util;
 class WalletConfig;
+class HeartBeat;
 }
 
 namespace wnd {
@@ -40,26 +41,22 @@ public:
     virtual ~Receive() override ;
 
 private:
-    void updateStatus();
-
-    void onTransactionActionIsFinished( bool success, QString message );
+    void updateListenerStatus();
+    void updateListenerStatusWith(bool mqsOnline, bool torOnline);
 
     void updateWalletBalance();
 private slots:
     // respond from signTransaction
     void onSgnTransactionActionIsFinished( bool success, QString message );
     void onSgnWalletBalanceUpdated();
-    void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
-    void onSgnTorAddress(QString tor);
-    void onSgnFileProofAddress(QString proofAddress);
-    void onSgnUpdateListenerStatus(bool mqsOnline, bool torOnline); // keybaseOnline is absolete
+    void onSgnUpdateListenerStatus(bool mqsOnline, bool torOnline);
 
     void on_accountComboBox_activated(int index);
-    void on_recieveFileButton_clicked();
     void on_recieveSlatepackButton_clicked();
 
+    void on_requestFaucetMWCButton_clicked();
+
 private:
-    void updateAccountList();
 
 private:
     Ui::Receive *ui;
@@ -68,6 +65,7 @@ private:
     bridge::WalletConfig * walletConfig = nullptr;
     bridge::Receive * receive = nullptr;
     bridge::Util * util = nullptr;
+    bridge::HeartBeat * heartBeat = nullptr;
 
     QString mwcAddress;
 };

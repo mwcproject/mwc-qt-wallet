@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include "../../wallet/wallet.h"
+#include <QJsonArray>
 
 namespace bridge {
 
@@ -30,7 +31,7 @@ public:
     explicit ViewOutputs(QObject *parent = nullptr);
     ~ViewOutputs();
 
-    void setSgnViewOutputs( const QVector<wallet::WalletOutput > & outputResult, int64_t total);
+    void setSgnViewOutputs( const wallet::ViewWallet & walletOutputs, int64_t height);
 
     // Switching to the progress window
     Q_INVOKABLE void startScanning(QString hashKey);
@@ -47,7 +48,7 @@ public:
     Q_INVOKABLE QString getLastViewViewingKey();
 private:
 signals:
-    void onSgnViewOutputs( QString viewingKey, QVector<QString> outputs, QString totalAmount);
+    void onSgnViewOutputs( QString viewingKey, QJsonArray outputs, QString totalAmount);
 private:
     static QString lastViewingKey;
 };

@@ -38,20 +38,8 @@ protected:
     virtual bool mobileBack() override {return false;}
     virtual QString getHelpDocName() override {return "accounts.html";}
 private slots:
-    void onLoginResult(bool ok);
-
-    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-
 private:
-    virtual void timerEvent(QTimerEvent *event) override;
 
-    bool isNodeHealthy() const {return nodeIsHealthy;}
-private:
-    bool nodeIsHealthy = true;
-
-    bool lastNodeIsHealty = true;
-
-    int64_t startingTime = 0;
 };
 
 }

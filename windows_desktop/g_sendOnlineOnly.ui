@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SendOnlineOnly</class>
- <widget class="QWidget" name="SendOnlineOnly">
+ <widget class="control::MwcWidget" name="SendOnlineOnly">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -102,10 +102,10 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Recipient wallet address. Note, your peer wallet needs to be online to accept the payment.</string>
+         <string>Recipient wallet address. Your peer wallet must be online to accept the payment.</string>
         </property>
         <property name="statusTip">
-         <string>Recipient wallet address. Note, your peer wallet needs to be online to accept the payment.</string>
+         <string>Recipient wallet address. Your peer wallet must be online to accept the payment.</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -272,10 +272,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Select account to send MWC coins from</string>
+         <string>Select the account to send MWC from</string>
         </property>
         <property name="statusTip">
-         <string>Select account to send MWC coins from</string>
+         <string>Select the account to send MWC from</string>
         </property>
        </widget>
        <widget class="control::MwcLineEditNormal" name="amountEdit">
@@ -306,10 +306,10 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Amount of MWC coins to send</string>
+         <string>Amount of MWC to send</string>
         </property>
         <property name="statusTip">
-         <string>Amount of MWC coins to send</string>
+         <string>Amount of MWC to send</string>
         </property>
         <property name="maxLength">
          <number>32</number>
@@ -374,10 +374,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more</string>
+         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
         </property>
         <property name="statusTip">
-         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more</string>
+         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
         </property>
         <property name="text">
          <string>Generate Transaction Proof</string>
@@ -404,7 +404,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label">
+       <widget class="control::MwcLabel" name="label">
         <property name="geometry">
          <rect>
           <x>2</x>
@@ -542,7 +542,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget" native="true">
+        <widget class="control::MwcWidget" name="widget" native="true">
          <property name="minimumSize">
           <size>
            <width>1</width>
@@ -627,6 +627,16 @@
    <class>control::MwcCheckBox</class>
    <extends>QCheckBox</extends>
    <header>control_desktop/MwcCheckBox.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

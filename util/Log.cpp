@@ -18,10 +18,12 @@
 #include <QDir>
 #include <QApplication>
 #include <QDateTime>
-#include "../wallet/mwc713task.h"
 #include <QProcess>
+
+#include "message_mapper.h"
 #include "../core/Config.h"
 #include "../core/WndManager.h"
+#include "wallet/api/MwcWalletApi.h"
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QRegularExpression>
 #endif
@@ -38,16 +40,52 @@ namespace logger {
 static LogSender *   logClient = nullptr;
 static LogReceiver * logServer = nullptr;
 
-static bool logMwc713outBlocked = false;
+//static bool logMwc713outBlocked = false;
 
 const QString LOG_FILE_NAME = "mwcwallet.log";
+
+QString who2str(Who who) {
+    switch (who) {
+        case LIB_LOGS: {
+            return "LIB_LOGS";
+        }
+        case MWC_WALLET: {
+            return "MWC_WALLET";
+        }
+        case NODE_CLIENT: {
+            return "NODE_CLIENT";
+        }
+        case MWC_NODE: {
+            return "MWC_NODE";
+        }
+        case HTTP_CLIENT: {
+            return "HTTP_CLIENT";
+        }
+        case QT_WALLET: {
+            return "QT_WALLET";
+        }
+        case NOTIFICATION: {
+            return "NOTIFICATION";
+        }
+        case STATE: {
+            return "STATE";
+        }
+        case BRIDGE: {
+            return "BRIDGE";
+        }
+        default: {
+            Q_ASSERT(false);
+            return "UNKNOWN";
+        }
+    }
+}
 
 void initLogger( bool logsEnabled) {
     logClient = new LogSender(true);
 
     enableLogs(logsEnabled);
 
-    logClient->doAppend2logs(true, "", "mwc-qt-wallet is started..." );
+    logClient->log(true, "", "mwc-qt-wallet is started..." );
 }
 
 void cleanUpLogs() {
@@ -141,7 +179,8 @@ void LogReceiver::rotateLogFileIfNeeded() {
 
     // Generate the file name
     QDateTime  now = QDateTime::currentDateTime();
-    QString archiveFileName = now.toString("yyyy_MM_dd_hh_mm_ss_zzz")+".zip";
+    QString fn = now.toString("yyyy_MM_dd_hh_mm_ss_zzz");
+    QString archiveFileName = fn +".zip";
 
     QString srcFileName = logPath + "/" + logFileName;
     QString resultFileName = logPath + "/" + archiveFileName;
@@ -151,13 +190,13 @@ void LogReceiver::rotateLogFileIfNeeded() {
     qDebug() << "Creating zip archive: " << resultFileName;
 
     // 3 is OK for the
-    int exitCode = QProcess::execute(config::getMwcZipPath(), {srcFileName, resultFileName});
-
-    qDebug() << "mwczip exit code: " << exitCode;
+    mwc_api::ApiResponse<bool> res = wallet::zip_file( srcFileName, resultFileName , fn+".log");
     QDir logDir( logPath );
 
-    if (exitCode!=3) {
-        core::getWndManager()->messageTextDlg("Log files rotation", "Unable to rotate log file at "+ logPath +"\nYour previous file will be swapped with a new log data.");
+    if (res.hasError()) {
+        core::getWndManager()->messageTextDlg("Log files rotation",
+            "Unable to rotate log file at " + logPath + "\nYour previous file will be swapped with a new log data.\n\n" +
+            util::mapMessage(res.error));
         const QString prevLogFn = "prev_"+logFileName;
         logDir.remove(prevLogFn);
         logDir.rename(logFileName, prevLogFn);
@@ -184,6 +223,7 @@ void LogReceiver::openLogFile() {
 void LogReceiver::onAppend2logs(bool addDate, QString prefix, QString line ) {
     counter++;
     if (counter>10000) {
+        counter = 0;
         rotateLogFileIfNeeded();
     }
 
@@ -194,94 +234,37 @@ void LogReceiver::onAppend2logs(bool addDate, QString prefix, QString line ) {
 
     logLine += prefix + " " + line + "\n";
 
-    logFile->write( logLine.toUtf8() );
-    logFile->flush();
+    if (logFile!=nullptr) {
+        logFile->write( logLine.toUtf8() );
+        logFile->flush();
+    }
 }
 
 // Global methods that do logging
 
-void blockLogMwc713out(bool blockOutput) {
-    logMwc713outBlocked = blockOutput;
-}
-
-
-// mwc713 IOs
-void logMwc713out(QString str) {
-    Q_ASSERT(logClient); // call initLogger first
-
-    if (logMwc713outBlocked) {
-        logClient->doAppend2logs(true, "mwc713>>", "CENSORED");
-        return;
-    }
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    auto lns = str.split(QRegularExpression("[\r\n]"),Qt::SkipEmptyParts);
-#else
-    auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-#endif
-    for (auto & l: lns) {
-        logClient->doAppend2logs(true, "mwc713>>", l);
-    }
-}
-
-void logMwc713in(QString str) {
-    Q_ASSERT(logClient); // call initLogger first
-    logClient->doAppend2logs(true, "mwc713<<", str);
-}
-
-void logMwcNodeOut(QString str) {
-    Q_ASSERT(logClient);
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    auto lns = str.split(QRegularExpression("[\r\n]"),Qt::SkipEmptyParts);
-#else
-    auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-#endif
-    for (auto & l: lns) {
-        logClient->doAppend2logs(true, "mwc-node>>", l);
-    }
-
-}
-
-
-// Tasks to excecute on mwc713
-void logTask( QString who, wallet::Mwc713Task * task, QString comment ) {
-    Q_ASSERT(logClient); // call initLogger first
-    if (task == nullptr)
-        return;
-    logClient->doAppend2logs(true, who, "Task " + task->toDbgString() + "  "+comment );
-}
-
 // Events activity
-void logEmit(QString who, QString event, QString params) {
+void logEmit(Who who, QString event, QString params) {
     // in tests there is no logger
     if (logClient) // call initLogger first
-        logClient->doAppend2logs(true, who, "emit " + event + (params.length()==0 ? "" : (" with "+params)) );
+        logClient->log(true, who2str(who), "emit " + event + (params.length()==0 ? "" : (" with "+params)) );
 }
 
-void logInfo(QString who, QString message) {
+void logDebug(Who who, QString message) {
+#ifndef QT_NO_DEBUG
     Q_ASSERT(logClient); // call initLogger first
-    logClient->doAppend2logs(true, who, message );
+    logClient->log(true, who2str(who), "DEBUG " + message );
+#endif
 }
 
-void logParsingEvent(wallet::WALLET_EVENTS event, QString message ) {
+void logInfo(Who who, QString message) {
     Q_ASSERT(logClient); // call initLogger first
-    if (logMwc713outBlocked) { // Skipping event during block pahse as well
-        logClient->doAppend2logs(true, "Event>", "CENSORED" );
-        return;
-    }
-
-    if (event == wallet::WALLET_EVENTS::S_LINE) // Lines are reliable and not needed into the nogs. Let's keep logs less noisy.
-        return;
-
-    logClient->doAppend2logs(true, "mwc713-Event>", toString(event) + " [" + message + "]" );
+    logClient->log(true, who2str(who), "INFO  " +  message );
 }
 
-void logNodeEvent( tries::NODE_OUTPUT_EVENT event, QString message ) {
+void logError(Who who, QString message) {
     Q_ASSERT(logClient); // call initLogger first
-    logClient->doAppend2logs(true, "mwc-node-Event>", toString(event) + " [" + message + "]" );
+    logClient->log(true, who2str(who), "ERROR " + message );
 }
-
 
 }
 

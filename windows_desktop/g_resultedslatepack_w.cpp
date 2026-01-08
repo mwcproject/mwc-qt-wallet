@@ -20,8 +20,10 @@
 #include "../bridge/config_b.h"
 #include "../bridge/util_b.h"
 #include "../bridge/wallet_b.h"
+#include "../bridge/wnd/g_finalize_b.h"
 #include "../util/Json.h" // Just for a contant value
 #include <QClipboard>
+#include <QJsonDocument>
 #include <QToolTip>
 
 namespace wnd {
@@ -30,7 +32,7 @@ const QString INIT_TAG = "InitialSP";
 const QString FINALIZE_TAG = "FinalizeSP";
 
 
-ResultedSlatepack::ResultedSlatepack(QWidget *parent, QString slatepack, int backStateId, QString txExtension,
+ResultedSlatepack::ResultedSlatepack(QWidget *parent, QString slatepack, QString tx_uuid, int backStateId, QString txExtension,
                                      bool enableFinalize) :
         core::NavWnd(parent),
         ui(new Ui::ResultedSlatepack) {
@@ -38,17 +40,14 @@ ResultedSlatepack::ResultedSlatepack(QWidget *parent, QString slatepack, int bac
     this->backStateId = backStateId;
     this->txExtension = txExtension;
     this->slatepack = slatepack;
+    this->tx_uuid = tx_uuid;
     this->enableFinalize = enableFinalize;
 
     stateMachine = new bridge::StateMachine(this);
     config = new bridge::Config(this);
     util = new bridge::Util(this);
     wallet = new bridge::Wallet(this);
-
-    QObject::connect(wallet, &bridge::Wallet::sgnDecodeSlatepack,
-                     this, &wnd::ResultedSlatepack::onSgnDecodeSlatepack, Qt::QueuedConnection);
-    QObject::connect(wallet, &bridge::Wallet::sgnFinalizeSlatepack,
-                     this, &wnd::ResultedSlatepack::sgnFinalizeSlatepack, Qt::QueuedConnection);
+    finalize = new bridge::Finalize(this);
 
     ui->qr_code_window->setContent(slatepack);
     ui->slatepackContent->setText(slatepack);
@@ -103,64 +102,26 @@ void ResultedSlatepack::on_backButton_2_clicked() {
 }
 
 void ResultedSlatepack::on_finalizeSlatepack_textChanged() {
-    if (spInProgress.isEmpty()) {
-        QString sp = ui->finalizeSlatepack->toPlainText().trimmed();
-        initiateSlateVerification(sp, FINALIZE_TAG);
-    }
+    QString sp = ui->finalizeSlatepack->toPlainText().trimmed();
+    initiateSlateVerification(sp, FINALIZE_TAG);
 }
 
 void ResultedSlatepack::initiateSlateVerification(const QString &slate2check, QString tag) {
     if (slate2check.isEmpty())
         return;
 
-    spInProgress = slate2check;
-    wallet->decodeSlatepack(slate2check, tag);
-}
+    QJsonObject decodedSlatepackJson = wallet->decodeSlatepack(slate2check);
+    wallet::DecodedSlatepack decoded = wallet::DecodedSlatepack::fromJson(decodedSlatepackJson);
 
-void ResultedSlatepack::sgnFinalizeSlatepack(QString tagId, QString error, QString txUuid) {
-    if (tagId != "ResultedSlatepack")
-        return;
-
-    if (!error.isEmpty()) {
-        control::MessageBox::messageText(this, "Finalization error", "Unable to finalize the transaction.\n" + error);
-        return;
-    }
-
-    Q_ASSERT(txUuid == transactionUUID);
-    control::MessageBox::messageText(this, "Finalize Transaction",
-                                     "Transaction " + txUuid + " was finalized successfully.");
-    // pressing back button. We are done here
-    on_backButton_clicked();
-}
-
-void ResultedSlatepack::on_finalizeSlatepackBtn_clicked() {
-    if (slate2finalize.isEmpty())
-        return;
-
-    // disabling to prevent double clicking...
     ui->finalizeSlatepackBtn->setEnabled(false);
 
-    wallet->finalizeSlatepack(slate2finalize, false, "ResultedSlatepack");
-}
-
-void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson,
-                                             QString content, QString sender, QString recipient) {
-    Q_UNUSED(recipient)
-    Q_UNUSED(sender)
-
-    if ( !(tag == FINALIZE_TAG || tag == INIT_TAG))
-        return;
-
-    spInProgress = "";
-    ui->finalizeSlatepackBtn->setEnabled(false);
-
-    if (!error.isEmpty()) {
+    if (!decoded.error.isEmpty()) {
         // we don't report error..
         return;
     }
 
     if (tag == FINALIZE_TAG) {
-        if (content != "SendResponse") {
+        if (decoded.content != "SendResponse") {
             if (lastReportedError != 2) {
                 lastReportedError = 2;
                 control::MessageBox::messageText(this, "Wrong Slatepack",
@@ -171,13 +132,15 @@ void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString
         }
     }
 
-    if (slateJson.isEmpty())
+    if (decoded.slate.isEmpty())
         return;
 
     int txType = int(util::FileTransactionType::RECEIVE);
     if (tag == FINALIZE_TAG) {
         txType = int(util::FileTransactionType::FINALIZE);
     }
+
+    QString slateJson = QJsonDocument(decoded.slate).toJson(QJsonDocument::Compact);
 
     // Normal case:
     // res[0] = transactionId
@@ -212,14 +175,20 @@ void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString
     }
 
     // we are good here, can finalize...
-    slate2finalize = slatepack;
+    slate2finalize = slate2check;
     ui->finalizeSlatepackBtn->setEnabled(true);
 
-    QString textSp = ui->finalizeSlatepack->toPlainText().trimmed();
+    finalize->uploadSlatepackTransaction( slate2check, slateJson, decoded.sender, false );
+}
 
-    if (slatepack != textSp) {
-        initiateSlateVerification(textSp, tag);
-    }
+void ResultedSlatepack::on_finalizeSlatepackBtn_clicked() {
+    if (slate2finalize.isEmpty())
+        return;
+
+    // disabling to prevent double clicking...
+    ui->finalizeSlatepackBtn->setEnabled(false);
+
+    finalize->finalizeSlatepack(slate2finalize, tx_uuid, "",  false, backStateId);
 }
 
 void wnd::ResultedSlatepack::on_copySlatepackToClipboardBtn_clicked() {

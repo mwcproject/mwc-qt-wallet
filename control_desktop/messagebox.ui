@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MessageBox</class>
- <widget class="QDialog" name="MessageBox">
+ <widget class="control::MwcDialog" name="MessageBox">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Message</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -52,7 +52,7 @@
       </font>
      </property>
      <property name="text">
-      <string>WARNING</string>
+      <string>Warning</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -161,7 +161,7 @@
          </font>
         </property>
         <property name="text">
-         <string>TTL Blocks:</string>
+         <string>TTL blocks:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -209,7 +209,7 @@
          <enum>QLineEdit::Normal</enum>
         </property>
         <property name="placeholderText">
-         <string>TTL Blocks</string>
+         <string>TTL blocks</string>
         </property>
         <property name="clearButtonEnabled">
          <bool>false</bool>
@@ -236,7 +236,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Input your password to continue:</string>
+         <string>Enter your password to continue:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -430,6 +430,11 @@
    <class>control::MwcTextEditDlg</class>
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcPlainEditLogs.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

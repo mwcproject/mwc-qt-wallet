@@ -13,22 +13,26 @@
 // limitations under the License.
 
 #include "x_Resync.h"
+
+#include <QJsonArray>
+
 #include "../state/statemachine.h"
 #include "../core/global.h"
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/z_progresswnd_b.h"
+#include "../util/Log.h"
 
 namespace state {
 
 Resync::Resync( StateContext * context) :
             State(context,  STATE::RESYNC ) {
 
-    QObject::connect(context->wallet, &wallet::Wallet::onRecoverProgress,
-                     this, &Resync::onRecoverProgress, Qt::QueuedConnection);
+    QObject::connect(context->wallet, &wallet::Wallet::onScanProgress,
+                     this, &Resync::onScanProgress, Qt::QueuedConnection);
 
-    QObject::connect(context->wallet, &wallet::Wallet::onCheckResult,
-                     this, &Resync::onCheckResult, Qt::QueuedConnection);
+    QObject::connect(context->wallet, &wallet::Wallet::onScanDone,
+                     this, &Resync::onScanDone, Qt::QueuedConnection);
 
     inSyncProcess = false;
 }
@@ -49,7 +53,9 @@ NextStateRespond Resync::execute() {
     // Starting recovery process
     context->wallet->listeningStop(true, true);
 
-    core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, RESYNC_CALLER_ID,
+    scanRespId = context->wallet->scan(true);
+
+    core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, scanRespId,
             "Re-sync with full node", "Preparing to re-sync", "", false);
 
     respondCounter = 0;
@@ -60,74 +66,85 @@ NextStateRespond Resync::execute() {
     // We can't really be blocked form resync. Result will be looping with locking screen
     context->stateMachine->blockLogout("Resync");
 
-    context->wallet->check();
-    // Check does full resync, no needs to 'sync'
-    context->wallet->updateWalletBalance(false,false);
-
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 void Resync::exitingState() {
+    logger::logInfo(logger::STATE, "Call Resync::exitingState");
     context->stateMachine->unblockLogout("Resync");
 }
 
 bool Resync::canExitState(STATE nextWindowState) {
+    logger::logInfo(logger::STATE, "Call Resync::canExitState with nextWindowState=" + QString::number(nextWindowState));
     Q_UNUSED(nextWindowState)
     return !inSyncProcess;
 }
 
+void Resync::onScanProgress( QString responseId, QJsonObject statusMessage ) {
+    if (responseId!=scanRespId)
+        return;
 
-void Resync::onRecoverProgress( int progress, int maxVal ) {
-    for (auto b: bridge::getBridgeManager()->getProgressWnd()) {
-        if (b->getCallerId() == RESYNC_CALLER_ID) {
-            if (respondCounter<3) {
-                respondCounter++;
-                respondZeroLevel = progress;
-                progressBase = maxVal / 100 * respondCounter;
+    if (statusMessage.contains("Scanning")) {
+        QJsonArray vals = statusMessage["Scanning"].toArray();
+        QString message = vals[1].toString();
+        int percent_progress = vals[2].toInt();
 
-                progress = respondCounter;
-                maxVal = 100;
+        for (auto b: bridge::getBridgeManager()->getProgressWnd()) {
+            if (b->getCallerId() == scanRespId) {
+                int maxVal = 100;
+                if (respondCounter<3) {
+                    respondCounter++;
+                    respondZeroLevel = percent_progress;
+
+                    percent_progress = respondCounter;
+                }
+                else {
+                    percent_progress -= respondZeroLevel;
+                    maxVal -= respondZeroLevel;
+                    percent_progress += 2;
+                    maxVal += 2;
+                }
+
+                b->initProgress(scanRespId, 0, maxVal);
+
+                maxProgrVal = maxVal;
+                QString msgProgress = "Re-sync in progress...  " + QString::number(percent_progress * 100.0 / maxVal, 'f',0) + "%";
+                b->updateProgress(scanRespId, percent_progress, msgProgress);
+                b->setMsgPlus(scanRespId, "");
             }
-            else {
-                progress -= respondZeroLevel;
-                maxVal -= respondZeroLevel;
-                progress += progressBase;
-                maxVal += progressBase;
-            }
-
-            b->initProgress(RESYNC_CALLER_ID, 0, maxVal);
-
-            maxProgrVal = maxVal;
-            QString msgProgress = "Re-sync in progress...  " + QString::number(progress * 100.0 / maxVal, 'f',0) + "%";
-            b->updateProgress(RESYNC_CALLER_ID, progress, msgProgress);
-            b->setMsgPlus(RESYNC_CALLER_ID, "");
         }
     }
 }
 
-void Resync::onCheckResult(bool ok, QString errors ) {
-    context->wallet->listeningStart( context->appContext->isFeatureMWCMQS(), context->appContext->isFeatureTor(), true);
+void Resync::onScanDone( QString responseId, bool fullScan, int height, QString errorMessage ) {
+    Q_UNUSED(fullScan);
+    Q_UNUSED(height);
+
+    if (responseId!=scanRespId)
+        return;
+
+    context->wallet->listeningStart( context->appContext->isFeatureMWCMQS(), context->appContext->isFeatureTor());
 
     for (auto b: bridge::getBridgeManager()->getProgressWnd()) {
-        if (b->getCallerId() == RESYNC_CALLER_ID) {
-            b->updateProgress(RESYNC_CALLER_ID, maxProgrVal, ok? "Done" : "Failed");
+        if (b->getCallerId() == scanRespId) {
+            b->updateProgress(scanRespId, maxProgrVal, errorMessage.isEmpty() ? "Done" : "Failed");
         }
     }
 
-    if (ok)
+    if (errorMessage.isEmpty())
         core::getWndManager()->messageTextDlg("Success", "Account re-sync finished successfully.");
     else
-        core::getWndManager()->messageTextDlg("Failure", "Account re-sync failed.\n" + errors);
+        core::getWndManager()->messageTextDlg("Failure", "Account re-sync failed.\n\n" + errorMessage);
 
     inSyncProcess = false;
 
     if (context->appContext->getActiveWndState() == STATE::RESYNC ) {
         context->stateMachine->setActionWindow( (STATE)prevState );
     }
-
 }
 
 bool Resync::mobileBack() {
+    logger::logInfo(logger::STATE, "Call Resync::mobileBack");
     // Blocking back while in sync
     return inSyncProcess;
 }

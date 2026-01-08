@@ -32,9 +32,6 @@ NewSeed::NewSeed( QWidget *parent,
 
     newSeed = new bridge::NewSeed(this);
 
-    QObject::connect( newSeed, &bridge::NewSeed::sgnShowSeedData,
-                      this, &NewSeed::onSgnShowSeedData, Qt::QueuedConnection);
-
     ui->progress->initLoader(false);
 
     if ( hideSubmitButton ) {
@@ -58,17 +55,6 @@ void NewSeed::panelWndStarted() {
 NewSeed::~NewSeed()
 {
     delete ui;
-}
-
-// if seed empty or has size 1, it is error message
-void NewSeed::onSgnShowSeedData(QVector<QString> seed) {
-    util::TimeoutLockObject to("NewSeed");
-
-    if (seed.size()<2) {
-        control::MessageBox::messageText( this, "Getting Passphrase Failure", "Unable to retrieve a passphrase from mwc713. " + (seed.size()>0 ? seed[0] : "") );
-        return;
-    }
-    updateSeedData("Mnemonic passphrase:", seed);
 }
 
 void NewSeed::updateSeedData( const QString & name, const QVector<QString> & seed) {

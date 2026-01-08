@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_newswap2_w.h"
+
+#ifdef FEATURE_SWAP
+
 #include <cmath>
 #include "ui_s_newswap2_w.h"
 #include "../bridge/wnd/swap_b.h"
@@ -172,37 +175,37 @@ void NewSwap2::onSgnApplyNewTrade2Params(bool ok, QString errorMessage) {
 
 void NewSwap2::on_offerEpirationHelpButton_clicked() {
     control::MessageBox::messageText(this, "Help",
-                                     "Please specify enough time for initial offer exchnage and start locking funds. "
-                                     "If you don't reserve enough time, the swap will be automatically cancelled because of the timeout.");
+                                     "Please specify enough time for the initial offer exchange and locking funds. "
+                                     "If you don't reserve enough time, the swap will be automatically canceled because of the timeout.");
 }
 
 void NewSwap2::on_secRedeemHelpButton_clicked() {
     QString secCurrency = swap->getCurrentSecCurrency();
     control::MessageBox::messageText(this, "Help", "Please specify enough time to redeem " + secCurrency +
-                                                   " transaction was issues and mined. "
-                                                   "This configuration is related to the transaction fee. If you failed to estimate this time correctly, your swap trade will be vulnerable.\n\n"
-                                                   "Please Note, if you will not be able to redeem your funds before lock time, "
-                                                   "you might loose them.");
+                                                   " transactions once they are issued and mined. "
+                                                   "This configuration is related to the transaction fee. If you fail to estimate this time correctly, your swap trade will be vulnerable.\n\n"
+                                                   "Please note that if you are not able to redeem your funds before lock time, "
+                                                   "you might lose them.");
 }
 
 void NewSwap2::on_secTransFeeHelpButton_clicked() {
     QString secCurrency = swap->getCurrentSecCurrency();
     control::MessageBox::messageText(this, "Help",
-                                     "Please specify transaction fee high enough, so your transactions will be mined during redeem time interval. "
-                                     "If you failed to redeem during estimated time interval, your swap trade will be vulnerable.\n\n"
-                                     "Please Note, if you will not be able to redeem your funds before lock time, "
-                                     "you might loose them.");
+                                     "Please specify a transaction fee high enough so your transactions will be mined during the redeem time interval. "
+                                     "If you fail to redeem during the estimated time interval, your swap trade will be vulnerable.\n\n"
+                                     "Please note that if you are not able to redeem your funds before lock time, "
+                                     "you might lose them.");
 }
 
 void NewSwap2::on_electrumXHelpButton_clicked() {
     control::MessageBox::messageText(this, "Help",
                                      "MWC team is providing community ElectrumX servers, but for the extra security and privacy we "
-                                     "recommend you to use your own ElectrumX instance. The secondary fail over instance will be community provided.");
+                                     "recommend using your own ElectrumX instance. The secondary failover instance will be community provided.");
 }
 
 void NewSwap2::on_confNumberHelpButton_clicked() {
     control::MessageBox::messageText(this, "Help",
-                                     "Please specify confirmation number large enough to make reorg attack to your swap trade non profitable. Larger number you put, more expensive it will be for attacker.");
+                                     "Please specify a confirmation number large enough to make a reorg attack on your swap trade unprofitable. The larger the number, the more expensive it will be for an attacker.");
 }
 
 void NewSwap2::on_secRedeemCombo_currentIndexChanged(int index) {
@@ -253,3 +256,4 @@ void NewSwap2::on_secTransFeeEdit_textEdited(const QString &arg1) {
 }
 
 }
+#endif

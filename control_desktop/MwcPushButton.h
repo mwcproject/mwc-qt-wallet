@@ -19,7 +19,16 @@
 
 namespace control {
 
-class MwcPushButtonNormal : public QPushButton {
+class MwcPushButton : public QPushButton {
+Q_OBJECT
+public:
+    explicit MwcPushButton(QWidget *parent = Q_NULLPTR);
+    explicit MwcPushButton(const QString &text, QWidget *parent = Q_NULLPTR);
+    MwcPushButton(const QIcon &icon, const QString &text, QWidget *parent = Q_NULLPTR);
+    virtual ~MwcPushButton() override;
+};
+
+class MwcPushButtonNormal : public MwcPushButton {
 Q_OBJECT
 public:
     explicit MwcPushButtonNormal(QWidget *parent = Q_NULLPTR);
@@ -32,7 +41,7 @@ protected:
     virtual void focusOutEvent(QFocusEvent * event) override;
 };
 
-class MwcPushButtonSmall : public QPushButton {
+class MwcPushButtonSmall : public MwcPushButton {
 Q_OBJECT
 public:
     explicit MwcPushButtonSmall(QWidget *parent = Q_NULLPTR);
@@ -41,7 +50,7 @@ public:
     virtual ~MwcPushButtonSmall() override;
 };
 
-class MwcPushButtonTiny : public QPushButton {
+class MwcPushButtonTiny : public MwcPushButton {
 Q_OBJECT
 public:
     explicit MwcPushButtonTiny(QWidget *parent = Q_NULLPTR);
@@ -50,7 +59,7 @@ public:
     virtual ~MwcPushButtonTiny() override;
 };
 
-class MwcPushButtonTinyUnderline : public QPushButton {
+class MwcPushButtonTinyUnderline : public MwcPushButton {
 Q_OBJECT
 public:
     explicit MwcPushButtonTinyUnderline(QWidget *parent = Q_NULLPTR);
@@ -60,7 +69,7 @@ public:
 };
 
 
-class MwcPushButtonRound : public QPushButton {
+class MwcPushButtonRound : public MwcPushButton {
 Q_OBJECT
 public:
     explicit MwcPushButtonRound(QWidget *parent = Q_NULLPTR);
@@ -70,7 +79,7 @@ public:
 };
 
 
-class MwcPushButtonStatusLine : public QPushButton {
+class MwcPushButtonStatusLine : public MwcPushButton {
 Q_OBJECT
 public:
     explicit MwcPushButtonStatusLine(QWidget *parent = Q_NULLPTR);

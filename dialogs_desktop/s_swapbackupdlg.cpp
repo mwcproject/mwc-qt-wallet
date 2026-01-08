@@ -14,6 +14,9 @@
 
 
 #include "s_swapbackupdlg.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_swapbackupdlg.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wnd/swap_b.h"
@@ -73,3 +76,4 @@ void dlg::SwapBackupDlg::on_okBtn_clicked()
 }
 
 }
+#endif

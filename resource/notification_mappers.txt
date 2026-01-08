@@ -1,6 +1,0 @@
-# It is a message mappers files for the mwc-wallet messages that we need to show to the users nice way.
-# Format:
-# <regex expression to parse the message>
-# <mapper string>  - string with regex groups.
-# empty line (separator)
-

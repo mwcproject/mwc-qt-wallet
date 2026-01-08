@@ -29,9 +29,6 @@ namespace state {
 Listening::Listening(StateContext * context) :
     State(context, STATE::LISTENING )
 {
-    // Let's establish connectoins at the beginning
-    QObject::connect(context->wallet, &wallet::Wallet::onListenerMqCollision,
-                 this, &Listening::onListenerMqCollision, Qt::QueuedConnection);
 }
 
 Listening::~Listening() {
@@ -46,12 +43,6 @@ NextStateRespond Listening::execute() {
     core::getWndManager()->pageListening();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
-}
-
-void Listening::onListenerMqCollision() {
-    core::getWndManager()->messageTextDlg("MWC MQS new login detected",
-            "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\n"
-            "Listener is stopped. Please close your other instance and restart this wallet to start use MWCMQS.");
 }
 
 

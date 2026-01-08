@@ -24,8 +24,9 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/e_receive_b.h"
-#include "../bridge/wnd/g_filetransaction_b.h"
 #include "../core/WndManager.h"
+#include "node/node_client.h"
+#include "util/message_mapper.h"
 #ifdef WALLET_MOBILE
 #include "../core_mobile/qtandroidservice.h"
 #endif
@@ -36,20 +37,6 @@ namespace state {
 
 Receive::Receive( StateContext * _context ) :
         State(_context, STATE::RECEIVE_COINS) {
-
-    QObject::connect(context->wallet, &wallet::Wallet::onReceiveFile,
-                                   this, &Receive::onReceiveFile, Qt::QueuedConnection);
-    QObject::connect(context->wallet, &wallet::Wallet::onReceiveSlatepack,
-                     this, &Receive::onReceiveSlatepack, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
-                     this, &Receive::onNodeStatus, Qt::QueuedConnection);
-
-#ifdef WALLET_MOBILE
-    androidDevice = new QtAndroidService(this);
-    QObject::connect(androidDevice, &QtAndroidService::sgnOnFileReady,
-                     this, &Receive::sgnOnFileReady, Qt::QueuedConnection);
-#endif
 }
 
 Receive::~Receive() {}
@@ -64,8 +51,9 @@ NextStateRespond Receive::execute() {
 }
 
 void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress) {
+    logger::logInfo(logger::STATE, "Call Receive::signSlatepackTransaction <slatepack> <slateJson> <slateSenderAddress>");
     util::FileTransactionInfo flTrInfo;
-    QPair<bool, QString> perseResult = flTrInfo.parseSlateContent( slateJson, util::FileTransactionType::RECEIVE, slateSenderAddress );
+    QPair<bool, QString> perseResult = flTrInfo.parseSlateContent( slateJson, util::FileTransactionType::RECEIVE, slateSenderAddress, context->wallet );
 
     if (!perseResult.first) {
         for (auto p : bridge::getBridgeManager()->getReceive() )
@@ -76,154 +64,39 @@ void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QSt
     // We don't want to intercept the action from other windows like AirDrop...
     if ( isActive() ) {
         signingFile = false;
-        core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS, slatepack, flTrInfo, lastNodeHeight);
+        core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS,
+                    slatepack, flTrInfo,
+                    context->nodeClient->getLastNodeHeight());
         atInitialPage = false;
     }
 }
 
-
-void Receive::signTransaction( QString uriFileName ) {
-    QString fileName = uriFileName;
-#ifdef WALLET_MOBILE
-    QString tmpFile = util::genTempFileName(".tmp");
-    
-    if (!util::copyUriToFile(uriFileName, tmpFile)) {
-        core::getWndManager()->messageTextDlg( "Data access",
-                    "Unable to copy data from the file " + uriFileName );
-        return;
-    }
-
-    fileName = tmpFile;
-#endif
-
-    // Let's parse transaction first
-    util::FileTransactionInfo flTrInfo;
-    QPair<bool, QString> parseResult = flTrInfo.parseSlateFile( fileName, util::FileTransactionType::RECEIVE );
-
-    if (!parseResult.first) {
-        for (auto p : bridge::getBridgeManager()->getReceive() )
-            p->onTransactionActionIsFinished( false, parseResult.second );
-
-        return;
-    }
-
-    // We don't want to intercept the action from other windows like AirDrop...
-    if ( isActive() ) {
-        signingFile = true;
-        core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS, uriFileName, flTrInfo, lastNodeHeight);
-        atInitialPage = false;
-    }
-}
 
 void Receive::ftBack() {
+    logger::logInfo(logger::STATE, "Call Receive::ftBack");
     core::getWndManager()->pageRecieve();
     atInitialPage = true;
 }
 
-void Receive::receiveFile(QString uriFileName, QString description) {
-    logger::logInfo("Receive", "receiveFile " + uriFileName);
-    QString fileName = uriFileName;
-#ifdef WALLET_MOBILE
-    QString tmpFile = util::genTempFileName(".tx");
-    if (!util::copyUriToFile(uriFileName, tmpFile)) {
-        core::getWndManager()->messageTextDlg( "Data access",
-                    "Unable to copy data from the file " + uriFileName );
-        return;
-    }
-    fileName = tmpFile;
-#endif
-
-    // It can be filename or slate
-    Q_ASSERT(signingFile);
-    context->wallet->receiveFile(fileName, description);
-}
-
 void Receive::receiveSlatepack(QString slatepack, QString description) {
-    logger::logInfo("Receive", "Receive Slatepack " + slatepack);
+    logger::logInfo(logger::STATE, "Call Receive::receiveSlatepack with <slatepack> <description>");
     // It can be filename or slate
     Q_ASSERT(!signingFile);
-    context->wallet->receiveSlatepack(slatepack, description, "");
-}
+    QPair<wallet::ResReceive,QString> sp_err = context->wallet->receiveSlatepack(slatepack, description);
 
+    if (!sp_err.first.tx_UUID.isEmpty() && !sp_err.first.slatepack.isEmpty())
+        context->appContext->addReceiveSlatepack(sp_err.first.tx_UUID, sp_err.first.slatepack);
 
-void Receive::onReceiveFile( bool success, QStringList errors, QString inFileName ) {
-    // Checking if this state is really active on UI level
-    if (isActive()) {
-        for (auto p: bridge::getBridgeManager()->getFileTransaction())
-            p->hideProgress();
-        for (auto p: bridge::getBridgeManager()->getReceive())
-            p->hideProgress();
-
-        if (success) {
-#ifdef WALLET_MOBILE
-            // We got temp file, now we need to save the result. To save we need ask user for location
-            QString pickerInitialUri = context->appContext->getPathFor("fileGen");
-            scrFileName = inFileName + ".response";
-            QString dstFile = scrFileName.mid( scrFileName.lastIndexOf('/') );
-            androidDevice->createFile( pickerInitialUri, "*/*", dstFile, 300 );
-#else
-            core::getWndManager()->messageTextDlg("Receive Slatepack Transaction",
-                                         "Transaction was successfully signed. Resulting transaction located at " +
-                                         inFileName + ".response");
-            ftBack();
-#endif
-        } else {
-            core::getWndManager()->messageTextDlg("Failure",
-                                         "Unable to receive slatepack transaction.\n\n" + util::formatErrorMessages(errors));
-        }
+    if (sp_err.second.isEmpty()) {
+        Q_ASSERT(!sp_err.first.slatepack.isEmpty());
+        atInitialPage = false;
+        core::getWndManager()->pageShowSlatepack(sp_err.first.slatepack, sp_err.first.tx_UUID, STATE::RECEIVE_COINS, ".response", false );
+    } else {
+        core::getWndManager()->messageTextDlg("Failure",
+                                              "Unable to receive slatepack transaction.\n\n" + util::mapMessage(sp_err.second));
     }
 }
 
-#ifdef WALLET_MOBILE
-void Receive::sgnOnFileReady( int eventCode, QString fileUri ) {
-    qDebug() << "Receive::sgnOnFileReady get " << eventCode << " " <<  fileUri;
-    if (eventCode == 300 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
-        context->appContext->updatePathFor("fileGen", fileUri);
-        if (util::copyFileToUri(scrFileName, fileUri)) {
-            ftBack();
-        }
-        else {
-            core::getWndManager()->messageTextDlg("Access Error",
-                                         "Unable to save result to " + fileUri);
-        }
-        scrFileName = "";
-    }
-}
-#endif
-
-void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepack, QString txId ) {
-    Q_UNUSED(tagId)
-
-    if (!txId.isEmpty() && !slatepack.isEmpty())
-        context->appContext->addReceiveSlatepack(txId, slatepack);
-
-    if (isActive()) {
-        for (auto p: bridge::getBridgeManager()->getFileTransaction())
-            p->hideProgress();
-        for (auto p: bridge::getBridgeManager()->getReceive())
-            p->hideProgress();
-
-        if (error.isEmpty()) {
-            Q_ASSERT(!slatepack.isEmpty());
-            atInitialPage = false;
-            core::getWndManager()->pageShowSlatepack(slatepack, STATE::RECEIVE_COINS, ".response", false );
-        } else {
-            core::getWndManager()->messageTextDlg("Failure",
-                                                  "Unable to receive slatepack transaction.\n\n" + error);
-        }
-    }
-}
-
-
-void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-    Q_UNUSED(errMsg)
-    Q_UNUSED(peerHeight)
-    Q_UNUSED(totalDifficulty)
-    Q_UNUSED(connections)
-
-    if (online)
-        lastNodeHeight = nodeHeight;
-}
 
 bool Receive::isActive() const {
     return state::getStateMachine()->getCurrentStateId() == STATE::RECEIVE_COINS;
@@ -248,5 +121,24 @@ QString Receive::getHelpDocName() {
     }
 }
 
+bool Receive::needResultTxFileName() {
+    logger::logInfo(logger::STATE, "Call Receive::needResultTxFileName");
+    return false;
+}
+
+QString Receive::getResultTxPath() {
+    logger::logInfo(logger::STATE, "Call Receive::getResultTxPath");
+    return "";
+}
+
+void Receive::updateResultTxPath(QString path) {
+    logger::logInfo(logger::STATE, "Call Receive::updateResultTxPath with path=" + path);
+    Q_UNUSED(path)
+}
+
+bool Receive::isNodeHealthy() const {
+    logger::logInfo(logger::STATE, "Call Receive::isNodeHealthy");
+    return true;
+}
 
 }

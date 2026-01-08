@@ -37,7 +37,7 @@ public:
     void moveEvent(QMoveEvent* event);
     void resizeEvent(QResizeEvent* event);
     bool event(QEvent* event);
-    void onLoginResult(bool ok);
+    void onLogin();
     void onApplicationStateChange(Qt::ApplicationState state);
 
 protected:
@@ -56,7 +56,6 @@ private:
     Qt::ApplicationState             currentState = Qt::ApplicationActive;
 
     bool                             enabled = true;
-    bool                             loginOk = true;
     bool                             previouslyMinimized = false;
     bool                             previouslyFullScreen = false;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NewSwap2</class>
- <widget class="QWidget" name="NewSwap2">
+ <widget class="control::MwcWidget" name="NewSwap2">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -116,7 +116,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="offerEpirationHelpButton">
+        <widget class="control::MwcPushButton" name="offerEpirationHelpButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -130,10 +130,10 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Click for help</string>
+          <string>Open help</string>
          </property>
          <property name="statusTip">
-          <string>Click for help</string>
+          <string>Open help</string>
          </property>
          <property name="styleSheet">
           <string notr="true">#offerEpirationHelpButton{border: none;}</string>
@@ -236,7 +236,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="secRedeemHelpButton">
+        <widget class="control::MwcPushButton" name="secRedeemHelpButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -250,10 +250,10 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Click for help</string>
+          <string>Open help</string>
          </property>
          <property name="statusTip">
-          <string>Click for help</string>
+          <string>Open help</string>
          </property>
          <property name="styleSheet">
           <string notr="true">#secRedeemHelpButton{border: none;}</string>
@@ -377,7 +377,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="secTransFeeHelpButton">
+        <widget class="control::MwcPushButton" name="secTransFeeHelpButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -391,10 +391,10 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Click for help</string>
+          <string>Open help</string>
          </property>
          <property name="statusTip">
-          <string>Click for help</string>
+          <string>Open help</string>
          </property>
          <property name="styleSheet">
           <string notr="true">#secTransFeeHelpButton{border: none;}</string>
@@ -441,7 +441,7 @@
         <number>20</number>
        </property>
        <item>
-        <widget class="QGroupBox" name="autoStart">
+        <widget class="control::MwcGroupBox" name="autoStart">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -459,7 +459,7 @@
            <number>20</number>
           </property>
           <item row="1" column="0">
-           <widget class="QLabel" name="secBlocksLabel">
+           <widget class="control::MwcLabel" name="secBlocksLabel">
             <property name="minimumSize">
              <size>
               <width>40</width>
@@ -472,7 +472,7 @@
            </widget>
           </item>
           <item row="0" column="3">
-           <widget class="QPushButton" name="confNumberHelpButton">
+           <widget class="control::MwcPushButton" name="confNumberHelpButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -486,10 +486,10 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
-             <string>Click for help</string>
+             <string>Open help</string>
             </property>
             <property name="statusTip">
-             <string>Click for help</string>
+             <string>Open help</string>
             </property>
             <property name="styleSheet">
              <string notr="true">#confNumberHelpButton{border: none;}</string>
@@ -513,7 +513,7 @@
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QLabel" name="label_9">
+           <widget class="control::MwcLabel" name="label_9">
             <property name="text">
              <string>blocks</string>
             </property>
@@ -534,10 +534,10 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Number of confirmations for MWC coin</string>
+             <string>Number of confirmations for MWC</string>
             </property>
             <property name="statusTip">
-             <string>Number of confirmations for MWC coin</string>
+             <string>Number of confirmations for MWC</string>
             </property>
             <property name="text">
              <string/>
@@ -548,7 +548,7 @@
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QLabel" name="label_8">
+           <widget class="control::MwcLabel" name="label_8">
             <property name="text">
              <string>blocks</string>
             </property>
@@ -583,7 +583,7 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="label_7">
+           <widget class="control::MwcLabel" name="label_7">
             <property name="minimumSize">
              <size>
               <width>40</width>
@@ -612,7 +612,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="autoStart_2">
+        <widget class="control::MwcGroupBox" name="autoStart_2">
          <property name="styleSheet">
           <string notr="true"/>
          </property>
@@ -635,7 +635,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="control::MwcLabel" name="label">
               <property name="minimumSize">
                <size>
                 <width>55</width>
@@ -654,7 +654,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="mwcLockTimeLabel">
+             <widget class="control::MwcLabel" name="mwcLockTimeLabel">
               <property name="minimumSize">
                <size>
                 <width>170</width>
@@ -671,7 +671,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
-             <widget class="QLabel" name="secLockCurrencyLabel">
+             <widget class="control::MwcLabel" name="secLockCurrencyLabel">
               <property name="minimumSize">
                <size>
                 <width>55</width>
@@ -690,7 +690,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="secLockTimeLabel">
+             <widget class="control::MwcLabel" name="secLockTimeLabel">
               <property name="minimumSize">
                <size>
                 <width>170</width>
@@ -799,7 +799,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="electrumXHelpButton">
+          <widget class="control::MwcPushButton" name="electrumXHelpButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -813,10 +813,10 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="statusTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="styleSheet">
             <string notr="true">#electrumXHelpButton{border: none;}</string>
@@ -906,7 +906,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_3" native="true">
+        <widget class="control::MwcWidget" name="widget_3" native="true">
          <property name="minimumSize">
           <size>
            <width>1</width>
@@ -975,10 +975,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Return back to first step</string>
+          <string>Return to the first step</string>
          </property>
          <property name="statusTip">
-          <string>Return back to first step</string>
+          <string>Return to the first step</string>
          </property>
          <property name="text">
           <string>Back</string>
@@ -1104,6 +1104,26 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>control_desktop/MwcGroupBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButton</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

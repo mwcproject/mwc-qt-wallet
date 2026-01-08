@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SendOffline</class>
- <widget class="QWidget" name="SendOffline">
+ <widget class="control::MwcWidget" name="SendOffline">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -97,7 +97,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QWidget" name="widget_2" native="true">
+           <widget class="control::MwcWidget" name="widget_2" native="true">
             <property name="minimumSize">
              <size>
               <width>410</width>
@@ -110,7 +110,7 @@
               <height>110</height>
              </size>
             </property>
-            <widget class="QLabel" name="label">
+            <widget class="control::MwcLabel" name="label">
              <property name="geometry">
               <rect>
                <x>5</x>
@@ -233,16 +233,16 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Recipient slatepack address to encrypt the slate</string>
+             <string>Recipient Slatepack address to encrypt the Slatepack</string>
             </property>
             <property name="statusTip">
-             <string>Recipient slatepack address to encrypt the slate</string>
+             <string>Recipient Slatepack address to encrypt the Slatepack</string>
             </property>
             <property name="maxLength">
              <number>1024</number>
             </property>
             <property name="placeholderText">
-             <string>Recipient slatepack address</string>
+             <string>Recipient Slatepack address</string>
             </property>
            </widget>
           </item>
@@ -318,7 +318,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QTextEdit" name="descriptionEdit">
+         <widget class="control::MwcTextEdit" name="descriptionEdit">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -496,7 +496,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget" native="true">
+        <widget class="control::MwcWidget" name="widget" native="true">
          <property name="minimumSize">
           <size>
            <width>1</width>
@@ -568,6 +568,21 @@
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

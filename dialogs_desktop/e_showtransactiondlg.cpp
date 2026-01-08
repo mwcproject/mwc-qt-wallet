@@ -21,10 +21,9 @@
 namespace dlg {
 
 ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
-                                       const QString& account,
                                        const wallet::WalletTransaction transaction,
                                        const QVector<wallet::WalletOutput> & _outputs,
-                                       const QVector<QString> & messages,
+                                       const QVector<wallet::WalletTransactionMessage> & messages,
                                        const QString& note) :
     control::MwcDialog(parent),
     ui(new Ui::ShowTransactionDlg),
@@ -46,10 +45,10 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
 
     QString strMessage = "None";
     if (!messages.isEmpty()) {
-        strMessage = messages[0];
+        strMessage = messages[0].message;
         for (int t=1;t<messages.size();t++) {
             strMessage += "; ";
-            strMessage += messages[t];
+            strMessage += messages[t].message;
         }
     }
 
@@ -63,18 +62,21 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
     ui->fee->setText( util::nano2one( transaction.fee ) );
 
     ui->commitsComboBox->clear();
+    int selectedIdx = -1;
     for (int i=0; i<outputs.size(); i++) {
         ui->commitsComboBox->addItem( outputs[i].outputCommitment, QVariant(i));
+        if (outputs[i].status == "Unspent") {
+            selectedIdx = i;
+        }
     }
 
     // Selecting first output
-    if (outputs.size()>0) {
-        ui->commitsComboBox->setCurrentIndex(0);
+    if (selectedIdx>=0) {
+        ui->commitsComboBox->setCurrentIndex(selectedIdx);
         updateOutputData();
     }
 
     txUuid = transaction.txid;
-    this->account = account;
     newTransactionNote = note;
     ui->transactionNote->setText(newTransactionNote);
 }

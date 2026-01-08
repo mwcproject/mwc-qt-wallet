@@ -26,22 +26,6 @@
 
 namespace state {
 
-struct ReceivedTxInfo {
-    QString mwc;
-    QString fromAddr;
-    QString message;
-
-    ReceivedTxInfo() = default;
-    ReceivedTxInfo(const ReceivedTxInfo &) = default;
-    ReceivedTxInfo(const QString &_mwc, const QString &_fromAddr, const QString &_message)
-        : mwc(_mwc),
-          fromAddr(_fromAddr),
-          message(_message) {
-    }
-
-    ReceivedTxInfo& operator=(const ReceivedTxInfo&) = default;
-};
-
 class Events : public QObject, public State
 {
     Q_OBJECT
@@ -59,21 +43,12 @@ public:
 
 private slots:
     void onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message);
-
-    void onSlateReceivedFrom(QString slate, QString mwc, QString fromAddr, QString message );
-    void onTransactionById( bool success, QString account, int64_t height, wallet::WalletTransaction transaction,
-                                QVector<wallet::WalletOutput> outputs, QVector<QString> messages );
-
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override {return false;}
     virtual QString getHelpDocName() override {return "event_log.html";}
 private:
     int64_t         messageWaterMark = 0;
-    // Transactions that we are processing for congrats request
-    QMap<QString, ReceivedTxInfo> recievedTxs;
-    QSet<QString>   activeUUID;
-
 };
 
 }

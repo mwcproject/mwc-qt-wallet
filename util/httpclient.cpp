@@ -20,117 +20,104 @@
 #include <QJsonObject>
 #include <QUrlQuery>
 #include <QDataStream>
+#include <QFuture>
+#include <QtConcurrent>
+#include <QTimer>
+#include <QThread>
+#include <QThreadPool>
+
 #include "stringutils.h"
 #include "Log.h"
+#include "ui_x_events.h"
 
 namespace util {
 
-HttpClient::HttpClient() {
+static QThreadPool * httpClientThreadPool() {
+    static QThreadPool pool;
+    static bool inited = false;
+    if (!inited) {
+        pool.setMaxThreadCount(2);
+        pool.setExpiryTimeout(-1); // keep threads alive for reuse
+        inited = true;
+    }
+    return &pool;
+}
+
+HttpClient::HttpClient(QObject * parent) : QObject(parent) {
     nwManager = new QNetworkAccessManager(this);
-    connect(nwManager, &QNetworkAccessManager::finished, this, &HttpClient::replyFinished, Qt::QueuedConnection);
 }
 
-void HttpClient::sendRequest(HTTP_CALL call, const QString & url,
-                          const QString &tag,
-                          const QVector<QString> & params,
-                          const QByteArray & body, //
-                          const QString & param1, const QString & param2,
-                          const QString & param3, const QString & param4) {
+QString HttpClient::sendRequest(HTTP_CALL call, const QString & url,
+                          const QVector<QString> & queryParams, // key/value
+                          const QVector<QString> & headers, // key/value
+                          const QByteArray & body,
+                          int timeoutMs,
+                          bool logRequest) {
 
-    qDebug() << "Sending request: " << url << ", params: " << params << "  tag:" << tag;
+    qDebug() << "Sending request: " << url << ", params: " << queryParams << ",  headers: " << headers;
 
-    QUrl requestUrl(url);
-
-    // enrich with params
-    Q_ASSERT( params.size()%2==0 );
-    QUrlQuery query;
-    for (int t=1; t<params.size(); t+=2) {
-        query.addQueryItem( util::urlEncode(params[t-1]), util::urlEncode(params[t]));
+    if (logRequest) {
+        logger::logInfo( logger::HTTP_CLIENT, "Requesting: " + url + "   with body: " + util::string2shortStrR( QString::fromUtf8(body), 50) );
     }
-    // Note: QT encoding has issues, some symbols will be skipped.
-    // No encoding needed because we encode params with out code.
-    requestUrl.setQuery(query.query(QUrl::PrettyDecoded), QUrl::StrictMode );
 
-    QNetworkRequest request;
+    QFuture<QString> request = QtConcurrent::run(httpClientThreadPool(), [=]() -> QString {
+        // Per-call manager in this thread
+        QNetworkAccessManager nam;
 
-    // sslLibraryVersionString neede as a workaroung for a deadlock at defaultConfiguration, qt v5.9
-    QSslSocket::sslLibraryVersionString();
-    QSslConfiguration config = QSslConfiguration::defaultConfiguration();
-    config.setProtocol(QSsl::TlsV1_2);
-    config.setPeerVerifyMode(QSslSocket::VerifyNone);
-    request.setSslConfiguration(config);
+        QUrl requestUrl(url);
 
-    qDebug() << "Processing: GET " << requestUrl.toString(QUrl::FullyEncoded);
-    logger::logInfo("Airdrop", "Requesting: " + url );
-    request.setUrl( requestUrl );
-    request.setHeader(QNetworkRequest::ServerHeader, "application/json");
-
-    QNetworkReply *reply = nullptr;
-    switch (call) {
-        case GET:
-            reply =  nwManager->get(request);
-            break;
-        case POST:
-            reply =  nwManager->post(request, body );
-            break;
-        default:
-            Q_ASSERT(false);
-    }
-    Q_ASSERT(reply);
-
-
-    if (reply) {
-        reply->setProperty("tag", QVariant(tag));
-        reply->setProperty("param1", QVariant(param1));
-        reply->setProperty("param2", QVariant(param2));
-        reply->setProperty("param3", QVariant(param3));
-        reply->setProperty("param4", QVariant(param4));
-        // Respond will be send back async
-    }
-}
-
-void HttpClient::replyFinished(QNetworkReply* reply) {
-    QNetworkReply::NetworkError errCode = reply->error();
-    QString tag = reply->property("tag").toString();
-
-    qDebug() << "Get back respond with tag: " << tag << "  Error code: " << errCode;
-
-    QJsonObject jsonRespond;
-    bool  requestOk = false;
-    QString requestErrorMessage;
-
-    if (reply->error() == QNetworkReply::NoError) {
-        requestOk = true;
-
-        // read the reply body
-        QString strReply (reply->readAll().trimmed());
-        qDebug() << "Get back respond. Tag: " << tag << "  Reply " << strReply;
-        logger::logInfo("HttpClient", "Success respond for Tag: " + tag + "  Reply " + strReply);
-
-        QJsonParseError error;
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(strReply.toUtf8(), &error);
-        if (error.error != QJsonParseError::NoError) {
-            requestOk = false;
-            requestErrorMessage = "Unable to parse respond Json at position " + QString::number(error.offset) +
-                                  "\nJson string: " + strReply;
+        // enrich with params
+        Q_ASSERT( queryParams.size()%2==0 );
+        QUrlQuery query;
+        for (int t=1; t<queryParams.size(); t+=2) {
+            query.addQueryItem( util::urlEncode(queryParams[t-1]), util::urlEncode(queryParams[t]));
         }
-        jsonRespond = jsonDoc.object();
-    }
-    else  {
-        requestOk = false;
-        requestErrorMessage = reply->errorString();
-        logger::logInfo("HttpClient", "Fail respond for Tag: " + tag + "  requestErrorMessage: " + requestErrorMessage);
-    }
-    reply->deleteLater();
+        // Note: QT encoding has issues, some symbols will be skipped.
+        // No encoding needed because we encode params with out code.
+        requestUrl.setQuery(query.query(QUrl::PrettyDecoded), QUrl::StrictMode );
 
-    // Done with reply. Now processing the results by tags
+        QNetworkRequest request(requestUrl);
 
-    onProcessHttpResponse(requestOk, tag, jsonRespond,
-                reply->property("param1").toString(),
-                reply->property("param2").toString(),
-                reply->property("param3").toString(),
-                reply->property("param4").toString()
-            );
+        // sslLibraryVersionString neede as a workaroung for a deadlock at defaultConfiguration, qt v5.9
+        QSslSocket::sslLibraryVersionString();
+        QSslConfiguration config = QSslConfiguration::defaultConfiguration();
+        config.setProtocol(QSsl::TlsV1_2);
+        config.setPeerVerifyMode(QSslSocket::VerifyNone);
+        request.setSslConfiguration(config);
+
+        Q_ASSERT( headers.size()%2==0 );
+        for (int t=1; t<headers.size(); t+=2) {
+            request.setRawHeader(headers[t-1].toUtf8(), headers[t].toUtf8());
+        }
+
+        QNetworkReply* reply = nullptr;
+        if (call == GET) reply = nam.get(request);
+        else if (call == POST) reply = nam.post(request, body);
+        else Q_ASSERT(false);
+
+        QEventLoop loop;
+        QTimer timer;
+        timer.setSingleShot(true);
+        QObject::connect(&timer, &QTimer::timeout, reply, &QNetworkReply::abort);
+        QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+        timer.start(timeoutMs);
+        loop.exec();
+
+        QString response;
+        bool finished = reply->isFinished();
+        auto err=reply->error();
+        if (finished && err == QNetworkReply::NoError) {
+            response = reply->readAll().trimmed();
+        }
+        reply->deleteLater();
+        return response;
+    });
+
+    QString response = request.result();
+    if (response.isEmpty()) {
+        logger::logError( logger::HTTP_CLIENT, "Requesting to " + url + "  is failed" );
+    }
+    return response;
 }
 
 

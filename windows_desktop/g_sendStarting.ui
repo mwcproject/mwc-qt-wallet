@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SendStarting</class>
- <widget class="QWidget" name="SendStarting">
+ <widget class="control::MwcWidget" name="SendStarting">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -93,10 +93,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Send MWC online with MWC MQS, TOR</string>
+         <string>Send MWC online with MWCMQS or Tor</string>
         </property>
         <property name="statusTip">
-         <string>Send MWC online with MWC MQS, TOR</string>
+         <string>Send MWC online with MWCMQS or Tor</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -104,7 +104,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="QLabel" name="label">
+        <widget class="control::MwcLabel" name="label">
          <property name="geometry">
           <rect>
            <x>39</x>
@@ -253,10 +253,10 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Amount of MWC coins to send</string>
+         <string>Amount of MWC to send</string>
         </property>
         <property name="statusTip">
-         <string>Amount of MWC coins to send</string>
+         <string>Amount of MWC to send</string>
         </property>
         <property name="maxLength">
          <number>32</number>
@@ -330,10 +330,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Send MWC. Continue with a next step.</string>
+         <string>Send MWC and continue to the next step.</string>
         </property>
         <property name="statusTip">
-         <string>Send MWC. Continue with a next step.</string>
+         <string>Send MWC and continue to the next step.</string>
         </property>
         <property name="text">
          <string>Next</string>
@@ -349,9 +349,9 @@
          </rect>
         </property>
         <property name="text">
-         <string>- Transaction will not be finalized if the destination wallet is offline and not listening for the destination address.
-- Your funds will be locked until your transaction is finalized.
-- You can cancel any non finalized transaction to unlock your funds at 'Transactions'.</string>
+         <string>- Transaction won't be sent if the destination wallet is offline and isn't listening for the chosen address.
+- Your funds remain locked until the transaction is fully confirmed on-chain.
+- You can cancel any unconfirmed transaction to unlock your funds at 'Transactions'.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -415,7 +415,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="QLabel" name="label_16">
+        <widget class="control::MwcLabel" name="label_16">
          <property name="geometry">
           <rect>
            <x>48</x>
@@ -578,7 +578,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget" native="true">
+        <widget class="control::MwcWidget" name="widget" native="true">
          <property name="minimumSize">
           <size>
            <width>1</width>
@@ -640,7 +640,7 @@
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelSmall</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
@@ -650,9 +650,9 @@
    <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcCheckBox</class>
-   <extends>QCheckBox</extends>
-   <header>control_desktop/MwcCheckBox.h</header>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
@@ -660,14 +660,14 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
@@ -680,6 +680,16 @@
    <extends>QFrame</extends>
    <header>control_desktop/MwcCheckedFrame.h</header>
    <container>1</container>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

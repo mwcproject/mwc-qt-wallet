@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_mrktswapnew_w.h"
+
+#ifdef FEATURE_SWAP
+
 #include "ui_s_mrktswapnew_w.h"
 #include "../bridge/wnd/swapmkt_b.h"
 #include "../bridge/config_b.h"
@@ -103,6 +106,7 @@ MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
 
     updateThirdValue();
 
+    fdg
     onSgnWalletBalanceUpdated();
 
     // Fee need to be updated at the end because currency tab does reset to the default one.
@@ -255,6 +259,9 @@ void MrktSwapNew::updateFundsLockTime() {
 }
 
 void MrktSwapNew::onSgnWalletBalanceUpdated() {
+
+    check if wallet is not busy
+
     // init accounts
     ui->accountComboBox->clear();
 
@@ -484,3 +491,5 @@ void MrktSwapNew::on_secAddressEdit_textEdited(const QString &arg1)
 }
 
 }
+
+#endif

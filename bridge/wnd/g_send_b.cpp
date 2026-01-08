@@ -16,10 +16,13 @@
 #include "../BridgeManager.h"
 #include "../../state/state.h"
 #include "../../state/g_Send.h"
+#include "../../state/u_nodeinfo.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
 static state::Send * getState() {return (state::Send *) state::getState(state::STATE::SEND);}
+static state::NodeInfo * getNodeInfo() { return (state::NodeInfo *) state::getState(state::STATE::NODE_INFO); }
 
 Send::Send(QObject * parent) :
     QObject(parent){
@@ -37,42 +40,52 @@ Send::~Send() {
 //   0 - ok
 //   1 - account error
 //   2 - amount error
-int Send::initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount, bool gotoNextPage ) {
-    return getState()->initialSendSelection( bridge::SEND_SELECTED_METHOD(sendSelectedMethod), account, sendAmount, gotoNextPage);
+int Send::initialSendSelection( int sendSelectedMethod, QString accountPath, QString sendAmount, bool gotoNextPage ) {
+    logger::logInfo(logger::BRIDGE, "Call Send::initialSendSelection with sendSelectedMethod=" + QString::number(sendSelectedMethod) +
+                " accountPath=" + accountPath + " sendAmount=" + sendAmount + " gotoNextPage=" + QString(gotoNextPage ? "true" : "false"));
+    return getState()->initialSendSelection( bridge::SEND_SELECTED_METHOD(sendSelectedMethod), accountPath, sendAmount, gotoNextPage);
 }
 
 int64_t Send::getTmpAmount() {
+    logger::logInfo(logger::BRIDGE, "Call Send::getTmpAmount");
     return getState()->getTmpAmount();
 }
 
-QString Send::getTmpAccountName() {
-    return getState()->getTmpAccountName();
+QString Send::getTmpAccountPath() {
+    logger::logInfo(logger::BRIDGE, "Call Send::getTmpAccountPath");
+    return getState()->getTmpAccountPath();
 }
 
 
 void Send::showSendResult( bool success, QString message ) {
+    logger::logInfo(logger::BRIDGE, QString("Call Send::showSendResult success=") + (success?"true":"false") + " <message>" );
     emit sgnShowSendResult(success, message);
 }
 
-
 bool Send::isNodeHealthy() {
-    return getState()->isNodeHealthy();
+    logger::logInfo(logger::BRIDGE, "Call Send::isNodeHealthy");
+    return getNodeInfo()->isNodeHealthy();
 }
 
 // Handle whole workflow to send offline
 // return true if some long process was started.
-bool Send::sendMwcOffline( QString account, QString amountNano, QString message, bool isLockLater, QString slatepackRecipientAddress) {
-    return getState()->sendMwcOffline( account, amountNano.toLongLong(), message, isLockLater, slatepackRecipientAddress);
+bool Send::sendMwcOffline( QString account, QString accountPath, QString amountNano, QString message, bool isLockLater, QString slatepackRecipientAddress) {
+    logger::logInfo(logger::BRIDGE, "Call Send::sendMwcOffline with accountPath=" + accountPath + " amountNano=" + amountNano +
+        " <message> " + " isLockLater=" + QString(isLockLater ? "true" : "false") + " slatepackRecipientAddress=" + (slatepackRecipientAddress.isEmpty() ? "<empty>" : "<hidden>"));
+    return getState()->sendMwcOffline( account, accountPath, amountNano.toLongLong(), message, isLockLater, slatepackRecipientAddress);
 }
 
 // Handle whole workflow to send online
 // return true if some long process was started.
-bool Send::sendMwcOnline( QString account, QString amountNano, QString address, QString apiSecret, QString message) {
-    return getState()->sendMwcOnline( account, amountNano.toLongLong(), address, apiSecret, message);
+bool Send::sendMwcOnline( QString account, QString accountPath, QString amountNano, QString address, QString message) {
+    logger::logInfo(logger::BRIDGE, "Call Send::sendMwcOnline with accountPath=" + accountPath + " amountNano=" + amountNano +
+            " address=" + (address.isEmpty() ? "<empty>" : "<hidden>") + " <message>");
+    return getState()->sendMwcOnline( account, accountPath, amountNano.toLongLong(), address, message);
 }
 
-QString Send::getSpendAllAmount( QString account) {
-    return getState()->getSpendAllAmount(account);
+QString Send::getSpendAllAmount( QString accountPath) {
+    logger::logInfo(logger::BRIDGE, "Call Send::getSpendAllAmount with account=" + accountPath);
+    return getState()->getSpendAllAmount(accountPath);
 }
 
 

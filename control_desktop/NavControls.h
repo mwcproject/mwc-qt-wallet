@@ -15,20 +15,20 @@
 #ifndef MWC_QT_WALLET_NAVCONTROLS_H
 #define MWC_QT_WALLET_NAVCONTROLS_H
 
-#include <QPushButton>
-#include <QToolButton>
+#include "MwcPushButton.h"
+#include "MwcToolButton.h"
 
 // Navigation controls: Tool Button (NavControls) and menu button (NavMenuButton)
 namespace control {
 
-class NavPushButton : public QToolButton {
+class NavPushButton : public MwcToolButton {
     Q_OBJECT
 public:
     explicit NavPushButton(QWidget *parent = Q_NULLPTR);
     virtual ~NavPushButton() override;
 };
 
-class NavMenuButton : public QPushButton {
+class NavMenuButton : public MwcPushButton {
 Q_OBJECT
 public:
     explicit NavMenuButton(QWidget *parent = Q_NULLPTR);

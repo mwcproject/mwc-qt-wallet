@@ -15,6 +15,10 @@
 #ifndef S_ADJUSTSTATEDLG_H
 #define S_ADJUSTSTATEDLG_H
 
+#include "../features.h"
+
+#ifdef FEATURE_SWAP
+
 #include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
@@ -47,5 +51,5 @@ private:
 };
 
 }
-
+#endif
 #endif // S_ADJUSTSTATEDLG_H

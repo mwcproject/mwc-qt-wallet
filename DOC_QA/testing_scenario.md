@@ -443,6 +443,7 @@ Update 'Change output' to '3'. Press "Apply" button<br>
 Response: "Reset" highligted, "Apply" disabled. Change output value is 3.
 
 Switch to setting => Outputs page. Count your outputs. 
+Note, if change outpts amount is lass than 0.1 MWC, number of change outputs will be reduced. 
 
 Send some coins to another account (not self send) with slatepack.<br> 
 Response: At 'Confirm Send Request' validate that the 'Change outputs' value is 3.   Change it to 2.
@@ -450,7 +451,8 @@ Response: At 'Confirm Send Request' validate that the 'Change outputs' value is 
 Switch to setting => Outputs page. Count your outputs.<br>
 Response: you should see 2 new outputs with same amounts. Note, if you see less, it is possible because wallet doesn't produce multiple outputs smaller than 0.1 MWC
 
-Switch to 'Wallet Configuration', 'Main' tab. Check that 'Change outputs' value is 2.
+Switch to 'Wallet Configuration', 'Main' tab. Check that 'Change outputs' value is 2. 
+Note, if change outpts amount is lass than 0.1 MWC, number of change outputs will be reduced.
 
 Press 'Reset' button, press "Apply".
 
@@ -719,7 +721,7 @@ Validate tooltips.
 
 Validate tab order, resize.
 
-Validate the status bar. Only network shouls be there, no Listeners status.
+Validate the status bar. Only network should be there, no Listeners status.
 
 Check 'Help' at the bottom right
 
@@ -738,6 +740,12 @@ Response: Message -  String 'XXXXXXX' contains not acceptable unicode characters
 
 In 'recipient slatepack address' try unicode symbols гчф 湖 😃💁. Press 'Continue' <br>
 Response: Message -  Please specify valid recipient wallet address
+
+In 'recipient slatepack address' try full onion address in format like `http://<address>.onion`. Press 'Continue' and do send. Then retry from this step<br>
+Response: Address should be accpted
+
+In 'recipient slatepack address' try Slatepack address in format like `<address>`. Press 'Continue' and do send. Then retry from this step<br>
+Response: Address should be accpted
 
 Leave recipient slatepack address empty.
 
@@ -862,6 +870,9 @@ press "View" for Kernel<br>
 Response: In the browser page with that kernel should be open. Kernel must exist.
 
 Press OK.
+
+## Send All.
+Try to send All with a slatepack
 
 ## Contacts
 
@@ -1026,7 +1037,7 @@ Switch tab to 'QR Code'<br>
 Response: Page with a QR code:<br>
 <img src="testing_scenario/receive_sp_resp_qr.png" alt="img" width="400">
 
-Check QR code acceptable with yuor cell phone. The QR code content should match the Slatepack
+Check QR code acceptable with your cell phone. The QR code content should match the Slatepack
 
 Press "Copy to clipboard"<br> 
 Validate by paste the image into some editor
@@ -1042,7 +1053,7 @@ Response: Back to 'Receive' page
 
 ### Finalize and check description
 
-Finalize this ST at the sender's wallet. Check if description 'Thanks' was shown.<br>
+Finalize this SP at the sender's wallet. Check if description 'Thanks' was shown.<br>
 Finalize transaction.<br>
 
 ### Receive success message in on first confirmation.
@@ -1089,7 +1100,7 @@ Response: Message that data is corrupted
 ### Finalize workflow
 
 Paste valid SP, See at the bottom tarnsaction ID and receiver address.<br>
-Validate that rfeceiver address is valid and transaction id is correct (check "Transaction" page)
+Validate that receiver address is valid and transaction id is correct (check "Transaction" page)
 
 Note, 'Continue' should be enabled only when valid Slatepack will be entered.
 
@@ -1104,6 +1115,8 @@ Check tooltips
 Check Help, must be same as at Finalization.
 
 Check transaction detals: amounts, descriptions, receiver address.
+
+Check: My Description & Reciever's Description. Both should be correct
 
 ### Cancel button
 
@@ -1123,10 +1136,10 @@ Check tooltips
 ### Transaction confirmation dialog, network related errors
 
 Press "Decline"<br>
-Response. Confirmation finalize request is closed, no finalizetion happens.
+Response. Back to 'finalize transaction' page
 
 Press 'Finalize' button. At confirmation enter the password and press 'Confirm', but break the network connection first.<br>
-Response: Message about Node connection error
+Response: In intenal node - nothing should happens. If external - Message about Node connection error
 
 Wait for some time while node status will be red. Try to finalize transaction.<br>
 Response: Message about Node heath status
@@ -1196,8 +1209,6 @@ Check notification: We are expecting one message that Listeners was started, and
 Enable Network, wait for some time<br>
 Validate: MQS & Tor connection become green.
 
-Check notification: We are expecting one message that Lesteners was started, and one that they was stopped.
-
 Try simulate Network dusruptions for intervals 30 sec, 1 min, 5 min, 10 min. Check if wallet was able to restore 
 
 Close the wallet.
@@ -1215,7 +1226,6 @@ Turn ON the network connection.
 Validate that connection to node and Listeners should be restored
 
 Press "Next Address" and "To address index" and validate that address was changed when Network on and Off with Green/Red listeners statuses.<br>
-Note: when network is OFF, chenging address will take a lot of time, it is expected.
 
 # Send, online only (MQS & Tor, no Slatepack)
 
@@ -1245,11 +1255,11 @@ Validate proofs: Check that transaction doesn't have proofs do download
 
 ### Network interruptions
 
-Send coins to offline address. Check if the unable to send message was shown. Check if unable to send notification was in the logs.<br>
+Send coins to offline address. Check if the unable to send message was shown..<br>
 Note, send waiting time will be around a minute<br>
 Validate: No transaction must be created, no outputs are locked
 
-Send coins to TOR&MQS addresses and turn off network during that process. Check if the unable to send message was shown. Check if unable to send notification was in the logs.<br>
+Send coins to TOR&MQS addresses and turn off network during that process. Check if the unable to send message was shown.<br>
 Note, send waiting time will be around a minute<br>
 Validate: No transaction must be created, no outputs are locked<br>
 Note: With MQS you might get response after the incident becuase MQS keeping it in the memory for soem time. That transaction still will be ignored because it was failed. 
@@ -1269,6 +1279,9 @@ Response: Message that tor feature is disabled
 Check if  FORMATS comment should match selected features. Try all Tor and MQS combinations, check that format include selected plus http
 
 Press "Contacts" and check that you can select contact only for selected features.
+
+## Send All.
+Try to send All with a MQS and TOR
 
 # Receive, online only (MQS & Tor, no Slatepack)
 
@@ -1306,9 +1319,9 @@ Go to transaction page. Validate that funds was receives on expected accounts, a
 
 Test how receive looks for all combinations of features: Tor, MQS, Slatepack (Use "Wallet Configuration" to change those values) 
 
-# Receive, online only (MQS & Tor, Slatepack)
+# Receive, online & offline (MQS & Tor, Slatepack)
 
-At 'Wallet Configuration', 'Active features' specify Tor & MWCMQS, press "Apply"
+At 'Wallet Configuration', 'Active features' specify Tor, MWCMQS & slatepack, press "Apply"
 
 Switch to 'Receive' page<br>
 Response: page with both listeners and addresses<br>
@@ -1348,7 +1361,7 @@ Send 6 transactions with Tor & MQS to your primary wallet.
 Wait when they will be mined.
 
 Check: Congrats dialogs with amounts, description and from address<br>
-Check: Number of dialogs should be 4, even 6 was sent. We shouw only first 4 messages
+Check: Number of dialogs should be 4, even 6 was sent. We show only first 4 messages
 
 # Event Window
 
@@ -1456,7 +1469,7 @@ Repeat: Send another SP transaction and don't specify recipient address. Unencry
 Validate: The slatepack should start/end with 'BEGINSLATE_BIN' instead of 'BEGINSLATEPACK'<br>
 Finish that transaciton and check that it is legit.
 
-Validate that unencrypted SP can have Proof.
+Validate that unencrypted SP can't have a Proof. UI will ask for address of proof is enabled.
 
 # Transactions
 
@@ -1484,7 +1497,7 @@ Check tooltips
 Note, inputs/Ouputs has only inputs/outputs belong to this wallet, not to the peer 
 
 Check that in 'Input/Ouput' selected change Output by default.<br>
-If transaction doesn't have any change outputs (only inputs), nothing will be selected by default
+If transaction doesn't have any change outputs (only inputs). If all spent - the first will be selected by default
 
 Press "View" for Kernel<br>
 Response: web explorer should be open with a kernel info
@@ -1515,16 +1528,17 @@ Validate: Transaction proof dialog, tested before, should be opened
 Press "Export .CSV", specify resulting file name.<br>
 Validate: Open that file with Excel or alternative and see that Transaction data at CSV file is valid <br>
 
-### Refresh button
+### Auto-refresh
 
 Send some coins online to this wallet while you at Transaction page.<br>
-Check: no new transactions was shown.
+Check: New transaction should be shown as soon as it was received. State should unconfirmed (new Tx is highlighted)
 
-Press "Refresh" button<br>
-Response: You should see your new transaction marked with neon vertical line.
+Wait while transaction will be confirmed.<br>
+Response: 'Congrats' dialog and next you should see your new transaction without that neon mark.
 
-Wait while transaction will be confirmed. Press 'Refresh'<br>
-Response: Your new transaction should You should see your new transaction without that neon mark.
+Scroll in the middle of transactions. Items are rendered dynamically, so we want to skip some.<br>
+Wait for new block so autorefresh will be treggered.<br>
+Response: You shoudn't see that last visualized transactions was shifted. 
 
 ## Transaction - Cancel
 
@@ -1539,7 +1553,7 @@ Send online transaction to other wallet
 At 'Transaction' page view it, check that it is not confirmed, so can be cancellable.<br>
 Press 'Cancel'<br>
 Response: Cancel confirmation dialog. Than Tx status should be 'Cancelled'<br>
-Also wallet pending coins should be updated after about 20 seconds.
+Also wallet pending coins should be updated soon.
 
 ### Reverting cancel on confirmation
 
@@ -1566,17 +1580,17 @@ Receive online transaction from another wallet.
 At 'Transaction' page view it, check that it is not confirmed, so can be cancellable.<br>
 Press 'Cancel'<br>
 Response: Cancel confirmation dialog. Than Tx status should be 'Cancelled'<br>
-Also wallet pending coins should be updated after about 20 seconds.
+Also wallet pending coins should be updated.
 
 Wait until Transaction is confirmed.<br>
 Response: You shoudl see the critical message like this: Changing transaction 92f01330-de80-4d33-a69e-7a0ed227fd7d from Canceled to active and confirmed<br>
 Notification should be highlighted<br>
-Transaction status should be reverted to "Send"
+Transaction status should be reverted to "Receive"
 Wallet pending coins should be back (Assuming that number of confirmations is set to 10)
 
 Check if can view not confirmed, cancelled and not cancelled transactions. Double click on it and view the details 
 
-### Cancel ST transaction after finalization
+### Cancel SP transaction after finalization
 
 Receive another TX with slatepack. Cancel it before finalize it on another wallet.
 
@@ -1586,9 +1600,9 @@ Check if status will be reverted back.
 
 ## Transaction - Repost
 
-### Repost of oalready posted transaction
+### Repost of already posted transaction
 
-Send transaction while it is not confirmed should have 'Report' button.
+Send transaction while it is not confirmed should have 'Repost' button.
 
 Send coins online. While new transaction is not confirmed, press 'Repost' button<br>
 Response: You should message:  "Transaction is already posted and stored at the transaction pool. If transaction is not confirmed for a long time, please check if your MWC node can reach the network and miners."<br>
@@ -1598,20 +1612,18 @@ It is expected because node already have it in the Tx Pool.
 
 Now let's test how it can work with success.
 
-Switch to "MWC Node Status" (see below how to test it)
-
-Press "Change Node"<br>
-Select 'Embedded local MWC Node'<br>
-Press 'Apply', confirm. The wallet should restart automatically.<br>
-Login and wait until your embedded node finish the syncing. It will tale about 20 minutes.
+Switch to "MWC Node Status" and wait until node switched from 'public' to 'embedded'
 
 Send coins with Slatepack. Right before Finalize step stop the network. Finalize should pass because embedded node still 
 not realized that internet is down. But the broadcasting will fail.<br>
 Close the wallet<br>
+
 Turn ON network.<br>
-Start Wallet, Switch to the Public cloud node.<br>
+
+Start Wallet.<br>
 Go to 'Transactions' page. Wait for a few blocks to mine.<br>
 Validate that transaction still not confirmed.<br>
+
 Press 'Repost' button.<br>
 Response: Message - Transaction #XXX was successfully reposted.
 
@@ -1623,8 +1635,8 @@ Wait for some time, transaction should be confirmed.
 ### Repost of not finalized transaction
 
 Start new Slatepack Send transaction, just generate a first SP.<br>
-Go to 'Transaction' page. There should be 'Repost' button, press it.<br>
-Response: Message - Transaction is not complete. Please finalize it first.
+Go to 'Transaction' page. 
+Check: There is no 'Repost' button<br>
 
 Cancel that SP transaction.
 
@@ -1689,13 +1701,14 @@ Use "Validate Proof File" to view and validate those proofs. Validate kernels on
 
 ### Proof for not finalize transacitons
 
-Start Send coins with Slatepack, no encryption. When Initial slatepack will be generated, go to 'Transaction'<br>
+Start Send coins with Slatepack, no encryption.
+Response: You can't have proof and not encrypt the SP. UI should show message about that.
+
+Start Send coins with Slatepack, WITH encryption. When Initial slatepack will be generated, go to 'Transaction'<br>
 Validate: No 'Proof' buttom should exist.
 
 Continue with SP sending, generate response SP and finalize it.<br>
 Validate: 'Proof' button still must be there. Check if you can get the proof.
-
-Repeat: send coins with Slatepack, WITH encryption.
 
 ### Proof for received transacitons
 
@@ -1751,10 +1764,13 @@ Check if note for commit is correct.
 Click "Show Spend: XX" to trigger the status<br>
 Validate if you see spent outputs or not
 
-### Refresh button
+### Auto-refresh
 
-Send some coins to this wallet. Then press "Refresh"<br>
+Send some coins to this wallet.<br>
 Validate: You should see new output
+
+Wait for some time until Tx will be confirmed.
+Validate: Output should become confirmed
 
 # Node Overview
 
@@ -1768,114 +1784,86 @@ Check tooltips
 
 Check Help
 
-### Embedded node
-
-Press 'Change Node'<br>
-Response: MWC Node connection dialog<br>
-<img src="testing_scenario/node_connection.png" alt="img" width="250">
-
-Select Embedded or Custom connection.
-
-Press 'Reset' button<br>
-Response: 'Cloud MWC Node' should be selected 
-
-Select 'Embedded local MWC Node'<br>
-Press "Apply"<br>
-Response: Message - Update of mwc node connection required relogin into the ....<br>
-Press "Yes"<br>
-Response: Wallet will restart.
-
 ### Embedded node status, sync process
 
 At "Node Overview" page you should see node status, number of peers e.t.c.
 
-Press "Status Details"
-Response:<br>
-<img src="testing_scenario/node_logs.png" alt="img" width="250">
-
-View the logs, check if it is possible to copy them.
-
-Check that the logs are updated dynamically.
-
-Validate that the logs location at the top is valid.
-
-Press "OK", close that dialog.
+Status shown for 'public' or 'embedded' node. Check that the peers are exist
 
 Close the wallet.
+
+Start the wallet 
+
+Check: At "Node Overview" page there is "Embedded node status" while public node is active. When embedded status reach 'Ready',
+public should switch to embedded.
 
 ### Embedded node data corruption recovery
 
 Now let's test if QT wallet will be able to recover form node data corruption.<br>
 Let's corrupt some data for both main and floo networks<br>
 ```
-rm ~/mwc-qt-wallet/mwc-node/floo/chain_data/lmdb/data.mdb
-rm ~/mwc-qt-wallet/mwc-node/main/chain_data/lmdb/data.mdb
+rm ~/mwc-qt-wallet/mwc-node/Floonet/lmdb/data.mdb
+rm ~/mwc-qt-wallet/mwc-node/Mainnet/lmdb/data.mdb
 ```
 
 Start the QT wallet. Start should take longer to start. QT wallet should erase the node data.<br>
-Response: When wallet will start, at 'Node Overview' page you should se the status Handshaking first, than syncing from 0%.
+Response: When wallet will start, at 'Node Overview' page you should see the Embedded node status as Handshaking first, than syncing from 0%.
 
-Press 'Status Details' to check the logs. Close that dialog and wait. Check node connection status, it should be 'Orange' 
+In about 20 minutes node should finish to sync for embedded. Next node should switch from public to embedded.
 
-In about 20 minutes node should finish to sync, node connection status should become Green.
+Meanwhile check if wallet is robust, everything should work fine on public node,
 
-### Re-sync with node, posting tx validation
+# Re-sync with cloud and network failure
 
-Press "Re-sync with node"
-Response: You should see the progress windows, no wallet functionality will be available during the sync process. 
-
-Sync should take few minutes.
-
-Send some coins to another wallet and wait until tramnsaction will be confirmed.
-
-### Cloud MWC Node, re-sync, posting tx validation
-
-Go to "Node Overview", press "Change Node".  Select 'Cloud MWC Node'<br>
-Press "Apply"<br>
-Wallet will be restarted, Login into the wallet.
-
-Go to "Node Overview". Press "Re-Sync with node"<br>
-Wait for resync process, check if it finished successfully.
-
-Send some coins to another wallet and wait until transaction will be confirmed.
-
-### Custom node, re-sync, posting tx validation
-
-Start your local mwc node. Assuming it is started as 'mwc --floonet'
-
-Go to "Node Overview", press "Change Node".  Select 'Custom mwc-node'<br>
-For 'MWC Node URI' specify: 'http://127.0.0.1:13413'
-
-Get mwc node secret with terminal command:
+Close the wallet and delete mebdeed node data.<br>
 ```
-cat ~/.mwc/floo/.api_secret
+rm ~/mwc-qt-wallet/mwc-node/Floonet/lmdb/data.mdb
+rm ~/mwc-qt-wallet/mwc-node/Mainnet/lmdb/data.mdb
 ```
-Specify "MWC Node Secret" value<br>
-Press "Apply"<br>
-Wallet will be restarted, Login into the wallet.
 
-Check the node status, wait until sync will be finished.
+Start the wallet<br>
 
-Go to "Node Overview". Press "Re-Sync with node"<br>
-Wait for resync process, check if it finished successfully.
-
-Send some coins to another wallet and wait until transaction will be confirmed.
-
-Try to connect to custom node with invalid credentials.<br> 
-Responce: At 'Node Overview' page, you should see the node status "Offline" and connection indicatior should be Red.
-
-### Switch back to cloud node
-
-Change Node to the public Cloud, press "Apply", login into the wallet
-
-# Re-sync wuth full node
-
-Go to the Settings. Press 'Re-sync wuth full node' button.<br> 
+Go to "Node Overview". Make sure that public node is used. Press 'Re-sync wuth full node' button.<br>
 Response: Full sync with node progress. It should take few minutes.<br>
 <img src="testing_scenario/resync.png" alt="img" width="400">
 
 Shout down the network while scanning will be in the progress.
-Response: After about a minute you should see the error: Unable to reach MWC node. Please check your network connection.
+Response: Should see the error: Unable to reach MWC node. Please check your network connection.
+
+### Re-sync with Cloud MWC Node, posting tx validation
+
+Make some unconfirmed transactions. Send few SP and not finalize. Recieve few SP and not finalize.
+
+Go to "Node Overview". Validate is wallet connected to public node.<br>
+Press "Re-sync with node"<br>
+Response: You should see the progress windows, no wallet functionality will be available during the sync process. 
+
+Sync should take few minutes.
+
+Check that all unconfirmed Tx was cancelled.
+
+Send some coins to another wallet and wait until transaction will be confirmed.
+
+# Re-sync with embedded and network failure
+
+Go to "Node Overview". Make sure that embedded node is used. Press 'Re-sync wuth full node' button.<br>
+Response: Full sync with node progress. It should take few minutes.<br>
+
+Shout down the network while scanning will be in the progress.
+Response Now: Nothing, while embedded node is used data to sync is available.
+Long term response: At some point node might be switched to public, in that case network connect error should be shown.
+
+### Re-sync with embedded node, posting tx validation
+
+Make some unconfirmed transactions. Send few SP and not finalize. Recieve few SP and not finalize.
+
+Go to "Node Overview". Wait until wallet will be connected to embedded node.<br> 
+Press "Re-Sync with node"<br>
+Wait for resync process, check if it finished successfully.
+
+Check that all unconfirmed Tx was cancelled.
+
+Send some coins to another wallet and wait until transaction will be confirmed.
 
 # Select Running Mode
 
@@ -1975,14 +1963,14 @@ Response: Message - 'Your funds were successfully transferred' and switch back t
 
 At account page check that transferred 1 MWC is shown at del me account.
 
-### Chack transfer transactions and outputs
+### Check transfer transactions and outputs
 
 Switch to 'Outputs' and check that 'del me' account has 1 outputs<br>
 'Default' account has 3 change outputs
 
 Switch back to 'Acconts' page.
 
-### Transafer all coins
+### Transfer all coins
 
 Transfer from 'del me' to 'default' all coins. Press "All" to select all coins<br>
 Press 'Transfer'<br>
@@ -2084,8 +2072,11 @@ Response: Value the you can copy/paste. Copy it for your reference
 Paste the viewing key into 'Input viewing key to scan for outputs'<br>
 Response: 'Start scanning' should be activated
 
-Shout down the network while scanning will be in the progress.
-Response: After about a minute you should see the error: Unable to reach MWC node. Please check your network connection.
+Shout down the network while scanning will be in the progress.<br>
+Response: You should see the error if you run puplic node: Unable to reach MWC node. Please check your network connection.
+If you are running embedded node, this error message will never happen, wallet will continue to use embedded node because 
+it has some data (better than public).<br>
+Update: Enetually embedded node will be marked as offline as well and than the error will be shown. But that takes time, scan will finish faster.
 
 Restore network and start scanning: 
 
@@ -2303,7 +2294,7 @@ Validate UI:
 - Options has only 3 items: Configuration, Node Overview, Select Running mode
 
 Click 'Select Running mode'<br>
-Validate that 'Obline Node' is selected.
+Validate that 'Online Node' is selected.
 
 Click 'Configuration'<br>
 Response: 'Node config' page<br>
@@ -2319,10 +2310,6 @@ At the 'MWC Node Status' page:
 Check Tab Order
 
 Check tooltips
-
-Press "Status Details"<br>
-Response: mwc-node logs<br>
-Press OK to close the logs dialog.
 
 Press "Resync node"<br>
 Response: Embedded node should restart and start sync process from the 0% progress. 
@@ -2362,7 +2349,7 @@ Wait until the wallet finish update, should take couple of minutes.
 
 Check wallet balance, it should match what restored wallet expected to have,
 
-To to 'Transactions' and check if outptu was restored into transactions.
+To to 'Transactions' and check if outputs was restored into transactions.
 
 Got to 'Settings' -> 'Outputs'<br>
 Validate that output match expected.
@@ -2434,7 +2421,7 @@ START the network, internet connection required!!<br>
 
 Start QT wallet, it should start as a cold node
 
-Wait until the node finish syncing. It shoudl be fast, only new blocks needs to be downloaded.
+Wait until the node finish syncing. It should be fast, only new blocks needs to be downloaded.
 
 Press 'Publish Transaction' button<br>
 Select mwctx file that was stored before<br>
@@ -2469,7 +2456,6 @@ Resposne: message - MWC blockchain data was successfully imported
 Got to "Transaction", wait until the wallet state will be updated
 
 Check if your receive transaction exist and has confirmed.<br>
-Note, you should get Congrats receive dialog.<br>
 View the transaction (double click in it) and see that ll data exist (View in web browser is not expected to work offline)<br>
 Specify some Note, it should be stored
 
@@ -2501,8 +2487,7 @@ Resposne: message - MWC blockchain data was successfully imported
 Got to "Transaction", wait until the wallet state will be updated
 
 Check if your receive transaction exist and has confirmed.<br>
-Note, you should get Congrats receive dialog.<br>
-View the transaction (double click in it) and see that ll data exist (View in web browser is not expected to work offline)<br>
+View the transaction (double click in it) and see that data exist (View in web browser is not expected to work offline)<br>
 Specify some Note, it should be stored
 
 Go to 'Outputs', check that output does exist and has confirmations.<br>

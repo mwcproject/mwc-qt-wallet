@@ -25,8 +25,6 @@ public:
     explicit NewSeed(QObject * parent = nullptr);
     ~NewSeed();
 
-    void showSeedData(const QVector<QString> & seed);
-
     // Done looking at a new seed. Let's go forward
     Q_INVOKABLE void doneWithNewSeed();
 
@@ -37,7 +35,6 @@ public:
     Q_INVOKABLE void restartSeedVerification();
 private:
 signals:
-    void sgnShowSeedData(QVector<QString> seed);
 };
 
 }

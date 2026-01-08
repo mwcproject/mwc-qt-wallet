@@ -15,11 +15,11 @@
 #ifndef GUI_WALLET_MWCSTATUSLINE_H
 #define GUI_WALLET_MWCSTATUSLINE_H
 
-#include <QPushButton>
+#include "MwcPushButton.h"
 
 namespace control {
 
-class MwcStatusLine: public QPushButton {
+class MwcStatusLine: public MwcPushButton {
 Q_OBJECT
 public:
     explicit MwcStatusLine(QWidget *parent = Q_NULLPTR);

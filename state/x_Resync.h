@@ -21,15 +21,12 @@
 
 namespace state {
 
-const QString RESYNC_CALLER_ID = "Resync";
-
 // Do resync for account. Expected that caller want us to start 'check' process for mwc713
 class Resync : public QObject, public State {
     Q_OBJECT
 public:
     Resync( StateContext * context);
     virtual ~Resync() override;
-
 
 protected:
     virtual NextStateRespond execute() override;
@@ -38,13 +35,14 @@ protected:
     virtual bool canExitState(STATE nextWindowState) override;
 
 private slots:
-    void onRecoverProgress( int progress, int maxVal );
-    void onCheckResult(bool ok, QString errors );
+    void onScanProgress( QString responseId, QJsonObject statusMessage );
+    void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
 
 private:
     int prevState = STATE::TRANSACTIONS;
+    QString scanRespId;
     int maxProgrVal = 100;
-    // Need to recalibrate ther progress..
+    // Need to recalibrate the progress..
     // First few respond might be too fast
     int respondCounter = 0;
     int respondZeroLevel = 0;

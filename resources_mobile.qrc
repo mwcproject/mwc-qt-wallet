@@ -4,8 +4,7 @@
         <file>resource/passwords-10k.dat</file>
         <file>resource/passwords-1k.dat</file>
         <file>resource/passwords-1M.dat</file>
-        <file>resource/notification_mappers.txt</file>
-        <file>resource/mwc713_mappers.txt</file>
+        <file>resource/messsage_mappers.txt</file>
         <file>txt/bip39_words.txt</file>
         <file>windows_mobile/main.qml</file>
         <file>windows_mobile/Inputpassword.qml</file>
@@ -117,10 +116,6 @@
         <file>windows_mobile/AccountOptions.qml</file>
         <file>windows_mobile/Settings.qml</file>
         <file>windows_mobile/Send.qml</file>
-        <file>resource_mobile/mwc-server-floo-ip.toml</file>
-        <file>resource_mobile/mwc-server-main-ip.toml</file>
-        <file>resource_mobile/mwc-server-floo-tor.toml</file>
-        <file>resource_mobile/mwc-server-main-tor.toml</file>
         <file>windows_mobile/SendOnline.qml</file>
         <file>windows_mobile/SendOffline.qml</file>
         <file>windows_mobile/Finalize.qml</file>

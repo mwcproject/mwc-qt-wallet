@@ -24,7 +24,7 @@ using namespace qrcodegen;
 
 namespace control {
 
-QrCodeWidget::QrCodeWidget(QWidget *parent) : QWidget(parent) {
+QrCodeWidget::QrCodeWidget(QWidget *parent) : MwcWidget(parent) {
     util = new bridge::Util(this);
     show();
 }

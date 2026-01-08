@@ -14,7 +14,7 @@ set (Qt5_DIR "~/Qt/6.2.4/macos/lib/cmake/Qt6")
 #set (Qt5_DIR "C:/Qt/5.9.8/msvc2015_64/lib/cmake/Qt5")
 
 #find_package(Qt5 COMPONENTS Core Gui Widgets Network Svg REQUIRED)
-find_package(Qt6 COMPONENTS Core Gui Widgets Network Svg REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Widgets Network Svg Concurrent REQUIRED)
 
 
 ####################
@@ -32,8 +32,8 @@ add_definitions( -DWALLET_DESKTOP )
 # Input files
 #
 
-file(GLOB SOURCE_FILES ./*.cpp control_desktop/*.cpp ./core/*.cpp ./core_desktop/*.cpp ./state/*.cpp ./bridge/*.cpp ./bridge/wnd/*.cpp  ./tries/*.cpp ./util/*.cpp ./util_desktop/*.cpp ./wallet/*.cpp ./node/*.cpp  ./wallet/tasks/*.cpp  windows_desktop/*.cpp  dialogs_desktop/*.cpp ./tests/*.cpp ./misk/*.cpp)
-file(GLOB HEADER_FILES         control_desktop/*.h   ./core/*.h   ./core_desktop/*.h   ./state/*.h   ./bridge/*.h   ./bridge/wnd/*.h    ./tries/*.h   ./util/*.h   ./util_desktop/*.h   ./wallet/*.h   ./node/*.h    ./wallet/tasks/*.h    windows_desktop/*.h    dialogs_desktop/*.h   ./tests/*.h   ./misk/*.h)
+file(GLOB SOURCE_FILES ./*.cpp control_desktop/*.cpp ./core/*.cpp ./core_desktop/*.cpp ./state/*.cpp ./bridge/*.cpp ./bridge/wnd/*.cpp  ./util/*.cpp ./util_desktop/*.cpp ./wallet/*.cpp ./wallet/api/*.cpp ./node/*.cpp  ./wallet/tasks/*.cpp  windows_desktop/*.cpp  dialogs_desktop/*.cpp ./tests/*.cpp ./misk/*.cpp)
+file(GLOB HEADER_FILES  ./*.h  ../mwc-node/mwc-node-lib/c_header/*.h ../mwc-wallet/mwc-wallet-lib/c_header/*.h   control_desktop/*.h   ./core/*.h   ./core_desktop/*.h   ./state/*.h   ./bridge/*.h   ./bridge/wnd/*.h    ./util/*.h   ./util_desktop/*.h   ./wallet/*.h ./wallet/api/*.h ./node/*.h    ./wallet/tasks/*.h    windows_desktop/*.h    dialogs_desktop/*.h   ./tests/*.h   ./misk/*.h)
 
 # Generate necessary headers from .ui files. (qmake lets `uic` do this job.)
 # hint from [Cross-platform Qt5 project using cmake](http://stackoverflow.com/questions/21174586/)
@@ -70,18 +70,32 @@ ENDIF(APPLE)
 
 add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} ${Cocoa_SRCS} resources_desktop.qrc)
 #target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core Qt5::Network Qt5::Svg ${AppKit})
-target_link_libraries(mwc-qt-wallet Qt6::Widgets Qt6::Gui Qt6::Core Qt6::Network Qt6::Svg ${AppKit})
+target_link_libraries(mwc-qt-wallet PRIVATE Qt6::Widgets Qt6::Gui Qt6::Core Qt6::Network Qt6::Svg Qt6::Concurrent ${AppKit})
+target_link_libraries(mwc-qt-wallet PRIVATE ${CMAKE_SOURCE_DIR}/../mwc-wallet/target/debug/libmwc_wallet_lib.a )
+
+# macOS frameworks needed by security-framework and secure-transport
+if(APPLE)
+target_link_libraries(mwc-qt-wallet PRIVATE
+"-framework Security"
+"-framework CoreFoundation"
+"-framework SecurityFoundation"   # sometimes needed
+"-framework SystemConfiguration"  # if your Rust crate uses networking
+"-framework CFNetwork"
+"-lsqlite3"
+"-lresolv"
+)
+endif()
 
 # Copy Qt runtime libraries to build directory
 # [Copying Qt DLLs to executable directory on Windows using CMake](https://stackoverflow.com/questions/40564443/)
 add_custom_command(
-    TARGET mwc-qt-wallet POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#        $<TARGET_FILE:Qt5::Core>
-#        $<TARGET_FILE:Qt5::Gui>
-#        $<TARGET_FILE:Qt5::Widgets>
-#        $<TARGET_FILE:Qt5::Network>
-#        $<TARGET_FILE:Qt5::Svg>
+        TARGET mwc-qt-wallet POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        #        $<TARGET_FILE:Qt5::Core>
+        #        $<TARGET_FILE:Qt5::Gui>
+        #        $<TARGET_FILE:Qt5::Widgets>
+        #        $<TARGET_FILE:Qt5::Network>
+        #        $<TARGET_FILE:Qt5::Svg>
         $<TARGET_FILE:Qt6::Core>
         $<TARGET_FILE:Qt6::Gui>
         $<TARGET_FILE:Qt6::Widgets>

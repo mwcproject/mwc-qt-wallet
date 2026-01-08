@@ -31,7 +31,7 @@ namespace core {
 // on top of whatever windows might be visible at the time. If the MainWindow is destroyed,
 // all StatusWnd objects will also be destroyed.
 StatusWnd::StatusWnd(MainWindow* _mainWindow, bool _mainWindowDisplay) :
-    QWidget(_mainWindow),
+    control::MwcWidget(_mainWindow),
     ui(new Ui::StatusWnd),
     mainWindow(_mainWindow),
     mainWindowDisplay(_mainWindowDisplay)
@@ -299,5 +299,4 @@ void StatusWnd::on_statusMessage_clicked() {
 }
 
 }
-
 

@@ -21,36 +21,26 @@
 
 namespace wnd {
 
-ValidateOwnershipProofResult::ValidateOwnershipProofResult(QWidget *parent) :
+ValidateOwnershipProofResult::ValidateOwnershipProofResult(QWidget *parent, const QString & network, const QString & message, const QString & viewingKey,
+    const QString & torAddress, const QString & mqsAddress) :
         core::NavWnd(parent),
         ui(new Ui::ValidateOwnershipProofResult)
 {
     ui->setupUi(this);
 
-    wallet = new bridge::Wallet(this);
     viewAcounts = new bridge::ViewOutputs(this);
 
-    QObject::connect(wallet, &bridge::Wallet::sgnValidateOwnershipProof,
-                             this, &ValidateOwnershipProofResult::sgnValidateOwnershipProof, Qt::QueuedConnection);
-
     utils::defineDefaultButtonSlot(this, SLOT(on_back_clicked()) );
-}
-
-ValidateOwnershipProofResult::~ValidateOwnershipProofResult() {
-    delete ui;
-}
-
-void ValidateOwnershipProofResult::sgnValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error) {
-    if (!error.isEmpty()) {
-        control::MessageBox::messageText(this, "Error", "Unable to validate ownership proof.\n\n" + error);
-        viewAcounts->validateOwnershipProofStart();
-    }
 
     ui->network->setText(network);
     ui->message->setText(message);
     ui->viewing_key->setText(viewingKey);
     ui->tor_address->setText(torAddress);
     ui->mqs_address->setText(mqsAddress);
+}
+
+ValidateOwnershipProofResult::~ValidateOwnershipProofResult() {
+    delete ui;
 }
 
 void ValidateOwnershipProofResult::on_back_clicked() {

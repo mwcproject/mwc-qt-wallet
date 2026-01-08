@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>WalletConfig</class>
- <widget class="QWidget" name="WalletConfig">
+ <widget class="control::MwcWidget" name="WalletConfig">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -46,7 +46,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="control::MwcTabWidget" name="tabWidget">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -73,7 +73,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_main">
+     <widget class="control::MwcWidget" name="tab_main">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -99,7 +99,7 @@
         <number>12</number>
        </property>
        <item>
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="control::MwcGroupBox" name="groupBox">
          <property name="title">
           <string>Active Features</string>
          </property>
@@ -138,10 +138,10 @@
              <enum>Qt::StrongFocus</enum>
             </property>
             <property name="toolTip">
-             <string>Send or receive MWC online via Tor - use when the other wallet has a Tor address.</string>
+             <string>Send or receive MWC online via Tor - use when the other wallet listen on Tor address.</string>
             </property>
             <property name="statusTip">
-             <string>Send or receive MWC online via Tor - use when the other wallet has a Tor address.</string>
+             <string>Send or receive MWC online via Tor - use when the other wallet listen on Tor address.</string>
             </property>
             <property name="text">
              <string>Tor</string>
@@ -154,10 +154,10 @@
              <enum>Qt::StrongFocus</enum>
             </property>
             <property name="toolTip">
-             <string>Send or receive MWC online via MWC MQS - use when the other wallet has an MQS address.</string>
+             <string>Send or receive MWC online via MWCMQS - use when the other wallet listen on MWCMQS address.</string>
             </property>
             <property name="statusTip">
-             <string>Send or receive MWC online via MWC MQS - use when the other wallet has an MQS address.</string>
+             <string>Send or receive MWC online via MWCMQS - use when the other wallet listen on MWCMQS address.</string>
             </property>
             <property name="text">
              <string>MWCMQS</string>
@@ -192,7 +192,7 @@
           <number>2</number>
          </property>
          <item>
-          <widget class="QGroupBox" name="autoStart_3">
+          <widget class="control::MwcGroupBox" name="autoStart_3">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -318,7 +318,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="autoStart_4">
+          <widget class="control::MwcGroupBox" name="autoStart_4">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -444,7 +444,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_wallet">
+     <widget class="control::MwcWidget" name="tab_wallet">
       <attribute name="title">
        <string>Wallet</string>
       </attribute>
@@ -463,7 +463,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QGroupBox" name="notificationsGroup">
+            <widget class="control::MwcGroupBox" name="notificationsGroup">
              <property name="maximumSize">
               <size>
                <width>16777215</width>
@@ -512,7 +512,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="slatepackBox">
+            <widget class="control::MwcGroupBox" name="slatepackBox">
              <property name="title">
               <string>Slatepacks</string>
              </property>
@@ -566,7 +566,7 @@
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_16">
            <item>
-            <widget class="QGroupBox" name="autoLogout">
+            <widget class="control::MwcGroupBox" name="autoLogout">
              <property name="maximumSize">
               <size>
                <width>16777215</width>
@@ -743,7 +743,7 @@
           <number>20</number>
          </property>
          <item>
-          <widget class="QGroupBox" name="outputLockingGroup">
+          <widget class="control::MwcGroupBox" name="outputLockingGroup">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -792,7 +792,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="logsGroup">
+          <widget class="control::MwcGroupBox" name="logsGroup">
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -832,7 +832,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="fontHolder">
+          <widget class="control::MwcGroupBox" name="fontHolder">
            <property name="minimumSize">
             <size>
              <width>130</width>
@@ -873,7 +873,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QToolButton" name="fontSz1">
+               <widget class="control::MwcToolButton" name="fontSz1">
                 <property name="minimumSize">
                  <size>
                   <width>20</width>
@@ -914,7 +914,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="fontSz2">
+               <widget class="control::MwcToolButton" name="fontSz2">
                 <property name="minimumSize">
                  <size>
                   <width>22</width>
@@ -955,7 +955,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="fontSz3">
+               <widget class="control::MwcToolButton" name="fontSz3">
                 <property name="minimumSize">
                  <size>
                   <width>24</width>
@@ -996,7 +996,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="fontSz4">
+               <widget class="control::MwcToolButton" name="fontSz4">
                 <property name="minimumSize">
                  <size>
                   <width>26</width>
@@ -1107,7 +1107,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -1272,14 +1272,37 @@
    <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcRadioButton</class>
-   <extends>QRadioButton</extends>
-   <header>control_desktop/MwcRadioButton.h</header>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcToolButton</class>
+   <extends>QToolButton</extends>
+   <header>control_desktop/MwcToolButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcCheckBox</class>
    <extends>QCheckBox</extends>
    <header>control_desktop/MwcCheckBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>control_desktop/MwcRadioButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>control_desktop/MwcTabWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>control_desktop/MwcGroupBox.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

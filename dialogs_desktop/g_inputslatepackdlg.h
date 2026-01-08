@@ -41,7 +41,7 @@ public:
     const QString &getSenderAddress() const { return sender; }
 
 protected:
-    void updateButtons();
+    void updateButtons(bool enable);
 
     void initiateSlateVerification(const QString &slate2check);
 
@@ -50,9 +50,6 @@ private slots:
     void on_slatepackEdit_textChanged();
     void on_cancelButton_clicked();
     void on_continueButton_clicked();
-
-    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
-
 private:
     Ui::InputSlatepackDlg *ui;
     bridge::Wallet  *wallet = nullptr;
@@ -64,8 +61,6 @@ private:
     QString slatepack; // The content
     QString slateJson;
     QString sender;
-    bool isSpValid = false;
-    QString spInProgress;
 };
 
 }

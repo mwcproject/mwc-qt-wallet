@@ -35,7 +35,7 @@ class SendOnline : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit SendOnline(QWidget *parent, QString account, int64_t amount );
+    explicit SendOnline(QWidget *parent, QString account, QString accountPath, int64_t amount );
     virtual ~SendOnline() override;
 
 private slots:
@@ -54,6 +54,7 @@ private:
     bridge::Send * send = nullptr;
 
     QString account;
+    QString accountPath;
     int64_t amount;
 };
 

@@ -21,7 +21,14 @@ namespace control {
 
 // Swap list page, the top buttons that looks similar to the head of the tab control
 
-class MwcToolButtonUnderscore : public QToolButton {
+class MwcToolButton : public QToolButton {
+    Q_OBJECT
+public:
+    explicit MwcToolButton(QWidget *parent = Q_NULLPTR);
+    virtual ~MwcToolButton() override;
+};
+
+class MwcToolButtonUnderscore : public MwcToolButton {
     Q_OBJECT
 public:
     explicit MwcToolButtonUnderscore(QWidget *parent = Q_NULLPTR);

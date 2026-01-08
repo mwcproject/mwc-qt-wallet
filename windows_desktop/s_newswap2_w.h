@@ -15,6 +15,10 @@
 #ifndef S_NEWSWAP2_W_H
 #define S_NEWSWAP2_W_H
 
+#include "../features.h"
+
+#ifdef FEATURE_SWAP
+
 #include <control_desktop/MwcComboBox.h>
 #include "../core_desktop/navwnd.h"
 
@@ -65,5 +69,5 @@ private:
 };
 
 }
-
+#endif
 #endif // S_NEWSWAP2_W_H

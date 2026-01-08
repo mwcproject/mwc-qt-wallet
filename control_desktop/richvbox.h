@@ -16,11 +16,17 @@
 #define RICHVBOX_H
 
 #include <QScrollArea>
-#include "richitem.h"
 
 class QVBoxLayout;
 
 namespace control {
+
+class IRichFocusable           // the leading 'I' is just a naming convention
+{
+public:
+    virtual ~IRichFocusable() = default;
+    virtual void setFocusState(bool focus) = 0;
+};
 
 class RichVBox : public QScrollArea
 {
@@ -31,14 +37,16 @@ public:
     // clear all the data
     void clearAll(bool resetScrollValue);
     // Add next item into the list
-    RichVBox & addItem(RichItem * item);
+    RichVBox & addItem(QWidget * item);
     // Done with adding
     RichVBox & apply();
+    // Update layouts
+    void updateLayouts();
 
-    void itemClicked(QString id, RichItem * item);
-    void itemDblClicked(QString id, RichItem * item);
-    void itemFocus(QString id, RichItem * item);
-    void itemActivated(QString id, RichItem * item);
+    void itemClicked(QString id, QWidget * item);
+    void itemDblClicked(QString id, QWidget * item);
+    void itemFocus(QString id, IRichFocusable * item);
+    void itemActivated(QString id, QWidget * item);
 
 private
 slots:
@@ -54,7 +62,7 @@ signals:
 private:
     QWidget * vlist = nullptr;
     QVBoxLayout * layout = nullptr;
-    RichItem * focusItem = nullptr;
+    IRichFocusable * focusItem = nullptr;
 
     int scrollValue = 0;
     int needSetValue = false;

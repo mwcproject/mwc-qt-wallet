@@ -24,6 +24,7 @@ class SendConfirmationDlg;
 namespace bridge {
 class Util;
 class Config;
+class Wallet;
 }
 
 namespace dlg {
@@ -40,7 +41,7 @@ class SendConfirmationDlg: public control::MwcDialog
 public:
     // widthScale - Horizontal scale for the dialog. Sometimes we need it wider.
     explicit SendConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale,
-                int inputsNum, QString passwordHash );
+                int inputsNum );
     ~SendConfirmationDlg();
 private slots:
     void on_passwordEdit_textChanged(const QString &str);
@@ -56,8 +57,8 @@ private:
     Ui::SendConfirmationDlg *ui;
     bridge::Util * util = nullptr;
     bridge::Config * config = nullptr;
+    bridge::Wallet * wallet = nullptr;
 
-    QString passwordHash;
     QString messageBody;
     int inputsNum;
 };

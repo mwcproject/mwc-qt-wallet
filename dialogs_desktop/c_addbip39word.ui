@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>AddBip39Word</class>
- <widget class="QDialog" name="AddBip39Word">
+ <widget class="control::MwcDialog" name="AddBip39Word">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Add BIP39 Word</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -32,7 +32,7 @@
    <item>
     <widget class="control::MwcLabelLarge" name="titleLabel">
      <property name="text">
-      <string>Mnemonic passphrase Bip39, Word #X</string>
+      <string>BIP39 mnemonic passphrase, word #X</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -60,7 +60,7 @@
       <number>64</number>
      </property>
      <property name="placeholderText">
-      <string>Bip39 word</string>
+      <string>BIP39 word</string>
      </property>
     </widget>
    </item>
@@ -180,6 +180,11 @@
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

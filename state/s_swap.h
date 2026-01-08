@@ -15,6 +15,10 @@
 #ifndef MWC_QT_WALLET_SWAP_S_H
 #define MWC_QT_WALLET_SWAP_S_H
 
+#include "../features.h"
+
+#ifdef FEATURE_SWAP
+
 #include "state.h"
 #include "../wallet/wallet.h"
 #include <QMap>
@@ -100,7 +104,7 @@ struct AutoswapTask {
 
 enum class SwapWnd {None, PageSwapList, PageSwapEdit, PageSwapTradeDetails, PageSwapNew1, PageSwapNew2, PageSwapNew3 };
 
-class Swap : public util::HttpClient, public State {
+class Swap : public QObject, public State {
 Q_OBJECT
 public:
     Swap(StateContext * context);
@@ -145,27 +149,54 @@ public:
     void createStartSwap();
 
     // Account that is related to this swap trade
-    QString getAccount() const {return  newSwapAccount;}
-    void setAccount(QString accountName) {newSwapAccount = accountName;}
+    QString getAccount() const {
+        logger::logInfo(logger::STATE, "Call Swap::getAccount");
+        return  newSwapAccount;
+    }
+    void setAccount(QString accountName) {
+        logger::logInfo(logger::STATE, "Call Swap::setAccount with accountName=" + accountName);
+        newSwapAccount = accountName;
+    }
 
     // List of the secondary currencies that wallet support
     QVector<QString> secondaryCurrencyList();
 
     // Check if this trade is created from accepted Marketplace offer
-    bool isMktTrade() const {return !mktOfferId.isEmpty();}
+    bool isMktTrade() const {
+        logger::logInfo(logger::STATE, "Call Swap::isMktTrade");
+        return !mktOfferId.isEmpty();
+    }
 
     // Current selected currency to trade
-    QString getCurrentSecCurrency() const {return newSwapCurrency;}
+    QString getCurrentSecCurrency() const {
+        logger::logInfo(logger::STATE, "Call Swap::getCurrentSecCurrency");
+        return newSwapCurrency;
+    }
     void setCurrentSecCurrency(QString secCurrency);
 
     QString getCurrentSecCurrencyFeeUnits() const;
 
     // Current trade parameters.
-    QString getMwc2Trade() const {return newSwapMwc2Trade;}
-    QString getSec2Trade() const {return newSwapSec2Trade;}
-    QString getSecAddress() const {return newSwapSecAddress;}
-    bool isLockMwcFirst() const {return newSwapSellectLockFirst;}
-    QString getBuyerAddress() const {return newSwapBuyerAddress;}
+    QString getMwc2Trade() const {
+        logger::logInfo(logger::STATE, "Call Swap::getMwc2Trade");
+        return newSwapMwc2Trade;
+    }
+    QString getSec2Trade() const {
+        logger::logInfo(logger::STATE, "Call Swap::getSec2Trade");
+        return newSwapSec2Trade;
+    }
+    QString getSecAddress() const {
+        logger::logInfo(logger::STATE, "Call Swap::getSecAddress");
+        return newSwapSecAddress;
+    }
+    bool isLockMwcFirst() const {
+        logger::logInfo(logger::STATE, "Call Swap::isLockMwcFirst");
+        return newSwapSellectLockFirst;
+    }
+    QString getBuyerAddress() const {
+        logger::logInfo(logger::STATE, "Call Swap::getBuyerAddress");
+        return newSwapBuyerAddress;
+    }
 
     // Get minimal Amount for the secondary currency
     double getSecMinAmount(QString secCurrency) const;
@@ -174,14 +205,38 @@ public:
     // <Interval is string> <Value in minutes>
     QVector<QString> getExpirationIntervals() const;
 
-    int getOfferExpirationInterval() const {return newSwapOfferExpirationTime;}
-    int getSecRedeemTime() const {return newSwapRedeemTime;}
-    double getSecTransactionFee() const {return newSwapSecTxFee;}
-    double getSecMinTransactionFee() const {return newSwapMinSecTxFee;}
-    double getSecMaxTransactionFee() const {return newSwapMaxSecTxFee;}
-    int getMwcConfNumber() const {return newSwapMwcConfNumber;}
-    int getSecConfNumber() const {return newSwapSecConfNumber;}
-    QString getElectrumXprivateUrl() const {return newSwapElectrumXUrl;}
+    int getOfferExpirationInterval() const {
+        logger::logInfo(logger::STATE, "Call Swap::getOfferExpirationInterval");
+        return newSwapOfferExpirationTime;
+    }
+    int getSecRedeemTime() const {
+        logger::logInfo(logger::STATE, "Call Swap::getSecRedeemTime");
+        return newSwapRedeemTime;
+    }
+    double getSecTransactionFee() const {
+        logger::logInfo(logger::STATE, "Call Swap::getSecTransactionFee");
+        return newSwapSecTxFee;
+    }
+    double getSecMinTransactionFee() const {
+        logger::logInfo(logger::STATE, "Call Swap::getSecMinTransactionFee");
+        return newSwapMinSecTxFee;
+    }
+    double getSecMaxTransactionFee() const {
+        logger::logInfo(logger::STATE, "Call Swap::getSecMaxTransactionFee");
+        return newSwapMaxSecTxFee;
+    }
+    int getMwcConfNumber() const {
+        logger::logInfo(logger::STATE, "Call Swap::getMwcConfNumber");
+        return newSwapMwcConfNumber;
+    }
+    int getSecConfNumber() const {
+        logger::logInfo(logger::STATE, "Call Swap::getSecConfNumber");
+        return newSwapSecConfNumber;
+    }
+    QString getElectrumXprivateUrl() const {
+        logger::logInfo(logger::STATE, "Call Swap::getElectrumXprivateUrl");
+        return newSwapElectrumXUrl;
+    }
 
     double getSecTransactionFee(const QString & secCurrency) const;
     double getSecMinTransactionFee(const QString & secCurrency) const;
@@ -199,8 +254,14 @@ public:
     // Get Tx fee for secondary currency
     double getSecondaryFee(QString secCurrency);
 
-    QString getNote() const {return newSwapNote;}
-    void setNote(QString note) {newSwapNote = note;}
+    QString getNote() const {
+        logger::logInfo(logger::STATE, "Call Swap::getNote");
+        return newSwapNote;
+    }
+    void setNote(QString note) {
+        logger::logInfo(logger::STATE, "Call Swap::setNote with note=<hidden>");
+        newSwapNote = note;
+    }
 
     // Notify about failed bidding. If it is true, we need to cancel and show the message about that
     // Note, mwc-wallet does cancellation as well.
@@ -240,12 +301,6 @@ signals:
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override;
-
-    virtual void onProcessHttpResponse(bool requestOk, const QString & tag, QJsonObject & jsonRespond,
-                                       const QString & param1,
-                                       const QString & param2,
-                                       const QString & param3,
-                                       const QString & param4) override;
 
     virtual QString getHelpDocName() override {return "swap.html";}
 
@@ -346,5 +401,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif //MWC_QT_WALLET_SWAP_H

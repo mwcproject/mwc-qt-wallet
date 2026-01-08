@@ -15,7 +15,7 @@
 #ifndef MWCTOOLBAR_H
 #define MWCTOOLBAR_H
 
-#include <QWidget>
+#include "../control_desktop/MwcWidget.h"
 #include "../state/state.h"
 
 namespace Ui {
@@ -35,7 +35,7 @@ namespace core {
 
 class MainWindow;
 
-class MwcToolbar : public QWidget
+class MwcToolbar : public control::MwcWidget
 {
    Q_OBJECT
 
@@ -50,7 +50,7 @@ protected:
 private slots:
 
     void onWalletBalanceUpdated();
-    void onLoginResult(bool ok);
+    void onLogin();
     void onLogout();
     void onWalletFeaturesChanged();
 

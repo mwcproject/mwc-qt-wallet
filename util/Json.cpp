@@ -74,16 +74,7 @@ QString readStringFromJson(const QJsonObject & jsonObj, QString path, const QStr
 
 //////////////////////////////////////////////// FILE TRANSACTIONS ///////////////////////////////////////
 
-QPair<bool, QString> FileTransactionInfo::parseSlateFile( QString fn, FileTransactionType type ) {
-    QString jsonStr = readTextFile(fn).join(' ');
-    qDebug() << "parseTransaction for " << fn << " Body:" << jsonStr;
-
-    fileName = fn;
-
-    return parseSlateContent( jsonStr, type, "" );
-}
-
-QPair<bool, QString> FileTransactionInfo::parseSlateContent( QString slateContent, FileTransactionType type, QString slateSenderAddress ) {
+QPair<bool, QString> FileTransactionInfo::parseSlateContent( QString slateContent, FileTransactionType type, QString slateSenderAddress, wallet::Wallet * wallet ) {
 
     QJsonObject json = jsonFromString(slateContent);
 
@@ -186,6 +177,30 @@ QPair<bool, QString> FileTransactionInfo::parseSlateContent( QString slateConten
              }
          }
     }
+
+    // Recaver amother message from the Tx wallet's data
+    wallet::WalletTransaction tx = wallet->getTransactionByUUID( transactionId );
+    if (tx.isValid()) {
+        // It can be not valid if SP from another wallet. No errors on that
+        for (const auto & msg : tx.messages ) {
+            if (msg.message.isEmpty())
+                continue;
+            if (msg.participant_id==0) {
+                if (senderMessage.isEmpty()) {
+                    senderMessage = msg.message;
+                }
+            }
+            else if (msg.participant_id==1) {
+                if (receiverMessage.isEmpty()) {
+                    receiverMessage = msg.message;
+                }
+            }
+            else {
+                Q_ASSERT(false);  // Expected only participants 0 & 1
+            }
+        }
+    }
+
 
     // Verify the type of the transaction.
     // For now receive has 1 participant_data item and no 'part_sig' at participant_data

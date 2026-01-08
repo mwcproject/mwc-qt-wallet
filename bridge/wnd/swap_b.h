@@ -15,6 +15,10 @@
 #ifndef MWC_QT_WALLET_SWAP_H
 #define MWC_QT_WALLET_SWAP_H
 
+#include "../../features.h"
+
+#ifdef FEATURE_SWAP
+
 #include <QObject>
 #include "../../wallet/wallet.h"
 
@@ -289,5 +293,7 @@ bool isSwapWatingToAccept(const QString & stateCmd);
 
 
 }
+
+#endif
 
 #endif //MWC_QT_WALLET_SWAP_H

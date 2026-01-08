@@ -17,6 +17,7 @@
 #include "../bridge/wnd/v_viewoutputs_b.h"
 #include "../bridge/wallet_b.h"
 #include "../util_desktop/widgetutils.h"
+#include "control_desktop/messagebox.h"
 
 namespace wnd {
 
@@ -45,6 +46,14 @@ void GenerateOwnershipProofInput::on_back_clicked()
 void GenerateOwnershipProofInput::on_generate_clicked()
 {
     QString message = ui->message2sign->toPlainText();
+
+    auto valRes = util::validateMwc713Str(message, true);
+    if (!valRes.first) {
+        control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
+        ui->message2sign->setFocus();
+        return;
+    }
+
     bool isViewingKey = ui->select_viewing_key->isChecked();
     bool isTorAddress = ui->select_tor->isChecked();
     bool isMqsAddress = ui->select_mqs->isChecked();

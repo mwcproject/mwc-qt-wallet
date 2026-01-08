@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_swap.h"
+
+#ifdef FEATURE_SWAP
+
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
@@ -123,6 +126,7 @@ NextStateRespond Swap::execute() {
 
 // Show first page with trade List
 void Swap::pageTradeList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) {
+    logger::logInfo(logger::STATE, "Call Swap::pageTradeList with selectIncoming=" + QString(selectIncoming ? "true" : "false") + " selectOutgoing=" + QString(selectOutgoing ? "true" : "false") + " selectBackup=" + QString(selectBackup ? "true" : "false") + " selectEthWallet=" + QString(selectEthWallet ? "true" : "false"));
     selectedPage = SwapWnd::PageSwapList;
     core::getWndManager()->pageSwapList(selectIncoming, selectOutgoing, selectBackup, selectEthWallet);
     context->stateMachine->notifyAboutNewState(STATE::SWAP);
@@ -130,6 +134,7 @@ void Swap::pageTradeList(bool selectIncoming, bool selectOutgoing, bool selectBa
 
 // Edit/View Trade Page
 void Swap::viewTrade(QString swapId, QString stateCmd) {
+    logger::logInfo(logger::STATE, "Call Swap::viewTrade with swapId=" + swapId + " stateCmd=" + stateCmd);
     selectedPage = SwapWnd::PageSwapEdit;
     core::getWndManager()->pageSwapEdit(swapId, stateCmd);
     context->stateMachine->notifyAboutNewState(STATE::SWAP);
@@ -137,16 +142,19 @@ void Swap::viewTrade(QString swapId, QString stateCmd) {
 
 // Show trade details page
 void Swap::showTradeDetails(QString swapId) {
+    logger::logInfo(logger::STATE, "Call Swap::showTradeDetails with swapId=" + swapId);
     selectedPage = SwapWnd::PageSwapTradeDetails;
     core::getWndManager()->pageSwapTradeDetails(swapId);
     context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 
 bool Swap::isTradeRunning(const QString & swapId) const {
+    logger::logInfo(logger::STATE, "Call Swap::isTradeRunning with swapId=" + swapId);
     return runningSwaps.contains(swapId);
 }
 
 QVector<QString> Swap::getRunningTrades() const {
+    logger::logInfo(logger::STATE, "Call Swap::getRunningTrades");
     QVector<QString> res;
     for (const auto & sw : runningSwaps)
         res.append(sw.swapId);
@@ -155,6 +163,7 @@ QVector<QString> Swap::getRunningTrades() const {
 }
 
 QVector<QString> Swap::getRunningCriticalTrades() const {
+    logger::logInfo(logger::STATE, "Call Swap::getRunningCriticalTrades");
     QVector<QString> res;
     for (const auto & sw : runningSwaps) {
         if ( context->appContext->getMaxBackupStatus(sw.swapId, bridge::getSwapBackup(sw.stateCmd)) >=2 )
@@ -174,6 +183,9 @@ void Swap::runTrade(QString swapId, QString tag, bool isSeller, QString statusCm
 }
 
 void Swap::onTimerEvent() {
+    if (core::WalletApp::isExiting())
+        return;
+
     updateFeesIsNeeded();
 
     if (runningSwaps.isEmpty() || !runningTask.isEmpty())
@@ -443,6 +455,11 @@ void Swap::updateFeesIsNeeded() {
             if ( sc.txFeeUpdateTime < timeLimit ) {
                 // making request...
                 if (sc.currency == "BTC") {
+
+                    run in a separate thread, do sync send
+
+                    request.setHeader(QNetworkRequest::ServerHeader, "application/json"
+
                     sendRequest(HTTP_CALL::GET, "https://www.bitgo.com/api/v2/btc/tx/fee",
                                 "BTC", {}, "");
                 }
@@ -490,6 +507,7 @@ void Swap::onProcessHttpResponse(bool requestOk, const QString & tag, QJsonObjec
 
 // New Trade Page
 void Swap::initiateNewTrade() {
+    logger::logInfo(logger::STATE, "Call Swap::initiateNewTrade");
     updateFeesIsNeeded();
     resetNewSwapData();
 
@@ -501,6 +519,7 @@ void Swap::initiateNewTrade() {
 }
 
 bool Swap::verifyBackupDir(QString backupDir, bool showErrorMessage) {
+    logger::logInfo(logger::STATE, "Call Swap::verifyBackupDir with backupDir=" + backupDir + " showErrorMessage=" + QString(showErrorMessage ? "true" : "false"));
     if (backupDir.isEmpty())
         backupDir = context->appContext->getSwapBackupDir();
 
@@ -518,6 +537,7 @@ bool Swap::verifyBackupDir(QString backupDir, bool showErrorMessage) {
 
 // Stop run Mkt Non winners
 void Swap::stopMktTrades(QString tag, QString winnerTradeUuid) {
+    logger::logInfo(logger::STATE, "Call Swap::stopMktTrades with tag=" + tag + " winnerTradeUuid=" + winnerTradeUuid);
     QMutableMapIterator<QString, AutoswapTask> i(runningSwaps);
     while (i.hasNext()) {
         i.next();
@@ -529,12 +549,14 @@ void Swap::stopMktTrades(QString tag, QString winnerTradeUuid) {
 
 // Show the trade page 1
 void Swap::showNewTrade1() {
+    logger::logInfo(logger::STATE, "Call Swap::showNewTrade1");
     selectedPage = SwapWnd::PageSwapNew1;
     core::getWndManager()->pageSwapNew1();
     context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 // Show the trade page 2
 void Swap::showNewTrade2() {
+    logger::logInfo(logger::STATE, "Call Swap::showNewTrade2");
     selectedPage = SwapWnd::PageSwapNew2;
     core::getWndManager()->pageSwapNew2();
     context->stateMachine->notifyAboutNewState(STATE::SWAP);
@@ -542,12 +564,16 @@ void Swap::showNewTrade2() {
 
 // Apply params from trade1, not need to check
 void Swap::applyNewTrade11Params(bool mwcLockFirst) {
+    logger::logInfo(logger::STATE, "Call Swap::applyNewTrade11Params with mwcLockFirst=" + QString(mwcLockFirst ? "true" : "false"));
     newSwapSellectLockFirst = mwcLockFirst;
 }
 
 // Apply params from trade1 and switch to trade2 panel. Expected that params are validated by the wallet(bridge)
 void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString mwcAmount, QString secAmount,
                           QString secAddress, QString sendToAddress ) {
+    logger::logInfo(logger::STATE, "Call Swap::applyNewTrade12Params with acccount=" + acccount +
+        " secCurrency=" + secCurrency + " mwcAmount=" + mwcAmount + " secAmount=" + secAmount +
+        " secAddress=" + secAddress + " sendToAddress=" + sendToAddress);
 
     bool need2recalc1 = (newSwapMwc2Trade != mwcAmount);
     bool need2recalc2 = (newSwapCurrency2recalc != secCurrency);
@@ -592,25 +618,30 @@ void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString 
 }
 
 double Swap::getSecTransactionFee(const QString & secCurrency) const {
+    logger::logInfo(logger::STATE, "Call Swap::getSecTransactionFee with secCurrency=" + secCurrency);
     SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
     return sci.txFee;
 }
 
 
 double Swap::getSecMinTransactionFee(const QString & secCurrency) const {
+    logger::logInfo(logger::STATE, "Call Swap::getSecMinTransactionFee with secCurrency=" + secCurrency);
     SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
     return sci.txFeeMin;
 }
 
 double Swap::getSecMaxTransactionFee(const QString & secCurrency) const {
+    logger::logInfo(logger::STATE, "Call Swap::getSecMaxTransactionFee with secCurrency=" + secCurrency);
     SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
     return sci.txFeeMax;
 }
 
 int Swap::getMwcConfNumber(double mwcAmount) const {
+    logger::logInfo(logger::STATE, "Call Swap::getMwcConfNumber with mwcAmount=" + QString::number(mwcAmount));
     return std::min(1000, calcConfirmationsForMwcAmount(mwcAmount));
 }
 int Swap::getSecConfNumber(const QString & secCurrency) const {
+    logger::logInfo(logger::STATE, "Call Swap::getSecConfNumber with secCurrency=" + secCurrency);
     SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
     return sci.confNumber;
 }
@@ -619,6 +650,10 @@ int Swap::getSecConfNumber(const QString & secCurrency) const {
 // Apply part1 params from trade2 panel. Expected that params are validated by the windows
 void Swap::applyNewTrade21Params(QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks,
                            double secTxFee) {
+    logger::logInfo(logger::STATE, "Call Swap::applyNewTrade21Params with secCurrency=" + secCurrency +
+        " offerExpTime=" + QString::number(offerExpTime) + " redeemTime=" + QString::number(redeemTime) +
+        " mwcBlocks=" + QString::number(mwcBlocks) + " secBlocks=" + QString::number(secBlocks) +
+        " secTxFee=" + QString::number(secTxFee));
     newSwapCurrency = secCurrency;
     newSwapOfferExpirationTime = offerExpTime;
     newSwapRedeemTime = redeemTime;
@@ -630,6 +665,7 @@ void Swap::applyNewTrade21Params(QString secCurrency, int offerExpTime, int rede
 // Apply [part2 params from trade2 panel and switch to the review (panel3).
 // Expected that params are validated by the wallet(bridge)
 void Swap::applyNewTrade22Params(QString electrumXUrl) {
+    logger::logInfo(logger::STATE, "Call Swap::applyNewTrade22Params with electrumXUrl=" + electrumXUrl);
     newSwapElectrumXUrl = electrumXUrl;
     selectedPage = SwapWnd::PageSwapNew3;
     core::getWndManager()->pageSwapNew3();
@@ -639,8 +675,9 @@ void Swap::applyNewTrade22Params(QString electrumXUrl) {
 // Create and start a new swap. The data must be submitted by that moment
 // Response: onCreateStartSwap(bool ok, QString errorMessage)
 void Swap::createStartSwap() {
+    logger::logInfo(logger::STATE, "Call Swap::createStartSwap");
     // By that moment it is expected that the data is verified and valid.
-    // So we can start with a new swap trade. If some data is wrong, mwc713 wallet will report about that.
+    // So we can start with a new swap trade. If some data is wrong, the wallet will report it.
 
     int minConf = context->appContext->getSendCoinsParams().inputConfirmationNumber;
 
@@ -662,7 +699,7 @@ void Swap::createStartSwap() {
             break;
         }
         default: {
-            emit onCreateStartSwap(false, "Automated swaps working only with MQS and TOR addresses.");
+            emit onCreateStartSwap(false, "Automated swaps work only with MWCMQS and Tor addresses.");
             return;
 
         }
@@ -733,7 +770,7 @@ void Swap::onSendMarketplaceMessage(QString error, QString response, QString off
         if ( core::WndManager::RETURN_CODE::BTN1 != core::getWndManager()->questionTextDlg("Warning",
                 "There have been multiple acceptances to the offer from " + walletAddress +
                 ". The offer will be rewarded to whichever wallet locks their funds first. As a result of this, "
-                "your trade may be cancelled (if you did not lock first) even though you have already locked your coins.\n\n"
+                "your trade may be canceled (if you did not lock first) even though you have already locked your coins.\n\n"
                 "You can either wait and try to accept the offer later, or continue with this offer acceptance process in hope of winning.\n\n"
                 "Do you want to continue with the acceptance process?",
                 "Yes", "No",
@@ -812,6 +849,7 @@ void Swap::onRestoreSwapTradeData(QString swapId, QString importedFilename, QStr
 
 // List of the secondary currencies that wallet support
 QVector<QString> Swap::secondaryCurrencyList() {
+    logger::logInfo(logger::STATE, "Call Swap::secondaryCurrencyList");
     QVector<QString> res;
     for (const auto & scl : SwapCurrencyList() ) {
         res.push_back(scl.currency);
@@ -820,6 +858,7 @@ QVector<QString> Swap::secondaryCurrencyList() {
 }
 
 void Swap::setCurrentSecCurrency(QString secCurrency) {
+    logger::logInfo(logger::STATE, "Call Swap::setCurrentSecCurrency with secCurrency=" + secCurrency);
     if (secCurrency == newSwapCurrency)
         return;
     newSwapCurrency = secCurrency;
@@ -827,11 +866,13 @@ void Swap::setCurrentSecCurrency(QString secCurrency) {
 }
 
 QString Swap::getCurrentSecCurrencyFeeUnits() const {
+    logger::logInfo(logger::STATE, "Call Swap::getCurrentSecCurrencyFeeUnits");
     return getCurrencyInfo(newSwapCurrency).feeUnits;
 }
 
 
 QVector<QString> Swap::getExpirationIntervals() const {
+    logger::logInfo(logger::STATE, "Call Swap::getExpirationIntervals");
     return QVector<QString>{
         "1 hour",               "60",
         "1 hour 30 minutes",    "90",
@@ -847,6 +888,9 @@ QVector<QString> Swap::getExpirationIntervals() const {
 
 // Calculate the locking time for a NEW not yet created swap offer.
 QVector<QString> Swap::getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks ) {
+    logger::logInfo(logger::STATE, "Call Swap::getLockTime with secCurrency=" + secCurrency +
+        " offerExpTime=" + QString::number(offerExpTime) + " redeemTime=" + QString::number(redeemTime) +
+        " mwcBlocks=" + QString::number(mwcBlocks) + " secBlocks=" + QString::number(secBlocks));
     int mwcLockTime = mwcBlocks * 60 * 11 / 10;
     SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
     int secLockTime = secBlocks * sci.blockIntervalSec * 11 / 10;
@@ -863,6 +907,7 @@ QVector<QString> Swap::getLockTime( QString secCurrency, int offerExpTime, int r
 
 // Accept a new trade and start run it. By that moment the trade must abe reviews and all set
 void Swap::acceptTheTrade(QString swapId) {
+    logger::logInfo(logger::STATE, "Call Swap::acceptTheTrade with swapId=" + swapId);
     if (!verifyBackupDir())
         return;
 
@@ -879,6 +924,7 @@ void Swap::acceptTheTrade(QString swapId) {
 
 // Get Tx fee for secondary currency
 double Swap::getSecondaryFee(QString secCurrency) {
+    logger::logInfo(logger::STATE, "Call Swap::getSecondaryFee with secCurrency=" + secCurrency);
     for (const SecCurrencyInfo & ci : SwapCurrencyList() ) {
         if (ci.currency == secCurrency)
             return ci.txFee;
@@ -973,8 +1019,8 @@ void Swap::onLogout() {
     if (!runningSwaps.isEmpty()) {
         int sz = runningSwaps.size();
         runningSwaps.clear();
-        core::getWndManager()->messageTextDlg("WARNING",
-                      QString::number(sz) + " swap trade(s) were cancelled because of a logout during the swap. Please log into your wallet as quickly as possible. "
+        core::getWndManager()->messageTextDlg("Warning",
+                      QString::number(sz) + " swap trade(s) were canceled because of a logout during the swap. Please log into your wallet as quickly as possible. "
                       "If this wallet is not active when the swap trade finishes the cancellation process, you may lose all coins involved in this transaction.");
     }
 }
@@ -1002,12 +1048,12 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
                 if ( bridge::isSwapCancellable( swap.stateCmd, true)) {
                     // Can cancel - great..
                     context->wallet->cancelSwapTrade( swap.swapId );
-                    QString message = "Trade " + swap.swapId + " is dropped by your peer because there was several trades and another one locked the coins first. This trade is cancelled.";
+                    QString message = "Trade " + swap.swapId + " is dropped by your peer because there were several trades and another one locked the coins first. This trade is canceled.";
                     core::getWndManager()->messageTextDlg("Warning", message);
                 }
                 else {
                     QString message = "Unfortunately someone else locked funds and accepted trade before you. Your trade " + swap.swapId + " will not go forward.\n\n"
-                    "Please don't deposit any coins to the lock account. After the trade expiration time has passed, the trade will be cancelled automatically.\n\n"
+                    "Please don't deposit any coins to the lock account. After the trade expiration time has passed, the trade will be canceled automatically.\n\n"
                     "If you have already locked your coins, you will need to wait until your payment is refunded.";
                     core::getWndManager()->messageTextDlg("Warning", message);
                 }
@@ -1031,7 +1077,7 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
     }
 
     if (!error.isEmpty()) {
-        core::getWndManager()->messageTextDlg("Error", "Unable to request swap trades. If you have running trades, please solve this problem as soon as possible. If your wallet is not online, you might loose your trade funds.\n\n" + error);
+        core::getWndManager()->messageTextDlg("Error", "Unable to request swap trades. If you have running trades, please resolve this problem as soon as possible. If your wallet is not online, you might lose your trade funds.\n\n" + error);
         return;
     }
 
@@ -1044,6 +1090,7 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
 }
 
 bool Swap::mobileBack() {
+    logger::logInfo(logger::STATE, "Call Swap::mobileBack");
     switch (selectedPage) {
         case SwapWnd::None :
         case SwapWnd::PageSwapList:
@@ -1073,6 +1120,7 @@ bool Swap::mobileBack() {
 
 // Get minimal Amount for the secondary currency
 double Swap::getSecMinAmount(QString secCurrency) const {
+    logger::logInfo(logger::STATE, "Call Swap::getSecMinAmount with secCurrency=" + secCurrency);
     double minAmount = getCurrencyInfo(secCurrency).minAmount;
     return minAmount;
 }
@@ -1080,6 +1128,7 @@ double Swap::getSecMinAmount(QString secCurrency) const {
 // Notify about failed bidding. If it is true, we need to cancel and show the message about that
 // Note, mwc-wallet does cancellation as well.
 void Swap::failBidding(QString wallet_tor_address, QString offer_id) {
+    logger::logInfo(logger::STATE, "Call Swap::failBidding with wallet_tor_address=" + wallet_tor_address + " offer_id=" + offer_id);
     QString tag = wallet_tor_address + "_" + offer_id;
 
     context->wallet->requestSwapTrades("failBidding:" + tag);
@@ -1089,6 +1138,7 @@ void Swap::failBidding(QString wallet_tor_address, QString offer_id) {
 // Start trading for my offer - automatic operation. For Sell the offer will be created.
 // For Buy - offer will be accepted automatically.
 void Swap::startTrading(const MySwapOffer & offer, QString wallet_tor_address) {
+    logger::logInfo(logger::STATE, "Call Swap::startTrading with wallet_tor_address=" + wallet_tor_address);
 
     // Creating a new trade. My Swap offer should have all needed info...
     // Output are must be selected and locked when we created this trade
@@ -1133,6 +1183,7 @@ void Swap::startTrading(const MySwapOffer & offer, QString wallet_tor_address) {
 // Start trading for Marketplace offer. It will start for sell only. For Buy the normal workflow should be fine, we will only press "Accept" automatically.
 // For Buy - offer will be accepted automatically.
 void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address, int running_num) {
+    logger::logInfo(logger::STATE, "Call Swap::acceptOffer with wallet_tor_address=" + wallet_tor_address + " running_num=" + QString::number(running_num));
     QVector<MktSwapOffer> accepted = acceptedOffers.value(wallet_tor_address);
     QString offerId = offer.id;
     accepted.erase(std::remove_if( accepted.begin(), accepted.end(), [offerId](const MktSwapOffer & off) {return off.id == offerId;}), accepted.end());
@@ -1177,12 +1228,14 @@ void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address, i
 
 // Reject any offers from this address. We don't want them, we are likely too late
 void Swap::rejectOffer(const MktSwapOffer & offer, QString wallet_tor_address) {
+    logger::logInfo(logger::STATE, "Call Swap::rejectOffer with wallet_tor_address=" + wallet_tor_address);
     Q_UNUSED(offer)
     acceptedOffers.remove(wallet_tor_address);
 }
 
 // check if swap with this tag is exist
 bool Swap::isSwapExist(QString tag) const {
+    logger::logInfo(logger::STATE, "Call Swap::isSwapExist with tag=" + tag);
     for (const AutoswapTask & val : runningSwaps.values() ) {
         if (val.tag == tag)
             return true;
@@ -1190,5 +1243,6 @@ bool Swap::isSwapExist(QString tag) const {
     return false;
 }
 
-
 }
+
+#endif

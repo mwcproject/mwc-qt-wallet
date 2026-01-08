@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_mktofferdetailsdlg.h"
+
+#ifdef FEATURE_MKTPLACE
+
 #include "ui_s_mktofferdetailsdlg.h"
 #include "../state/s_mktswap.h"
 #include "../bridge/wnd/swap_b.h"
@@ -74,3 +77,4 @@ void MktOfferDetailsDlg::on_acceptButton_clicked() {
 }
 
 }
+#endif

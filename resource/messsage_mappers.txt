@@ -1,0 +1,86 @@
+# It is a message mappers files for the mwc-wallet messages that we need to show to the users nice way.
+# Format:
+# <regex expression to parse the message>
+# <mapper string>  - string with regex groups.
+# empty line (separator)
+
+# Swap Error , Electrum Node error, Unable to contact the secondary ElectrumX client btc.test2.swap.mwc.mw:8000, Swap Rpc error: Unable connect to btc.test2.swap.mwc.mw:8000, Swap I/O: Connection refused (os error 61)
+Swap Error , Electrum Node error, Unable to contact the (.+) ElectrumX client .+, Swap Rpc error: (.+), Swap I\/O: (.+)
+The $1 ElectrumX client is not accessible. $2, $3
+
+# Checking {} outputs, up to index {}. (Highest index: {})
+Checking (.+) outputs, up to index (.+). \(Highest index: (.+)\)
+Processed outputs: $3 from $2
+
+# Unable to post transaction, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Duplicate tx"}
+Unable to post transaction, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Duplicate tx"}
+Transaction is already posted. Please wait until it will be mined.
+
+# Impls Error, MQS error: MQS unable to process slate e673d8cd-b60f-401e-9b5b-79445107fd5a, timed out waiting on channel
+.+MQS unable to process slate (.+), timed out waiting on channel
+Destination MWC MQS address is not responded. Another wallet is offline or not listening on MWC MQS.
+
+# LibWallet Error, Unable to post slate, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Invalid Tx Tx cut through error"}
+.+Failed to update pool, Tx Pool Invalid Tx Tx cut through error.+
+Node transaction pool has a stale transactions, some inputs from your transaction are already in transaction pool. Please wait until your posted transactions will be mined or expired.
+
+# Impls Error, Adapter Callback Error, Performing version check (is recipient listening?): Connection error: Reading response error, read timeout
+.+Performing version check \(is recipient listening\?\).+
+Destination address is not responded. Another wallet is offline or not listening on Tor.
+
+# Impls Error, Connection error: Unable connect to olpnocu5sv2pvylbnnvgkub3x7rcs2yorxgoyrmghqusfc2p5ottwvid.onion:80, Tor outbound connection error: Unable connect to olpnocu5sv2pvylbnnvgkub3x7rcs2yorxgoyrmghqusfc2p5ottwvid.onion:80, tor: Onion Service not reachable (due to service, or Tor network, behaviour): Failed to obtain hidden service circuit to […]vid.onion
+.+Failed to obtain hidden service circuit to.+
+Destination wallet is offline or not listening on Tor.
+
+# Unable to open the wallet, Lifecycle Error: Error opening wallet (is password correct?), Enc/Decryption error (check password?), Open in place error, ring::error::Unspecified
+Unable to open the wallet, Lifecycle Error: Error opening wallet \(is password correct\?\), Enc\/Decryption error \(check password\?\).+
+Password supplied was incorrect. Please input correct password to proceed.
+
+# LibWallet Error, Onion V3 Address Error, Unable to decode Onion address from a string, (Interpreted as Hex String) Public key is wrong length
+LibWallet Error, Onion V3 Address Error, Unable to decode Onion address from a string.+
+The recipient's Tor/Slatepack address has an invalid format. Please check and try again.
+
+# Slate decryption error, Slatepack decode error, Unable to decrypt, ring::error::Unspecified
+Slate decryption error, Slatepack decode error, Unable to decrypt.+
+This slatepack is encrypted for a wallet with a different Slatepack/Tor address, you can't process it.
+
+# Slate decryption error, Slatepack decode error, Bad armor footer
+Slate decryption error, Slatepack decode error.+
+Invalid slatepack. Data is corrupted or incomplete. Please double check that you copied entire slatepack correctly.
+
+# Unable to post transaction, Client Callback Error, Unable to parse node response: , EOF while parsing a value at line 1 column 0
+.+Unable to parse node response.+
+We couldn’t connect to the network. Please check your internet connection and try again.
+
+# Unable to finalize, Transaction Expired
+.+Transaction Expired
+This transaction has expired.
+
+# Unable to post transaction, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool General error failed to validate tx"}
+Unable to post transaction, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool General error failed to validate tx"}
+This transaction is not valid, it is not accepted by blockchain. Please cancel this transaction and send coins again.
+
+# Blockchain scan error, Client Callback Error, Unable to parse node response: , EOF while parsing a value at line 1 column 0
+.+Unable to parse node response: , EOF while parsing a value at line 1 column 0
+Unable to connect to the public node. Please check your internet connection and try again.
+
+# Failed to validate ownership proof, Invalid ownership proof: wallet root signature is invalid, secp: signature failed verification
+Failed to validate ownership proof, Invalid ownership proof: wallet root signature is invalid.+
+The ownership proof signature is invalid.
+
+#Failed to validate ownership proof, Invalid ownership proof: This proof is generated for wrong network: floonet2
+Failed to validate ownership proof, Invalid ownership proof: This proof is generated for wrong network: (.+)
+Ownership proof network mismatch: proof was generated for $1.
+
+# Failed to validate ownership proof, Invalid ownership proof: Unable to decode wallet root public key, Hex conversion error, Unable to build public key from HEX 01be9a884df2da8884cc9dbc7df58af76ab22a1a19cee4780822528731e538bb1b, secp: malformed public key
+Failed to validate ownership proof, Invalid ownership proof: Unable to decode wallet root public key, .*
+The ownership proof public key is invalid
+
+# Unable to parse expected parameter ownership_proof, missing field `network`
+Unable to parse expected parameter ownership_proof, missing field .+
+This ownership proof record is incomplete. Some required information is missing.
+
+# Covering other related to ownership proof errors
+# Failed to validate ownership proof, Invalid ownership proof....
+Failed to validate ownership proof, Invalid ownership proof.+
+The ownership proof is invalid

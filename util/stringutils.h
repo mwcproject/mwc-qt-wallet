@@ -33,11 +33,8 @@ QString zeroDbl2Dbl(QString  dbl);
 // convert string representing double into nano
 QPair<bool,int64_t> one2nano(QString str);
 
-// convert int64_t strign into shorter version
 // abcdefgh  => abc...
 QString string2shortStrR( QString str, int lenLimit );
-// abcdefgh  => ab...gh
-QString string2shortStrM( QString str, int lenLimit );
 
 // 'abc' => 'abc   '
 QString expandStrR(QString str, int len, QChar filler = ' ' );
@@ -55,8 +52,8 @@ QString formatErrorMessages(QStringList messages);
 // Get safely substring from the string. If indexes out of range, return emoty string
 QString getSubString(const QString & str, int idx1, int idx2);
 
-// Convert mwc713 UTC time to this wallet time. Time template is different.
-QString mwc713time2ThisTime(QString mwc713TimeStr);
+// mwc wallet time into local time
+QString utcTime2LocalTime(QString utcTimeStr);
 
 // Convert timestamp to this wallet time.
 QString timestamp2ThisTime(int64_t timestamp);

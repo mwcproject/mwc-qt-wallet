@@ -21,9 +21,12 @@
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/x_walletconfig_b.h"
 #include "../bridge/util_b.h"
+#include "../bridge/heartbeat_b.h"
 #include "../bridge/wnd/e_receive_b.h"
 #include "../core/global.h"
 #include "../dialogs_desktop/g_inputslatepackdlg.h"
+#include "zz_utils.h"
+#include "core/Config.h"
 
 namespace wnd {
 
@@ -38,25 +41,19 @@ Receive::Receive(QWidget *parent) :
     wallet  = new bridge::Wallet(this);
     receive = new bridge::Receive(this);
     util    = new bridge::Util(this);
+    heartBeat = new bridge::HeartBeat(this);
 
     QObject::connect( receive, &bridge::Receive::sgnTransactionActionIsFinished,
                       this, &Receive::onSgnTransactionActionIsFinished, Qt::QueuedConnection);
-
     QObject::connect( wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
                       this, &Receive::onSgnWalletBalanceUpdated, Qt::QueuedConnection);
 
-    QObject::connect( wallet, &bridge::Wallet::sgnMwcAddressWithIndex,
-                      this, &Receive::onSgnMwcAddressWithIndex, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnTorAddress,
-                      this, &Receive::onSgnTorAddress, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnFileProofAddress,
-                      this, &Receive::onSgnFileProofAddress, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnUpdateListenerStatus,
+    QObject::connect( heartBeat, &bridge::HeartBeat::sgnUpdateListenerStatus,
                       this, &Receive::onSgnUpdateListenerStatus, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
-    updateAccountList();
+    updateAccountsData(wallet, ui->accountComboBox, true, true);
 
     if (!walletConfig->isFeatureMWCMQS()) {
         ui->frameMqs->hide();
@@ -83,7 +80,7 @@ Receive::Receive(QWidget *parent) :
     }
     else if (hasTor) {
         // Tor only
-        ui->label_sp_tor->setText("TOR address");
+        ui->label_sp_tor->setText("Tor address");
     }
     else if (hasSp) {
         ui->label_sp_tor->setText("Slatepack address");
@@ -94,46 +91,35 @@ Receive::Receive(QWidget *parent) :
         ui->torAddress->hide();
     }
 
-    wallet->requestFileProofAddress();
+    if ( !config->isOnlineWallet() || config->isFaucetRequested()) {
+        ui->requestFaucetMWCButton->hide();
+    }
 
-    updateStatus();
+    ui->torAddress->setText( "http://" + wallet->getTorSlatepackAddress() + ".onion");
+    QString address = wallet->getMqsAddress();
+    mwcAddress = "mwcmqs://" + address;
+    ui->mwcmqAddress->setText( mwcAddress );
+    updateListenerStatus();
 }
 
 Receive::~Receive() {
     delete ui;
 }
 
-void Receive::updateStatus() {
+void Receive::updateListenerStatus() {
     // Recieve is a simple small page, we can update all without problems
-    QString address = wallet->getMqsAddress();
+    QVector<bool> listenerStatuses = wallet->getListenerStatus();
+    Q_ASSERT(listenerStatuses.size()==4);
+    updateListenerStatusWith(listenerStatuses[1], listenerStatuses[3]);
+}
 
-    mwcAddress = "mwcmqs://" + address;
-    ui->mwcmqAddress->setText( mwcAddress );
-
-    bool mqsOnline = wallet->getMqsListenerStatus();
+void Receive::updateListenerStatusWith(bool mqsOnline, bool torOnline) {
     ui->mwcmqStatusImg->setPixmap( QPixmap(mqsOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->mwcmqStatusLabel->setText( mqsOnline ? "Online" : "Offline" );
 
-    bool torOnline = wallet->getTorListenerStatus();
     ui->torStatusImg->setPixmap( QPixmap(torOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->torStatusLabel->setText( torOnline ? "Online" : "Offline" );
 }
-
-
-void Receive::on_recieveFileButton_clicked()
-{
-    util::TimeoutLockObject to( "Receive" );
-
-    QString fileName = util->getOpenFileName( "Open initial transaction file", "fileGen", "MWC transaction (*.tx *.input);;All files (*.*)");
-    if (fileName.isEmpty())
-        return;
-
-    ui->progress->show();
-
-    receive->signTransaction(fileName);
-    // Expected respond from state with result
-}
-
 
 void Receive::on_recieveSlatepackButton_clicked()
 {
@@ -143,8 +129,6 @@ void Receive::on_recieveSlatepackButton_clicked()
                            util::FileTransactionType::RECEIVE,  this);
 
     if (inputSlateDlg.exec()  == QDialog::Accepted ) {
-        ui->progress->show();
-
         receive->signSlatepackTransaction(inputSlateDlg.getSlatepack(), inputSlateDlg.getSlateJson(), inputSlateDlg.getSenderAddress() );
     }
 }
@@ -160,57 +144,31 @@ void Receive::onSgnTransactionActionIsFinished( bool success, QString message ) 
 void Receive::on_accountComboBox_activated(int index)
 {
     Q_UNUSED(index);
-    auto accountName = ui->accountComboBox->currentData(); // QVariant
-    if (accountName.isValid())
-        wallet->setReceiveAccount(accountName.toString());
-}
-
-void Receive::updateAccountList() {
-    // accountInfo - pairs of [name, longInfo]
-    QVector<QString> accountInfo = wallet->getWalletBalance(true, false, true);
-    QString selectedAccount = wallet->getReceiveAccount();
-
-    int selectedAccIdx = 0;
-
-    ui->accountComboBox->clear();
-
-    int idx=0;
-    for (int i=1; i<accountInfo.size(); i+=2) {
-        if ( accountInfo[i-1] == "integrity")
-            continue;
-
-        if (accountInfo[i-1] == selectedAccount)
-            selectedAccIdx = idx;
-
-        ui->accountComboBox->addItem( accountInfo[i], QVariant(accountInfo[i-1]) );
-        idx++;
-    }
-    ui->accountComboBox->setCurrentIndex(selectedAccIdx);
+    auto account = ui->accountComboBox->currentData(); // QVariant
+    if (account.isValid())
+        wallet->setReceiveAccountById( accountComboData2AccountPath(account.toString()).second );
 }
 
 void Receive::onSgnWalletBalanceUpdated() {
-    updateAccountList();
+    updateAccountsData(wallet, ui->accountComboBox, true, true);
 }
 
-void Receive::onSgnMwcAddressWithIndex(QString mwcAddress, int idx) {
-    Q_UNUSED(idx);
-    Q_UNUSED(mwcAddress);
-    updateStatus();
-}
-void Receive::onSgnTorAddress(QString tor) {
-    Q_UNUSED(tor);
-    updateStatus();
-}
-
-void Receive::onSgnFileProofAddress(QString proofAddress) {
-    ui->torAddress->setText(proofAddress);
-}
-
-// keybaseOnline is absolete
 void Receive::onSgnUpdateListenerStatus(bool mqsOnline, bool torOnline) {
     Q_UNUSED(mqsOnline)
     Q_UNUSED(torOnline)
-    updateStatus();
+    updateListenerStatusWith(mqsOnline, torOnline);
+}
+
+void Receive::on_requestFaucetMWCButton_clicked()
+{
+    // even it is sync call, it is a long operation and wallet will continue to handle the events.
+    // Not great design, but OK for single call at floonet
+    ui->progress->show();
+    if (wallet->requestFaucetMWC()) {
+        config->faucetRequested();
+        ui->requestFaucetMWCButton->hide();
+    }
+    ui->progress->hide();
 }
 
 

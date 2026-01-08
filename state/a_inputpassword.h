@@ -29,20 +29,18 @@ public:
     virtual ~InputPassword() override;
 
     // Async call to submit the password. This state migth get back to UI if password is incorrect
-    void submitPassword(const QString & password);
+    bool submitPassword(const QString & password, const QString & selectedPath);
 
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override {return false;}
 
 protected slots:
-    // Result of the login
-    void onLoginResult(bool ok);
 
-    void onWalletBalanceUpdated();
+    void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
 private:
     bool inLockMode = false;
-    QString lockedWalletPath;
+    QString updateRespId;
 };
 
 }

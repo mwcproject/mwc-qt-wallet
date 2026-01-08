@@ -15,6 +15,10 @@
 #ifndef S_SWAPBACKUPDLG_H
 #define S_SWAPBACKUPDLG_H
 
+#include "../features.h"
+
+#ifdef FEATURE_SWAP
+
 #include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
@@ -53,5 +57,5 @@ private:
 };
 
 }
-
+#endif
 #endif // S_SWAPBACKUPDLG_H

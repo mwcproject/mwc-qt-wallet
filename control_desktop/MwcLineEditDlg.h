@@ -15,11 +15,11 @@
 #ifndef GUI_WALLET_MWCLINEEDITDLG_H
 #define GUI_WALLET_MWCLINEEDITDLG_H
 
-#include <QLineEdit>
+#include "MwcLineEdit.h"
 
 namespace control {
 
-class MwcLineEditDlg: public QLineEdit {
+class MwcLineEditDlg: public MwcLineEdit {
 Q_OBJECT
 public:
     explicit MwcLineEditDlg(QWidget *parent = Q_NULLPTR);
@@ -30,4 +30,3 @@ public:
 }
 
 #endif // GUI_WALLET_MWCLINEEDITDLG_H
-

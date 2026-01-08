@@ -19,6 +19,7 @@
 #include <QString>
 #include <QObject>
 #include <QVector>
+#include <QJsonObject>
 #include "../core/testseedtask.h"
 
 namespace wnd {
@@ -29,8 +30,6 @@ class NewSeedTest;
 }
 
 namespace state {
-
-const QString INIT_ACCOUNT_CALLER_ID = "InitAccount";
 
 enum class InitAccountPage {None, PageInitAccount, PageSeedLength, PageEnterSeed, PageNewSeed, PageNewSeedTest, PageProgressWnd};
 
@@ -64,14 +63,8 @@ public:
     // Restore form the seed is cancelled by user.
     void cancel();
 private slots:
-    void onNewSeed(QVector<QString> seed);
-
-    void onLoginResult(bool ok);
-
-    void onRecoverProgress( int progress, int maxVal );
-
-    void onRecoverResult(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages);
-
+    void onScanProgress( QString responseId, QJsonObject statusMessage );
+    void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
 protected:
     virtual NextStateRespond execute() override;
     virtual void exitingState() override;
@@ -83,9 +76,9 @@ protected:
     void generateWordTasks();
 
     void showInitAccountPage();
-private:
-    int progressMaxVal = 10;
 
+    void executeDeleteSeedPath();
+private:
     int seedLength = 24;
 
     QString pass;
@@ -93,6 +86,9 @@ private:
     QVector<core::TestSeedTask> tasks;
     int  seedTestWrongAnswers = 0;
     InitAccountPage currentPage = InitAccountPage::None;
+
+    QString recoverResponseId = 0;
+    QString deleteSeedPath;
 };
 
 

@@ -16,6 +16,7 @@
 #include "../BridgeManager.h"
 #include "../../state/k_AccountTransfer.h"
 #include "../../state/state.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
@@ -40,11 +41,13 @@ void AccountTransfer::hideProgress() {
 }
 
 bool AccountTransfer::transferFunds(QString from, QString to, QString sendAmount) {
+    logger::logInfo(logger::BRIDGE, "Call AccountTransfer::transferFunds with from=" + from + " to=" + to + " sendAmount=" + sendAmount);
     return getState()->transferFunds(from, to, sendAmount);
 }
 
 // Back button was pressed.
 void AccountTransfer::goBack() {
+    logger::logInfo(logger::BRIDGE, "Call AccountTransfer::goBack");
     return getState()->goBack();
 }
 

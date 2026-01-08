@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NewSeed</class>
- <widget class="QWidget" name="NewSeed">
+ <widget class="control::MwcWidget" name="NewSeed">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -49,7 +49,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QTextEdit" name="seedText">
+      <widget class="control::MwcTextEdit" name="seedText">
        <property name="lineWidth">
         <number>0</number>
        </property>
@@ -63,7 +63,7 @@
         <bool>true</bool>
        </property>
        <property name="placeholderText">
-        <string>Waiting for the mnemonic passphrase from mwc713...</string>
+        <string>Waiting for the mnemonic passphrase from the wallet...</string>
        </property>
       </widget>
      </item>
@@ -120,7 +120,7 @@
 This passphrase will allow you to recover your wallet in case of computer failure.
 
 WARNING:
-- Never disclosure your passphrase.
+- Never disclose your passphrase.
 - Never type it on a website.
 - Do not store it electronically.</string>
        </property>
@@ -265,7 +265,7 @@ WARNING:
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -325,6 +325,16 @@ WARNING:
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NewWallet</class>
- <widget class="QWidget" name="NewWallet">
+ <widget class="control::MwcWidget" name="NewWallet">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -52,7 +52,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>300</width>
@@ -81,7 +81,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QRadioButton" name="radioCreateNew">
+       <widget class="control::MwcRadioButton" name="radioCreateNew">
         <property name="geometry">
          <rect>
           <x>6</x>
@@ -103,7 +103,7 @@
          <string notr="true">buttonGroup_2</string>
         </attribute>
        </widget>
-       <widget class="QRadioButton" name="radioHaveSeed">
+       <widget class="control::MwcRadioButton" name="radioHaveSeed">
         <property name="geometry">
          <rect>
           <x>6</x>
@@ -125,7 +125,7 @@
          <string notr="true">buttonGroup_2</string>
         </attribute>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="control::MwcWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>12</x>
@@ -210,7 +210,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QRadioButton" name="radioMainNet">
+       <widget class="control::MwcRadioButton" name="radioMainNet">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -232,7 +232,7 @@
          <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
-       <widget class="QRadioButton" name="radioFloonet">
+       <widget class="control::MwcRadioButton" name="radioFloonet">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -330,6 +330,16 @@
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>control_desktop/MwcRadioButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

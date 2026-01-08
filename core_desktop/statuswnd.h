@@ -17,7 +17,7 @@
 
 #include "mainwindow.h"
 #include <QApplication>
-#include <QWidget>
+#include "../control_desktop/MwcWidget.h"
 #include <QPropertyAnimation>
 
 namespace Ui {
@@ -29,7 +29,7 @@ namespace core {
 class MainWindow;
 
 // Window with navigation bar
-class StatusWnd : public QWidget {
+class StatusWnd : public control::MwcWidget {
     Q_OBJECT
 public:
     StatusWnd(core::MainWindow* mainWindow, bool mainWindowDisplay = true);

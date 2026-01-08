@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "g_inputslatepackdlg.h"
+
+#include <QJsonDocument>
+
 #include "ui_g_inputslatepackdlg.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/util_b.h"
@@ -31,37 +34,54 @@ InputSlatepackDlg::InputSlatepackDlg(QString _expectedContent, QString _expected
     wallet = new bridge::Wallet(this);
     util = new bridge::Util(this);
 
-    QObject::connect(wallet, &bridge::Wallet::sgnDecodeSlatepack,
-                     this, &dlg::InputSlatepackDlg::onSgnDecodeSlatepack, Qt::QueuedConnection);
-
-    updateButtons();
+    updateButtons(false);
 }
 
 InputSlatepackDlg::~InputSlatepackDlg() {
     delete ui;
 }
 
-void InputSlatepackDlg::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
-    Q_UNUSED(recipient)
+void InputSlatepackDlg::on_slatepackEdit_textChanged() {
+    QString sp = ui->slatepackEdit->toPlainText().trimmed();
+    initiateSlateVerification(sp);
+}
 
-    if (tag != "InputSlatepackDlg")
+void InputSlatepackDlg::on_cancelButton_clicked() {
+    reject();
+}
+
+void InputSlatepackDlg::on_continueButton_clicked() {
+    accept();
+}
+
+void InputSlatepackDlg::updateButtons(bool enable) {
+    ui->continueButton->setEnabled(enable);
+}
+
+void InputSlatepackDlg::initiateSlateVerification(const QString &slate2check) {
+    if (slate2check.isEmpty()) {
+        ui->slatepack_status->hide();
         return;
+    }
 
-    isSpValid = false;
-    spInProgress = "";
+    QJsonObject decodedSpJson = wallet->decodeSlatepack(slate2check);
+    wallet::DecodedSlatepack decodedSp = wallet::DecodedSlatepack::fromJson(decodedSpJson);
+
+    bool isSpValid = false;
     ui->slatepack_status->hide();
-    if (!error.isEmpty()) {
+    if (!decodedSp.error.isEmpty()) {
         ui->slatepack_status->show();
-        ui->slatepack_status->setText("<b>" + error + "</b>");
+        ui->slatepack_status->setText("<b>" + decodedSp.error + "</b>");
     }
     else {
-        if (expectedContent != content) {
+        if (expectedContent != decodedSp.content) {
             ui->slatepack_status->show();
             ui->slatepack_status->setText( "<b>Wrong slatepack content, expected " + expectedContentDescription + "</b>" );
         }
         else {
             // Validating Json
-            QVector<QString> slateParseRes = util->parseSlateContent(slateJson, int(txType), sender );
+            QString slateJson = QJsonDocument(decodedSp.slate).toJson(QJsonDocument::Compact);
+            QVector<QString> slateParseRes = util->parseSlateContent(slateJson, int(txType), decodedSp.sender );
             Q_ASSERT(slateParseRes.size() == 1 || slateParseRes.size() >= 2);
             if (slateParseRes.size() == 1) {
                 // parser reported error
@@ -71,14 +91,14 @@ void InputSlatepackDlg::onSgnDecodeSlatepack(QString tag, QString error, QString
             else {
                 QString spDesk;
                 QString senderStr;
-                if (sender == "None") {
+                if (decodedSp.sender.isEmpty()) {
                     spDesk = "non encrypted Slatepack";
                 } else {
                     spDesk = "encrypted Slatepack";
                     if (txType== util::FileTransactionType::RECEIVE)
-                        senderStr = " from " + sender;
+                        senderStr = " from " + decodedSp.sender;
                     else if (txType== util::FileTransactionType::FINALIZE)
-                        senderStr = ", receiver address " + sender;
+                        senderStr = ", receiver address " + decodedSp.sender;
                     else {
                         Q_ASSERT(false);
                     }
@@ -94,9 +114,9 @@ void InputSlatepackDlg::onSgnDecodeSlatepack(QString tag, QString error, QString
                     ui->slatepack_status->setText("Finalizing " + spDesk + ", transaction " + slateParseRes[0] + senderStr);
                 }
                 isSpValid = true;
-                this->slatepack = slatepack;
+                this->slatepack = slate2check;
                 this->slateJson = slateJson;
-                this->sender = sender;
+                this->sender = decodedSp.sender;
                 ui->slatepack_status->show();
             }
         }
@@ -104,45 +124,7 @@ void InputSlatepackDlg::onSgnDecodeSlatepack(QString tag, QString error, QString
 
     QString textSp = ui->slatepackEdit->toPlainText().trimmed();
 
-    if (slatepack != textSp) {
-        initiateSlateVerification(textSp);
-        isSpValid = false;
-    }
-
-    updateButtons();
-}
-
-
-void InputSlatepackDlg::on_slatepackEdit_textChanged() {
-    isSpValid = false;
-    updateButtons();
-
-    if (spInProgress.isEmpty()) {
-        QString sp = ui->slatepackEdit->toPlainText().trimmed();
-        initiateSlateVerification(sp);
-    }
-}
-
-void InputSlatepackDlg::on_cancelButton_clicked() {
-    reject();
-}
-
-void InputSlatepackDlg::on_continueButton_clicked() {
-    accept();
-}
-
-void InputSlatepackDlg::updateButtons() {
-    ui->continueButton->setEnabled(isSpValid);
-}
-
-void InputSlatepackDlg::initiateSlateVerification(const QString &slate2check) {
-    if (slate2check.isEmpty()) {
-        ui->slatepack_status->hide();
-        return;
-    }
-
-    spInProgress = slate2check;
-    wallet->decodeSlatepack(slate2check, "InputSlatepackDlg");
+    updateButtons(isSpValid);
 }
 
 }

@@ -14,12 +14,15 @@
 
 
 #include "s_mktshowparamsdlg_d.h"
+
+#ifdef FEATURE_MKTPLACE
+
 #include "ui_s_mktshowparamsdlg_d.h"
 #include "../windows_desktop/s_mrktswlist_w.h"
 #include "../bridge/wnd/swap_b.h"
 #include "../control_desktop/messagebox.h"
 
-/*
+
 namespace dlg {
 
 MktShowParamsDlg::MktShowParamsDlg(QWidget *parent, double _feeLevel, bool _selling, const QString & _secondaryCurrency, double _minMwcAmount, double _maxMwcAmount) :
@@ -128,4 +131,5 @@ void MktShowParamsDlg::on_applyButton_clicked() {
     accept();
 }
 
-}*/
+}
+#endif

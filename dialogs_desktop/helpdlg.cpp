@@ -15,6 +15,7 @@
 #include "helpdlg.h"
 #include "ui_helpdlg.h"
 #include "../util/Files.h"
+#include "control_desktop/MwcScrollBar.h"
 
 namespace dlg {
 
@@ -27,6 +28,7 @@ HelpDlg::HelpDlg( QWidget *parent, QString documentName ) :
     QStringList lines = util::readTextFile(":/help/" + documentName, false);
     QString htmlStr = lines.join("");
     ui->browser->setHtml(htmlStr);
+    ui->browser->setVerticalScrollBar(new control::MwcScrollBar(Qt::Vertical, ui->browser));
 }
 
 HelpDlg::~HelpDlg()

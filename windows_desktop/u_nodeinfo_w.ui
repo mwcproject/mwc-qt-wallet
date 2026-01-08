@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NodeInfo</class>
- <widget class="QWidget" name="NodeInfo">
+ <widget class="control::MwcWidget" name="NodeInfo">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>890</width>
-    <height>559</height>
+    <height>603</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QWidget" name="verticalSpacer_5" native="true">
+      <widget class="control::MwcWidget" name="verticalSpacer_5" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -70,13 +70,13 @@
        <property name="minimumSize">
         <size>
          <width>766</width>
-         <height>339</height>
+         <height>365</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>766</width>
-         <height>339</height>
+         <height>365</height>
         </size>
        </property>
        <property name="frameShape">
@@ -100,7 +100,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="QLabel" name="label_4">
+        <widget class="control::MwcLabel" name="label_4">
          <property name="geometry">
           <rect>
            <x>27</x>
@@ -183,7 +183,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="QLabel" name="label">
+        <widget class="control::MwcLabel" name="label">
          <property name="geometry">
           <rect>
            <x>27</x>
@@ -237,7 +237,7 @@
           <enum>QFrame::Raised</enum>
          </property>
         </widget>
-        <widget class="control::MwcLabelNormal" name="label_3">
+        <widget class="control::MwcLabelNormal" name="statusLabel">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -269,7 +269,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="QLabel" name="label_10">
+        <widget class="control::MwcLabel" name="label_10">
          <property name="geometry">
           <rect>
            <x>27</x>
@@ -352,7 +352,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="QLabel" name="label_7">
+        <widget class="control::MwcLabel" name="label_7">
          <property name="geometry">
           <rect>
            <x>27</x>
@@ -424,7 +424,7 @@
         <property name="geometry">
          <rect>
           <x>285</x>
-          <y>276</y>
+          <y>286</y>
           <width>201</width>
           <height>2</height>
          </rect>
@@ -440,9 +440,9 @@
         <property name="geometry">
          <rect>
           <x>3</x>
-          <y>249</y>
+          <y>252</y>
           <width>760</width>
-          <height>43</height>
+          <height>41</height>
          </rect>
         </property>
         <property name="text">
@@ -459,7 +459,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>294</y>
+          <y>316</y>
           <width>766</width>
           <height>44</height>
          </rect>
@@ -473,7 +473,7 @@
         <widget class="control::MwcPushButtonNormal" name="refreshButton">
          <property name="geometry">
           <rect>
-           <x>507</x>
+           <x>304</x>
            <y>2</y>
            <width>166</width>
            <height>40</height>
@@ -495,81 +495,13 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Re-sync your wallet with a full node. Resync process will take time.</string>
+          <string>Re-sync your wallet with a full node. The resync process will take time.</string>
          </property>
          <property name="statusTip">
-          <string>Re-sync your wallet with a full node. Resync process will take time.</string>
+          <string>Re-sync your wallet with a full node. The resync process will take time.</string>
          </property>
          <property name="text">
           <string>Re-sync with node</string>
-         </property>
-        </widget>
-        <widget class="control::MwcPushButtonNormal" name="changeNodeButton">
-         <property name="geometry">
-          <rect>
-           <x>297</x>
-           <y>2</y>
-           <width>166</width>
-           <height>40</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="toolTip">
-          <string>Change MWC Node that your wallet is connected to</string>
-         </property>
-         <property name="statusTip">
-          <string>Change MWC Node that your wallet is connected to</string>
-         </property>
-         <property name="text">
-          <string>Change Node</string>
-         </property>
-        </widget>
-        <widget class="control::MwcPushButtonNormal" name="showLogsButton">
-         <property name="geometry">
-          <rect>
-           <x>72</x>
-           <y>2</y>
-           <width>166</width>
-           <height>40</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="toolTip">
-          <string>View embedded MWC node Logs</string>
-         </property>
-         <property name="statusTip">
-          <string>View embedded MWC node Logs</string>
-         </property>
-         <property name="text">
-          <string>Status Details</string>
          </property>
         </widget>
        </widget>
@@ -577,7 +509,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>295</y>
+          <y>318</y>
           <width>766</width>
           <height>44</height>
          </rect>
@@ -588,45 +520,11 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="control::MwcPushButtonNormal" name="showLogsButton_5">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>2</y>
-           <width>166</width>
-           <height>40</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="toolTip">
-          <string>View embedded MWC node Logs</string>
-         </property>
-         <property name="statusTip">
-          <string>View embedded MWC node Logs</string>
-         </property>
-         <property name="text">
-          <string>Status Details</string>
-         </property>
-        </widget>
         <widget class="control::MwcPushButtonNormal" name="saveBlockchianData">
          <property name="geometry">
           <rect>
-           <x>405</x>
-           <y>2</y>
+           <x>300</x>
+           <y>0</y>
            <width>166</width>
            <height>40</height>
           </rect>
@@ -647,10 +545,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Export Blockchain data for Cold Wallet</string>
+          <string>Export blockchain data for Cold Wallet</string>
          </property>
          <property name="statusTip">
-          <string>Export Blockchain data for Cold Wallet</string>
+          <string>Export blockchain data for Cold Wallet</string>
          </property>
          <property name="text">
           <string>Export Blockchain</string>
@@ -659,8 +557,8 @@
         <widget class="control::MwcPushButtonNormal" name="publishTransaction">
          <property name="geometry">
           <rect>
-           <x>580</x>
-           <y>2</y>
+           <x>506</x>
+           <y>0</y>
            <width>186</width>
            <height>40</height>
           </rect>
@@ -681,10 +579,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Publish Transaction from Cold Wallet</string>
+          <string>Publish transaction from Cold Wallet</string>
          </property>
          <property name="statusTip">
-          <string>Publish Transaction from Cold Wallet</string>
+          <string>Publish transaction from Cold Wallet</string>
          </property>
          <property name="text">
           <string>Publish Transaction</string>
@@ -693,8 +591,8 @@
         <widget class="control::MwcPushButtonNormal" name="resyncNodeData">
          <property name="geometry">
           <rect>
-           <x>220</x>
-           <y>2</y>
+           <x>98</x>
+           <y>0</y>
            <width>166</width>
            <height>40</height>
           </rect>
@@ -715,10 +613,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Resync Node data from the scratch. </string>
+          <string>Resync node data from scratch. </string>
          </property>
          <property name="statusTip">
-          <string>Resync Node data from the scratch. </string>
+          <string>Resync node data from scratch. </string>
          </property>
          <property name="text">
           <string>Resync Node</string>
@@ -729,7 +627,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>295</y>
+          <y>316</y>
           <width>766</width>
           <height>44</height>
          </rect>
@@ -740,44 +638,10 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="control::MwcPushButtonNormal" name="showLogsButton_9">
+        <widget class="control::MwcPushButtonNormal" name="loadBlockchainData">
          <property name="geometry">
           <rect>
-           <x>135</x>
-           <y>2</y>
-           <width>223</width>
-           <height>40</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="toolTip">
-          <string>View embedded MWC node Logs</string>
-         </property>
-         <property name="statusTip">
-          <string>View embedded MWC node Logs</string>
-         </property>
-         <property name="text">
-          <string>Status Details</string>
-         </property>
-        </widget>
-        <widget class="control::MwcPushButtonNormal" name="loadBlockchainData_2">
-         <property name="geometry">
-          <rect>
-           <x>405</x>
+           <x>278</x>
            <y>2</y>
            <width>223</width>
            <height>40</height>
@@ -891,7 +755,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget" native="true">
+        <widget class="control::MwcWidget" name="widget" native="true">
          <property name="minimumSize">
           <size>
            <width>1</width>
@@ -950,14 +814,25 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabel</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
@@ -973,15 +848,11 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>showLogsButton_5</tabstop>
-  <tabstop>showLogsButton</tabstop>
-  <tabstop>showLogsButton_9</tabstop>
   <tabstop>resyncNodeData</tabstop>
-  <tabstop>changeNodeButton</tabstop>
   <tabstop>saveBlockchianData</tabstop>
   <tabstop>refreshButton</tabstop>
   <tabstop>publishTransaction</tabstop>
-  <tabstop>loadBlockchainData_2</tabstop>
+  <tabstop>loadBlockchainData</tabstop>
  </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>

@@ -22,20 +22,21 @@
 #include "../util_desktop/widgetutils.h"
 #include "../control_desktop/messagebox.h"
 #include "../bridge/config_b.h"
+#include "../bridge/wallet_b.h"
 
 namespace dlg {
 
 SendConfirmationSlatePackDlg::SendConfirmationSlatePackDlg(QWidget *parent, QString title, QString _messageBody, double widthScale,
-                                         int _inputsNum, int ttl, const QString & _passwordHash)
+                                         int _inputsNum, int ttl)
     : MwcDialog(parent),
     ui(new Ui::SendConfirmationSlatePackDlg),
     ttl_blocks(-1),
-    passwordHash(_passwordHash),
     messageBody(_messageBody),
     inputsNum(_inputsNum)
 {
     ui->setupUi(this);
     config = new bridge::Config(this);
+    wallet = new bridge::Wallet(this);
 
     ui->title->setText(title);
     ui->TTLEdit->setText(QString::number(ttl));
@@ -76,8 +77,7 @@ void SendConfirmationSlatePackDlg::updateMessageText() {
 }
 
 void SendConfirmationSlatePackDlg::checkPasswordStatus() {
-    QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
-    bool ok = crypto::calcHSA256Hash(ui->passwordEdit->text()) == passwordHash;
+    bool ok = wallet->checkPassword(ui->passwordEdit->text());
     ui->confirmBtn->setEnabled(ok);
     if (ok)
         ui->confirmBtn->setFocus();
@@ -85,8 +85,6 @@ void SendConfirmationSlatePackDlg::checkPasswordStatus() {
 
 void SendConfirmationSlatePackDlg::on_confirmBtn_clicked()
 {
-    passwordHash = ui->passwordEdit->text();
-
     int ttl = ui->TTLEdit->text().toInt();
     if (ttl < 10) {
             control::MessageBox::messageText(this, "TTL value",
@@ -103,6 +101,13 @@ void SendConfirmationSlatePackDlg::on_confirmBtn_clicked()
     }
 
     config->updateSendCoinsParams(config->getInputConfirmationNumber(), outs);
+
+    bool ok = wallet->checkPassword(ui->passwordEdit->text());
+    if (!ok) {
+        control::MessageBox::messageText(this, "Invalid password",
+                                "Please specify correct password to confirm send request.");
+        return;
+    }
 
     accept();
 }

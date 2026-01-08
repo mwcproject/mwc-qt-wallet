@@ -150,7 +150,7 @@ void StatusWndMgr::displayPendingStatusMessages() {
     if (!checkEnabled())
         return;
 
-    if (mwc::isWalletLocked() || mainWindow->isMinimized() || !loginOk) {
+    if (mwc::isWalletLocked() || mainWindow->isMinimized()) {
         // display pending messages if the wallet is locked or minimized
         // or the wallet is no longer in the locked state but the login did not succeed
         displayNumberPendingMessages();
@@ -335,8 +335,7 @@ bool StatusWndMgr::event(QEvent* event) {
     return eventConsumed;
 }
 
-void StatusWndMgr::onLoginResult(bool ok) {
-    loginOk = ok;
+void StatusWndMgr::onLogin() {
     visibleMsgCount = 0;
 }
 

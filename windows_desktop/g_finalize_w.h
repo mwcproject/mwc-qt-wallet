@@ -46,8 +46,6 @@ private slots:
     void on_slatepackEdit_textChanged();
     void on_continueButton_clicked();
 
-    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
-
 private:
     Ui::FinalizeUpload *ui;
     bridge::Config * config = nullptr;
@@ -59,7 +57,6 @@ private:
     QString slateJson;
     QString sender;
     bool isSpValid = false;
-    QString spInProgress;
 };
 
 }

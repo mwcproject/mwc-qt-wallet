@@ -20,6 +20,7 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/x_events_b.h"
+#include "../util/Log.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 
@@ -30,12 +31,6 @@ Events::Events(StateContext * context):
 {
     QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
             this, &Events::onNewNotificationMessage, Qt::QueuedConnection );
-
-    QObject::connect(context->wallet, &wallet::Wallet::onTransactionById,
-                 this, &Events::onTransactionById, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onSlateReceivedFrom,
-                 this, &Events::onSlateReceivedFrom, Qt::QueuedConnection);
 }
 
 Events::~Events() {}
@@ -56,15 +51,20 @@ NextStateRespond Events::execute() {
 
 void Events::eventsWndIsDeleted()
 {
+    logger::logInfo(logger::STATE, "Call Events::eventsWndIsDeleted");
     messageWaterMark = QDateTime::currentMSecsSinceEpoch();
 }
 
 // Historical design. UI can call this method now, but not in the past
 QVector<notify::NotificationMessage> Events::getWalletNotificationMessages() {
+    logger::logInfo(logger::STATE, "Call Events::getWalletNotificationMessages");
     return notify::getNotificationMessages();
 }
 
 void Events::onNewNotificationMessage(bridge::MESSAGE_LEVEL  level, QString message) {
+    Q_UNUSED(message)
+    logger::logInfo(logger::STATE, "Call Events::onNewNotificationMessage with level=" + QString::number(int(level)) + " message=" + message);
+
     for (auto b : bridge::getBridgeManager()->getEvents())
         b->updateShowMessages();
 
@@ -75,81 +75,11 @@ void Events::onNewNotificationMessage(bridge::MESSAGE_LEVEL  level, QString mess
         }
     }
 
-    // Tracking events when transactions was confirmed for the first time
-    if (message.contains("Changing transaction")) {
-        // Message:  Changing transaction c5d7fa2c-6463-4cbb-b42c-c22c195e3ec8 state to confirmed
-        if (message.endsWith("state to confirmed")) {
-            // Extracting tx UUID: 8 hex digits - 4 hex digits - 4 hex digits - 4 hex digits - 12 hex digits
-            QRegularExpression uuidRe(R"(\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b)");
-
-            QRegularExpressionMatch match = uuidRe.match(message);
-            if (match.hasMatch()) {
-                // use lowcase for safety. Standard doesn't say the case.
-                QString uuid = match.captured(0).toLower();
-                // Checking is it was reported
-                if (!context->appContext->isShowCongratsForTx(uuid)) {
-                    // If it is known tx - we can show the congrats message now.
-                    if (recievedTxs.contains(uuid)) {
-                        ReceivedTxInfo txInfo = recievedTxs[uuid];
-                        recievedTxs.remove(uuid);
-                        context->appContext->setShowCongratsForTx(uuid);
-                        // Just in case it was a receive slatepack, let's clean it up. Otherwise delete will handle not exist data well.
-                        context->appContext->deleteReceiveSlatepack(uuid);
-                        core::getWndManager()->messageHtmlDlg("Congratulations!",
-                                              "You received <b>" + txInfo.mwc + "</b> MWC<br>" +
-                                              (txInfo.message.isEmpty() ? "" : "Description: " + txInfo.message + "<br>") +
-                                              "<br>From: " + txInfo.fromAddr +
-                                              "<br>Transaction: " + uuid);
-                    }
-                    else {
-                        // Need to request the transaction details to see the amounts...
-                        activeUUID.insert(uuid);
-                        for (const wallet::AccountInfo & account : context->wallet->getWalletBalance()) {
-                            context->wallet->getTransactionById(account.accountName, uuid);
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
-
-void Events::onSlateReceivedFrom(QString slate, QString mwc, QString fromAddr, QString message ) {
-    recievedTxs.insert(slate, ReceivedTxInfo(mwc, fromAddr, message) );
-    if (fromAddr == "http listener") {
-        // It is self transaction, http listener is not supported by QT wallet
-        // We don't want to show congrats message to that.
-        context->appContext->setShowCongratsForTx(slate);
-    }
-}
-
-void Events::onTransactionById( bool success, QString account, int64_t height, wallet::WalletTransaction transaction,
-                                QVector<wallet::WalletOutput> outputs, QVector<QString> messages ) {
-    if (!success)
-        return;
-
-    Q_UNUSED(account);
-    Q_UNUSED(messages);
-    Q_UNUSED(outputs);
-    Q_UNUSED(height);
-
-    QString uuid = transaction.txid.toLower();
-    if (activeUUID.contains(uuid)) {
-        activeUUID.remove(uuid);
-        context->appContext->setShowCongratsForTx(uuid);
-        if (transaction.transactionType == wallet::WalletTransaction::TRANSACTION_TYPE::RECEIVE) {
-            core::getWndManager()->messageHtmlDlg("Congratulations!",
-                                                  "You received <b>" + util::nano2one(transaction.credited) + "</b> MWC<br>" +
-                                                  // Message info is lost, can't show anything
-                                                  "<br>From: " + transaction.address +
-                                                  "<br>Transaction: " + uuid);
-        }
-    }
-}
-
 
 // Check if some error/warnings need to be shown
 bool Events::hasNonShownWarnings() const {
+    logger::logInfo(logger::STATE, "Call Events::hasNonShownWarnings");
     QVector<notify::NotificationMessage> msgs = notify::getNotificationMessages();
 
     for ( int i = msgs.size()-1; i>=0; i-- ) {

@@ -28,10 +28,8 @@ class FileTransaction;
 class Listening;
 class Send;
 class Transactions;
-class Hodl;
 class Accounts;
 class AccountTransfer;
-class Airdrop;
 class NodeInfo;
 class Events;
 class NewSeed;
@@ -39,6 +37,7 @@ class WalletConfig;
 class CoreWindow;
 class SelectMode;
 class ViewOutputs;
+class HeartBeat;
 
 // Because many instances of bridges might exist, we need some place to map them.
 // Please use getBridgeManager to access a singletone.
@@ -80,10 +79,6 @@ public:
     void removeTransactions( bridge::Transactions * b ) {transactions -= b;}
     const QSet<Transactions*> & getTransactions() const {return transactions;}
 
-    void addHodl( bridge::Hodl * b ) {hodl += b;}
-    void removeHodl( bridge::Hodl * b ) {hodl -= b;}
-    const QSet<Hodl*> & getHodl() const {return hodl;}
-
     void addAccounts( bridge::Accounts * b ) {accounts += b;}
     void removeAccounts( bridge::Accounts * b ) {accounts -= b;}
     const QSet<Accounts*> & getAccounts() const {return accounts;}
@@ -91,10 +86,6 @@ public:
     void addAccountTransfer( bridge::AccountTransfer * b ) {accountTransfer += b;}
     void removeAccountTransfer( bridge::AccountTransfer * b ) {accountTransfer -= b;}
     const QSet<AccountTransfer*> & getAccountTransfer() const {return accountTransfer;}
-
-    void addAirdrop( bridge::Airdrop * b ) {airdrop += b;}
-    void removeAirdrop( bridge::Airdrop * b ) {airdrop -= b;}
-    const QSet<Airdrop*> & getAirdrop() const {return airdrop;}
 
     void addNodeInfo( bridge::NodeInfo * b ) {nodeInfo += b;}
     void removeNodeInfo( bridge::NodeInfo * b ) {nodeInfo -= b;}
@@ -124,6 +115,9 @@ public:
     void removeViewAccounts( bridge::ViewOutputs * b ) { viewAccounts -= b;}
     const QSet<ViewOutputs*> & getViewAccounts() const {return viewAccounts;}
 
+    void addHeartBeat( bridge::HeartBeat * b ) { heartBeats += b;}
+    void removeHeartBeat( bridge::HeartBeat * b ) { heartBeats -= b;}
+    const QSet<HeartBeat*> & getHeartBeat() const {return heartBeats;}
 private:
     QSet<ProgressWnd*>      progressWnd;
     QSet<InputPassword*>    inputPassword;
@@ -134,17 +128,16 @@ private:
     QSet<Listening*>        listening;
     QSet<Send*>             send;
     QSet<Transactions*>     transactions;
-    QSet<Hodl*>             hodl;
     QSet<Accounts*>         accounts;
     QSet<AccountTransfer*>  accountTransfer;
-    QSet<Airdrop*>          airdrop;
     QSet<NodeInfo*>         nodeInfo;
     QSet<Events*>           events;
     QSet<NewSeed*>          newSeed;
     QSet<WalletConfig*>     walletConfig;
     QSet<CoreWindow*>       coreWindow;
     QSet<SelectMode*>       selectMode;
-    QSet<ViewOutputs*>     viewAccounts;
+    QSet<ViewOutputs*>      viewAccounts;
+    QSet<HeartBeat*>        heartBeats;
 };
 
 BridgeManager * getBridgeManager();

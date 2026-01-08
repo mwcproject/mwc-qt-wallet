@@ -71,6 +71,7 @@ void Events::updateShowMessages() {
 #endif
 
         control::RichItem * itm = control::createMarkedItem(QString::number(i*MSG_GROUP_SIZE), ui->eventsList, !(levelShort == "info" || levelShort == "dgb"), "" );
+        itm->setParent(ui->eventsList);
 
         itm->hbox().setContentsMargins(0, 0, 0, 0);
         itm->addWidget( control::createLabel(itm, false, true, timeLong + " / " + levelFull ) );

@@ -17,7 +17,7 @@
 namespace control {
 
 RichButton::RichButton(QWidget * parent, QString text, int cx, int cy, QString tooltip, int fontSize) :
-    QPushButton(parent)
+    MwcPushButton(parent)
 {
     // Lock the size...
     setMaximumSize( cx,cy );
@@ -27,7 +27,7 @@ RichButton::RichButton(QWidget * parent, QString text, int cx, int cy, QString t
 
     setToolTip(tooltip);
 
-    QString style = "QPushButton"
+    QString style = "control--MwcPushButton"
                     " {"
                     " color: white;"
                     " font-family: Open Sans;"
@@ -38,15 +38,15 @@ RichButton::RichButton(QWidget * parent, QString text, int cx, int cy, QString t
                     " font-size: "+QString::number(fontSize)+"px;"
                     " background: transparent;"
                     " }"
-                    " QPushButton:enabled:!focus::hover"
+                    " control--MwcPushButton:enabled:!focus::hover"
                     " {"
                     " background-color: rgba(255, 255, 255, 0.15);"
                     " }"
-                    "  QPushButton:focus {"
+                    "  control--MwcPushButton:focus {"
                     " background: #FFFFFF;"
                     " color: #6F00D6;"
                     " }"
-                    " QPushButton:pressed {"
+                    " control--MwcPushButton:pressed {"
                     " background: rgba(255, 255, 255, 0.3);"
                     "}";
 
@@ -71,5 +71,3 @@ void RichButton::onClicked(bool checked) {
 
 
 }
-
-

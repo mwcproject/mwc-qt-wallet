@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>EnterSeed</class>
- <widget class="QWidget" name="EnterSeed">
+ <widget class="control::MwcWidget" name="EnterSeed">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -64,7 +64,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="seedText">
+        <widget class="control::MwcTextEdit" name="seedText">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -72,10 +72,10 @@
           <bool>false</bool>
          </property>
          <property name="toolTip">
-          <string>Please type your wallet mnemonic phrase here. Use 'Add Bip39 Word' to validate the words.</string>
+          <string>Please type your wallet mnemonic phrase here. Use 'Add BIP39 Word' to validate the words.</string>
          </property>
          <property name="statusTip">
-          <string>Please type your wallet mnemonic phrase here. Use 'Add Bip39 Word' to validate the words.</string>
+          <string>Please type your wallet mnemonic phrase here. Use 'Add BIP39 Word' to validate the words.</string>
          </property>
          <property name="lineWidth">
           <number>0</number>
@@ -87,7 +87,7 @@
           <bool>false</bool>
          </property>
          <property name="placeholderText">
-          <string>Input mnemonic passphrase</string>
+          <string>Enter your mnemonic passphrase</string>
          </property>
         </widget>
        </item>
@@ -164,13 +164,13 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Add new Bip 39 word to your mnemonic passphrase</string>
+            <string>Add a new BIP39 word to your mnemonic passphrase</string>
            </property>
            <property name="statusTip">
-            <string>Add new Bip 39 word to your mnemonic passphrase</string>
+            <string>Add a new BIP39 word to your mnemonic passphrase</string>
            </property>
            <property name="text">
-            <string>Add Bip39 Word</string>
+            <string>Add BIP39 Word</string>
            </property>
           </widget>
          </item>
@@ -287,7 +287,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -347,6 +347,16 @@
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

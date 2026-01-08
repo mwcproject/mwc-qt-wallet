@@ -79,13 +79,7 @@ void FileTransactionReceive::on_processButton_clicked()
 
     ui->progress->show();
 
-    if (fileNameOrSlatepack.startsWith("BEGINSLATE")) {
-        receive->receiveSlatepack( fileNameOrSlatepack, description );
-    }
-    else
-    { // file
-        receive->receiveFile( fileNameOrSlatepack, description );
-    }
+    receive->receiveSlatepack( fileNameOrSlatepack, description );
 }
 
 void FileTransactionReceive::onSgnHideProgress() {

@@ -32,6 +32,8 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event) override;
 
     virtual void showEvent(QShowEvent* event) override;
+
+    const QString & getDlgStyle() const;
 private:
     QPoint cursor;
 };

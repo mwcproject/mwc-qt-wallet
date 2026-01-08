@@ -28,199 +28,57 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/u_nodeInfo_b.h"
 #include <QDir>
+#include "zz_heart_beat.h"
+#include "node/node_client.h"
+
+#include "util/message_mapper.h"
 
 namespace state {
-
-void NodeStatus::setData(bool _online,
-             const QString & _errMsg,
-             int _nodeHeight,
-             int _peerHeight,
-             int64_t _totalDifficulty,
-             int _connections) {
-    online = _online;
-    errMsg = _errMsg;
-    nodeHeight = _nodeHeight;
-    peerHeight = _peerHeight;
-    totalDifficulty = _totalDifficulty;
-    connections = _connections;
-}
 
 ////////////////////////////////////////////////////
 
 NodeInfo::NodeInfo(StateContext * _context) :
         State(_context, STATE::NODE_INFO )
 {
-    QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
-                     this, &NodeInfo::onNodeStatus, Qt::QueuedConnection);
-    QObject::connect(context->wallet, &wallet::Wallet::onLoginResult,
-                     this, &NodeInfo::onLoginResult, Qt::QueuedConnection);
-
-    QObject::connect(context->mwcNode, &node::MwcNode::onMwcStatusUpdate,
-                     this, &NodeInfo::onMwcStatusUpdate, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onSubmitFile,
-                     this, &NodeInfo::onSubmitFile, Qt::QueuedConnection);
-
-    // Checking/update node status every 20 seconds...
-    startTimer(3000); // Let's update node info every 60 seconds. By some reasons it is slow operation...
 }
 
 NodeInfo::~NodeInfo() {
 
 }
 
-QString NodeInfo::getMwcNodeStatus() {
-    return context->mwcNode->getMwcStatus();
-}
-
 NextStateRespond NodeInfo::execute() {
+    logger::logInfo(logger::STATE, "Call NodeInfo::execute");
     if ( context->appContext->getActiveWndState() != STATE::NODE_INFO )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if ( state::getStateMachine()->getCurrentStateId() != STATE::NODE_INFO ) {
         core::getWndManager()->pageNodeInfo();
-        for (auto b : bridge::getBridgeManager()->getNodeInfo())
-            b->setNodeStatus( lastLocalNodeStatus,  lastNodeStatus );
+
+        HeartBeat * hbState = (HeartBeat *) context->stateMachine->getState( STATE::HEART_BEAT );
+        hbState->updateNodeStatus();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-node::MwcNode * NodeInfo::getMwcNode() const {
+/*node::MwcNode * NodeInfo::getMwcNode() const {
     return context->mwcNode;
+}*/
+
+bool NodeInfo::isNodeHealthy() const {
+    logger::logInfo(logger::STATE, "Call NodeInfo::isNodeHealthy");
+    return context->nodeClient->isNodeHealthy();
 }
 
-// After login - let's check the node status
-void NodeInfo::onLoginResult(bool ok) {
-    if (ok) {
-        currentNodeConnection = getNodeConnection();
-        lastLocalNodeStatus = "Waiting";
-        requestNodeInfo();
-        justLogin = true;
-    }
-}
-
-
-void NodeInfo::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event)
-
-    timerCounter++;
-
-    // Don't request for init or lock states.
-    if ( context->stateMachine->getCurrentStateId() >= STATE::ACCOUNTS ) {
-        int div = 1;
-        if ( currentNodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD ) {
-            // timer is 3 seconds.
-            div = 20; // want to update once in a minute
-        }
-        else if (!lastNodeStatus.online) {
-            div = 5; // oflline node, doesn't make sense to update too often
-        }
-        else if (lastNodeStatus.connections==0) {
-            div = 5; // no peers, likely an issue,  doesn't make sense to update too often
-        }
-        else if (lastNodeStatus.nodeHeight < lastNodeStatus.peerHeight - 3) {
-            // must be in sync mode...
-            div = 1;
-        }
-        else {
-            // normal running mode, local node
-            div =3;
-        }
-
-        if (timerCounter%div == 0) {
-            requestNodeInfo();
-        }
-    }
-}
 
 void NodeInfo::requestWalletResync() {
+    logger::logInfo(logger::STATE, "Call NodeInfo::requestWalletResync");
     context->appContext->pushCookie("PrevState", (int)context->appContext->getActiveWndState() );
     context->stateMachine->setActionWindow( state::STATE::RESYNC );
 }
 
-void NodeInfo::requestNodeInfo() {
-    context->wallet->getNodeStatus();
-}
-
-wallet::MwcNodeConnection NodeInfo::getNodeConnection() const {
-    return context->appContext->getNodeConnection( context->wallet->getWalletConfig().getNetwork() );
-}
-
-void NodeInfo::updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect) {
-    auto walletConfig = context->wallet->getWalletConfig();
-    context->appContext->updateMwcNodeConnection( walletConfig.getNetwork(), nodeConnect );
-    context->wallet->setWalletConfig( walletConfig, false );
-    // config require to restart
-    currentNodeConnection = nodeConnect;
-    context->stateMachine->executeFrom( STATE::NONE );
-}
-
-void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-
-    if (!justLogin) {
-        // check if node state was changed. In this case let's emit a message
-        if (online != lastNodeStatus.online) {
-            if (online) {
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                        "Wallet restore connection to MWC Node");
-            }
-            else {
-                if ( ! notify::notificationStateCheck( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA) )
-                    notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::CRITICAL,
-                                                           "Wallet lost connection to MWC Node");
-            }
-        }
-        else if ( (connections==0) ^ (lastNodeStatus.connections==0) ) {
-                if (connections>0) {
-                    notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                               "MWC Node restored connection to MWC network");
-                }
-                else {
-                    notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::CRITICAL,
-                                                               "MWC Node lost connection to MWC network");
-                }
-        }
-        else if ( (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) ^ (lastNodeStatus.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < lastNodeStatus.peerHeight) ) {
-            if (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) {
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::CRITICAL,
-                                                           "MWC Node out of sync from mwc network");
-            }
-            else {
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                           "MWC Node finish syncing and runs well now");
-            }
-        }
-    }
-
-    lastNodeStatus.setData(online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections);
-
-    if (justLogin) {
-        justLogin = false;
-        // Let's consider 5 blocks (5 minutes) unsync be critical issue
-        if ( !online || nodeHeight < peerHeight - mwc::NODE_HEIGHT_DIFF_LIMIT || connections==0 ) {
-            if ( state::getStateMachine()->getCurrentStateId() != STATE::NODE_INFO) {
-                // Switching to this Node Info state. State switch will take care about the rest workflow
-                context->stateMachine->setActionWindow( state::STATE::NODE_INFO );
-                return;
-            }
-        }
-    }
-
-    for (auto b : bridge::getBridgeManager()->getNodeInfo())
-        b->setNodeStatus( lastLocalNodeStatus, lastNodeStatus );
-}
-
-
-
-void NodeInfo::onMwcStatusUpdate( QString status ) {
-    lastLocalNodeStatus = status;
-    logger::logInfo("NodeInfo", "embedded mwc-node status: " + status);
-    for (auto b : bridge::getBridgeManager()->getNodeInfo())
-        b->updateEmbeddedMwcNodeStatus(getMwcNodeStatus());
-}
-
 void NodeInfo::exportBlockchainData(QString fileName) {
+    logger::logInfo(logger::STATE, "Call NodeInfo::exportBlockchainData with fileName=" + fileName);
     // 1. stop the mwc node
     // 2. Export node data
     // 3. start mwc-node
@@ -229,24 +87,18 @@ void NodeInfo::exportBlockchainData(QString fileName) {
 
     notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
+    QString nodeNetwork = context->mwcNode->getCurrentNetwork();
+    QString nodePath = context->mwcNode->getNodeDataPath();
+
     context->mwcNode->stop();
 
-    QString network = context->mwcNode->getCurrentNetwork();
+    QCoreApplication::processEvents();
 
-    Q_ASSERT(currentNodeConnection.isLocalNode());
-    QPair<bool,QString> nodePath = node::getMwcNodePath( currentNodeConnection.localNodeDataPath, network);
-    if (!nodePath.first) {
-        core::getWndManager()->messageTextDlg("Error", nodePath.second);
-        return;
-    }
+    QPair<bool, QString> res = compress::compressFolder( nodePath, fileName, nodeNetwork );
 
     QCoreApplication::processEvents();
 
-    QPair<bool, QString> res = compress::compressFolder( nodePath.second + "chain_data/", fileName, network );
-
-    QCoreApplication::processEvents();
-
-    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network, context->appContext->useTorForNode());
+    context->mwcNode->start(nodePath, nodeNetwork); //, context->appContext->useTorForNode());
 
     QCoreApplication::processEvents();
 
@@ -266,6 +118,7 @@ void NodeInfo::exportBlockchainData(QString fileName) {
 }
 
 void NodeInfo::importBlockchainData(QString fileName) {
+    logger::logInfo(logger::STATE, "Call NodeInfo::importBlockchainData with fileName=" + fileName);
     // 1. stop the mwc node
     // 2. Import node data
     // 3. start mwc-node
@@ -274,23 +127,18 @@ void NodeInfo::importBlockchainData(QString fileName) {
 
     notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
+    QString nodeNetwork = context->mwcNode->getCurrentNetwork();
+    QString nodePath = context->mwcNode->getNodeDataPath();
+
     context->mwcNode->stop();
 
-    Q_ASSERT(currentNodeConnection.isLocalNode());
-    QString network = context->mwcNode->getCurrentNetwork();
-    QPair<bool,QString> nodePath = node::getMwcNodePath(currentNodeConnection.localNodeDataPath, network);
-    if (!nodePath.first) {
-        core::getWndManager()->messageTextDlg("Error", nodePath.second);
-        return;
-    }
+    QCoreApplication::processEvents();
+
+    QPair<bool, QString> res = compress::decompressFolder( fileName,  nodePath, nodeNetwork );
 
     QCoreApplication::processEvents();
 
-    QPair<bool, QString> res = compress::decompressFolder( fileName,  nodePath.second + "chain_data/", network );
-
-    QCoreApplication::processEvents();
-
-    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network, context->appContext->useTorForNode());
+    context->mwcNode->start(nodePath, nodeNetwork); //, context->appContext->useTorForNode());
 
     QCoreApplication::processEvents();
 
@@ -309,49 +157,38 @@ void NodeInfo::importBlockchainData(QString fileName) {
     }
 }
 
-void NodeInfo::publishTransaction(QString fileName) {
+void NodeInfo::publishTransaction(QString fileName, bool fluff) {
+    logger::logInfo(logger::STATE, "Call NodeInfo::publishTransaction with fileName=" + fileName + " fluff=" + (fluff ? "true" : "false"));
     //   dssfddf
-    context->wallet->submitFile(fileName);
-    // Respond at onSubmitFile
-}
+    QString error = context->wallet->submitFile(fileName, fluff);
 
-void NodeInfo::onSubmitFile(bool success, QString message, QString fileName) {
-    for (auto b : bridge::getBridgeManager()->getNodeInfo())
-        b->hideProgress();
-
-    if (success) {
+    if (error.isEmpty()) {
         core::getWndManager()->messageTextDlg("Transaction published", "You transaction at " + fileName +
-        " was successfully delivered to your local node. Please keep your node running for some time to deliver it to MWC blockchain.\n" + message);
+        " was successfully delivered to your local node. Please keep your node running for some time to deliver it to MWC blockchain.");
     }
     else {
-        if (message.contains("Post TX Error: Request error: Wrong response code: 500 Internal Server Error with data Body(Streaming)"))
-            message = "MWC Node unable to publish this transaction. Probably this transaction is already published or original output doesn't exist any more";
+        if (error.contains("Post TX Error: Request error: Wrong response code: 500 Internal Server Error with data Body(Streaming)"))
+            error = "MWC Node unable to publish this transaction. Probably this transaction is already published or original output doesn't exist any more";
 
         core::getWndManager()->messageTextDlg("Transaction failed", "Transaction from " + fileName +
-                  " was not delivered to your local node.\n\n" + message);
+                  " was not delivered to your local node.\n\n" + util::mapMessage(error));
     }
 }
 
 
 void NodeInfo::resetEmbeddedNodeData() {
+    logger::logInfo(logger::STATE, "Call NodeInfo::resetEmbeddedNodeData");
     notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
-    currentNodeConnection = getNodeConnection();
-
-    Q_ASSERT(currentNodeConnection.isLocalNode());
-    QString network = context->mwcNode->getCurrentNetwork();
-    QPair<bool,QString> nodePath = node::getMwcNodePath(currentNodeConnection.localNodeDataPath, network);
-    if (!nodePath.first) {
-        core::getWndManager()->messageTextDlg("Error", nodePath.second);
-        return;
-    }
+    QString nodeNetwork = context->mwcNode->getCurrentNetwork();
+    QString nodePath = context->mwcNode->getNodeDataPath();
 
     context->mwcNode->stop();
 
     QCoreApplication::processEvents();
 
     // Cleaning up the folder
-    QString nodeDataPath = nodePath.second + "chain_data/";
+    QString nodeDataPath = nodePath;
     QDir dir(nodeDataPath);
     if (!dir.removeRecursively()) {
         core::getWndManager()->messageTextDlg("Error", "Unable to clean up the node data at " + nodeDataPath);
@@ -359,7 +196,7 @@ void NodeInfo::resetEmbeddedNodeData() {
 
     QCoreApplication::processEvents();
 
-    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network, context->appContext->useTorForNode());
+    context->mwcNode->start( nodePath, nodeNetwork);
 
     notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 

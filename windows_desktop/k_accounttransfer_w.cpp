@@ -54,7 +54,7 @@ AccountTransfer::~AccountTransfer()
 
 
 void AccountTransfer::onSgnUpdateAccounts() {
-    QVector<QString> accountInfo = wallet->getWalletBalance(true, false, true);
+    QVector<QString> accountInfo = wallet->getWalletBalance(true, false, false, true);
 
     QString fromAcc = getSelectedAccount( ui->accountFromCB, false );
     QString toAcc   = getSelectedAccount( ui->accountToCB, false );
@@ -93,7 +93,7 @@ void AccountTransfer::onSgnShowTransferResults(bool ok, QString errMsg) {
         onSgnUpdateAccounts();
     }
     else {
-        control::MessageBox::messageText(this, "Transfer failure", "Funds transfer request has failed.\n" + errMsg);
+        control::MessageBox::messageText(this, "Transfer failure", "Funds transfer request has failed.\n\n" + errMsg);
     }
 }
 

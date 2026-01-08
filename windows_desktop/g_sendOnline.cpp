@@ -26,10 +26,11 @@
 namespace wnd {
 
 SendOnline::SendOnline(QWidget *parent,
-                       QString _account, int64_t _amount) :
+                       QString _account, QString _accountPath, int64_t _amount) :
     core::NavWnd(parent),
     ui(new Ui::SendOnline),
     account(_account),
+    accountPath(_accountPath),
     amount(_amount)
 {
     ui->setupUi(this);
@@ -142,7 +143,7 @@ void SendOnline::on_sendButton_clicked()
 
     ui->progress->show();
     ui->sendButton->setEnabled(false);
-    if (!send->sendMwcOnline( account, QString::number(amount), sendTo, "", description)) {
+    if (!send->sendMwcOnline( account, accountPath, QString::number(amount), sendTo, description)) {
         ui->progress->hide();
         ui->sendButton->setEnabled(true);
     }

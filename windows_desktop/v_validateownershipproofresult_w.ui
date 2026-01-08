@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ValidateOwnershipProofResult</class>
- <widget class="QWidget" name="ValidateOwnershipProofResult">
+ <widget class="control::MwcWidget" name="ValidateOwnershipProofResult">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>779</width>
-    <height>662</height>
+    <width>831</width>
+    <height>669</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,6 +29,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <property name="topMargin">
       <number>40</number>
      </property>
@@ -215,10 +218,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Viewing key - share it to let others see this account's balance</string>
+         <string>Viewing key - share it to let others see this account's balance.</string>
         </property>
         <property name="statusTip">
-         <string>Viewing key - share it to let others see this account's balance</string>
+         <string>Viewing key - share it to let others see this account's balance.</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -271,10 +274,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Tor address</string>
+         <string>Slatepack/Tor address</string>
         </property>
         <property name="statusTip">
-         <string>Tor address</string>
+         <string>Slatepack/Tor address</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -327,10 +330,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>MWC MQS address</string>
+         <string>MWCMQS address</string>
         </property>
         <property name="statusTip">
-         <string>MWC MQS address</string>
+         <string>MWCMQS address</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -342,7 +345,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QTextEdit" name="message">
+       <widget class="control::MwcTextEdit" name="message">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -418,14 +421,25 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEdit.h</header>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

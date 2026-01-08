@@ -23,6 +23,10 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/k_accounttransfer_b.h"
 #include "g_Send.h"
+#include "node/node_client.h"
+#include "util/message_mapper.h"
+#include "../util/Log.h"
+#include "core/Notification.h"
 
 namespace state {
 
@@ -32,8 +36,6 @@ AccountTransfer::AccountTransfer( StateContext * context) :
     // using static connection. Lock flag transferInProgress will be used to switch the processing
 
     connect( context->wallet, &wallet::Wallet::onSend, this, &AccountTransfer::onSend, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &AccountTransfer::onWalletBalanceUpdated, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onNodeStatus, this, &AccountTransfer::onNodeStatus, Qt::QueuedConnection);
 }
 
 AccountTransfer::~AccountTransfer() {
@@ -56,8 +58,9 @@ NextStateRespond AccountTransfer::execute() {
 bool AccountTransfer::transferFunds(const QString & from,
                    const QString & to,
                    const QString & sendAmount ) {
+    logger::logInfo(logger::STATE, "Call AccountTransfer::transferFunds with from=" + from + " to=" + to + " sendAmount=" + sendAmount);
 
-    if ( !nodeIsHealthy ) {
+    if ( !context->nodeClient->isNodeHealthy() ) {
         core::getWndManager()->messageTextDlg("Unable to transfer", "Your MWC Node, that wallet is connected to, is not ready.\n"
                                                                  "MWC Node needs to be connected to a few peers and finish block synchronization process");
         return false;
@@ -78,7 +81,8 @@ bool AccountTransfer::transferFunds(const QString & from,
     int64_t nanoCoins = mwcAmount.second;
 
     wallet::AccountInfo accFrom;
-    QVector<wallet::AccountInfo> walletAccounts = context->wallet->getWalletBalance();
+    // For self send, let's allow to send all coins, no confirmations
+    QVector<wallet::AccountInfo> walletAccounts = context->wallet->getWalletBalance(0, true, context->appContext->getLockedOutputs() );
     for (auto & a : walletAccounts) {
         if (a.accountName == from)
             accFrom = a;
@@ -111,20 +115,19 @@ bool AccountTransfer::transferFunds(const QString & from,
     QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
     uint64_t txnFee = 0; // not used here yet
     // nanoCoins < 0  - All
-    util::getOutputsToSend( accFrom.accountName, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
+    util::getOutputsToSend2( accFrom.accountPath, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
 
     // Need to show confirmation dialog similar to what send has. Point to show the fees
     if (txnFee == 0 && outputs.size() == 0) {
-        txnFee = util::getTxnFee( accFrom.accountName, nanoCoins, context->wallet,
+        txnFee = util::getTxnFee2( accFrom.accountPath, nanoCoins, context->wallet,
                                   context->appContext, sendParams.changeOutputs, outputs );
     }
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
-    QString hash = context->wallet->getPasswordHash();
     if ( !core::getWndManager()->sendConfirmationDlg("Confirm Transfer Request",
                                                     "You are transferring " + (nanoCoins < 0 ? "all" : util::nano2one(nanoCoins)) +
                                                     " MWC\nfrom account '" + from + "' to account '" + to + "'",
-                                                    1.0, outputs.size(), hash ) ) {
+                                                    1.0, outputs.size() ) ) {
         return false;
     }
 
@@ -132,9 +135,9 @@ bool AccountTransfer::transferFunds(const QString & from,
 
     if (prms.changeOutputs != sendParams.changeOutputs) {
         // Recalculating the outputs and fees. There is a chance that outputs will be different.
-        util::getOutputsToSend( accFrom.accountName, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
+        util::getOutputsToSend2( accFrom.accountPath, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
         if (outputs.size() == 0) {
-            util::getTxnFee( accFrom.accountName, nanoCoins, context->wallet,
+            util::getTxnFee2( accFrom.accountPath, nanoCoins, context->wallet,
                                   context->appContext, sendParams.changeOutputs, outputs );
         }
     }
@@ -147,63 +150,71 @@ bool AccountTransfer::transferFunds(const QString & from,
     // 7. Restore back current account
     // 5. Refresh accounts balance
 
-    trAccountFrom = from;
-    trAccountTo = to;
-    trNanoCoins = nanoCoins;
-    outputs2use = outputs;
-
     transferState=1;
 
     bool fluff = context->appContext->isFluffSet();
-    context->wallet->selfSend( trAccountFrom, trAccountTo, trNanoCoins, prms.changeOutputs, outputs2use, fluff );
+    bool sent = context->wallet->sendTo(accFrom.accountPath,
+            "self_send",
+            nanoCoins, //  -1  - mean All
+            false,
+            "", // can be empty, means None
+            1,
+            "smallest", //  Values: all, smallest. Default: Smallest
+            "self",  // Values:  http, file, slatepack, self, mwcmqs
+            to, // Values depends on 'method' Send the transaction to the provided server (start with http://), destination for encrypting/proofs. For method self, dest can point to account name to move
+            false,
+            prms.changeOutputs,
+            fluff,
+            -1, // pass -1 to skip
+            false,
+            outputs, // Outputs to use. If None, all outputs can be used
+            false,
+            0);
 
-    return true;
+    if (!sent) {
+        core::getWndManager()->messageTextDlg("Error",
+            "Another Send operation is still in the progress. Please wait until it finished and retry after.");
+    }
+    return sent;
 }
 
 void AccountTransfer::goBack() {
+    logger::logInfo(logger::STATE, "Call AccountTransfer::goBack");
     context->stateMachine->setActionWindow( STATE::ACCOUNTS );
 }
 
-void AccountTransfer::onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc ) {
-    Q_UNUSED(txid);
-    Q_UNUSED(slate);
-    Q_UNUSED(address);
-    Q_UNUSED(mwc);
+void AccountTransfer::onSend(  bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag ) {
+    Q_UNUSED(amount);
+    Q_UNUSED(method);
+    Q_UNUSED(dest);
 
-    if (transferState!=1)
+    logger::logInfo(logger::STATE, "Call AccountTransfer::onSend with success=" + QString(success ? "true" : "false") +
+            " error=" + error + " tx_uuid=" + tx_uuid + " tag=" + tag);
+    Q_UNUSED(tx_uuid)
+
+    if (tag != "self_send")
         return;
 
-    context->wallet->updateWalletBalance(true, true);
-
-    if  (!success) {
-        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
-            b->showTransferResults(false, "Failed to transfer the funds. " + util::formatErrorMessages(errors) );
-        transferState = -1;
-        return;
-    }
-}
-
-void AccountTransfer::onWalletBalanceUpdated() {
-    if (transferState!=1) {
-        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
-            b->updateAccounts();
-        return;
-    }
-
-    for (auto b : bridge::getBridgeManager()->getAccountTransfer())
-        b->showTransferResults(true, "" );
-
-    // Done, finally
+    Q_ASSERT(transferState==1);
     transferState = -1;
 
+    if  (!success) {
+        for (auto b : bridge::getBridgeManager()->getAccountTransfer()) {
+            b->showTransferResults(false, util::mapMessage(error) );
+        }
+        return;
+    }
+
+    for (auto b : bridge::getBridgeManager()->getAccountTransfer()) {
+        b->updateAccounts();
+        b->showTransferResults(true, "" );
+    }
+
+    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "You successfully transfered " + util::nano2one(amount) + " MWC to " + dest + ". Transaction: " + tx_uuid );
+
     context->stateMachine->setActionWindow( STATE::ACCOUNTS );
 }
 
-void AccountTransfer::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-    Q_UNUSED(errMsg)
-    nodeIsHealthy = online &&
-                    ((config::isColdWallet() || connections > 0) && totalDifficulty > 0 && nodeHeight > peerHeight - 5);
-}
 
 
 }

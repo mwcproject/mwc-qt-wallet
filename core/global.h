@@ -25,13 +25,7 @@ namespace mwc {
 
 QString get_APP_NAME();
 
-// We not checking mwc713 versions because so far there is no benefits from that.
-// MWC version that we are expecting to ship
-//const QString MWC_713_VERSION("2.1.0");
-
-const QString PROMPTS_MWC713 = "<<+)mwc713(+>>";
-
-const QString DATETIME_TEMPLATE_MWC713 = "yyyy-MM-dd hh:mm:ss";
+//const QString DATETIME_TEMPLATE_MWC713 = "yyyy-MM-dd hh:mm:ss";
 const QString DATETIME_TEMPLATE_THIS = "hh:mm:ss dd-MM-yyyy";
 
 const QString DEL_ACCONT_PREFIX = "del_";
@@ -42,27 +36,11 @@ const QVector<QString> BANNED_ACCOUT_PREFIXES = {DEL_ACCONT_PREFIX};
 
 const QString QT_WALLET_DEFAULT_CONFIG  = ":/resource_desktop/mwc-gui-wallet.conf";
 
-const QString MWC713_DEFAULT_CONFIG     = ":/resource_desktop/wallet713_def.toml";
-
-const QString MWC_NODE_CONFIG_IP_MAIN      = ":/resource_desktop/mwc-server-main-ip.toml";
-const QString MWC_NODE_CONFIG_IP_FLOO      = ":/resource_desktop/mwc-server-floo-ip.toml";
-const QString MWC_NODE_CONFIG_TOR_MAIN      = ":/resource_desktop/mwc-server-main-tor.toml";
-const QString MWC_NODE_CONFIG_TOR_FLOO      = ":/resource_desktop/mwc-server-floo-tor.toml";
 #endif
 
 #ifdef WALLET_MOBILE
 const QString QT_WALLET_DEFAULT_CONFIG  = ":/resource_mobile/mwc-gui-wallet.conf";
-const QString MWC713_DEFAULT_CONFIG     = ":/resource_mobile/wallet713.toml";
-const QString MWC_NODE_CONFIG_MAIN      = ":/resource_mobile/mwc-server-main.toml";
-const QString MWC_NODE_CONFIG_FLOO      = ":/resource_mobile/mwc-server-floo.toml";
-
-const QString MWC_NODE_CONFIG_IP_MAIN      = ":/resource_mobile/mwc-server-main-ip.toml";
-const QString MWC_NODE_CONFIG_IP_FLOO      = ":/resource_mobile/mwc-server-floo-ip.toml";
-const QString MWC_NODE_CONFIG_TOR_MAIN      = ":/resource_mobile/mwc-server-main-tor.toml";
-const QString MWC_NODE_CONFIG_TOR_FLOO      = ":/resource_mobile/mwc-server-floo-tor.toml";
 #endif
-
-const int64_t AIRDROP_TRANS_KEEP_TIME_MS = 1000L*3600L*24L*15; // 15 days should be enough
 
 // Limit for the node height to consider it out of sync. 1 blocks is 1 minute.
 const int NODE_HEIGHT_DIFF_LIMIT = 5;

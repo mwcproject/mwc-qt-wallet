@@ -16,8 +16,6 @@
 #define GUI_WALLET_LOG_H
 
 #include <QObject>
-#include "../wallet/mwc713events.h"
-#include "../tries/NodeOutputParser.h"
 
 class QFile;
 
@@ -29,6 +27,20 @@ namespace wallet {
 // for wallet interraction.
 // For generic logs we are using qDebug
 namespace logger {
+
+    enum Who {
+        LIB_LOGS,
+        MWC_WALLET,
+        NODE_CLIENT,
+        MWC_NODE,
+        HTTP_CLIENT,
+        QT_WALLET,
+        NOTIFICATION,
+        STATE,
+        BRIDGE,
+    };
+
+    QString who2str(Who who);
 
     class LogSender : public QObject {
         Q_OBJECT
@@ -66,20 +78,23 @@ namespace logger {
     void initLogger(bool logsEnabled);
 
     // mwc713 IOs
-    void blockLogMwc713out(bool blockOutput);
-    void logMwc713out(QString str); //
-    void logMwc713in(QString str); //
-    void logMwcNodeOut(QString str); //
+    //void blockLogMwc713out(bool blockOutput);
+    //void logMwc713out(QString str); //
+    //void logMwc713in(QString str); //
+    //void logMwcNodeOut(QString str); //
 
-    void logParsingEvent(wallet::WALLET_EVENTS event, QString message );
-    void logNodeEvent( tries::NODE_OUTPUT_EVENT event, QString message );
+//    void logParsingEvent(wallet::WALLET_EVENTS event, QString message );
+//    void logNodeEvent( const QString & api, const QString & event, const QString & data );
 
     // Tasks to excecute on mwc713
-    void logTask( QString who, wallet::Mwc713Task * task, QString comment );
+//    void logTask( QString who, wallet::Mwc713Task * task, QString comment );
 
     // Events activity
-    void logEmit(QString who, QString event, QString params);
-    void logInfo(QString who, QString message);
+    void logEmit(Who who, QString event, QString params);
+
+    void logInfo(Who who, QString message);
+    void logDebug(Who who, QString message);
+    void logError(Who who, QString message);
 
     // enable/disable logs
     void enableLogs( bool enableLogs );

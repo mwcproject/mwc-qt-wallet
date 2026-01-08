@@ -16,6 +16,7 @@
 #define INPUTPASSWORDW_H
 
 #include "../core_desktop/PanelBaseWnd.h"
+#include <QJsonObject>
 
 namespace Ui {
 class InputPassword;
@@ -27,6 +28,7 @@ class WalletConfig;
 class InputPassword;
 class Wallet;
 class StartWallet;
+class HeartBeat;
 }
 
 namespace wnd {
@@ -39,10 +41,9 @@ public:
     ~InputPassword();
 
 private slots:
-    void onSgnLoginResult(bool ok);
     void onSgnUpdateListenerStatus(bool mwcOnline, bool tor);
-    void onSgnUpdateSyncProgress(double progressPercent);
-    void onSgnStartingCommand(QString actionName);
+    void onSgnScanProgress(QString responseId, QJsonObject statusMessage);
+    void onSgnScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
 
     void on_submitButton_clicked();
     void on_restoreInstanceButton_clicked();
@@ -62,6 +63,7 @@ private:
     bridge::InputPassword * inputPassword = nullptr;
     bridge::StartWallet * startWallet = nullptr;
     bridge::Wallet * wallet = nullptr;
+    bridge::HeartBeat * heartBeat = nullptr;
 };
 
 }

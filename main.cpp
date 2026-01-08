@@ -25,8 +25,6 @@
 #endif
 
 #include <QApplication>
-#include "wallet/mwc713.h"
-#include "wallet/MockWallet.h"
 #include "state/state.h"
 #include "state/statemachine.h"
 #include "core/appcontext.h"
@@ -40,7 +38,6 @@
 #include "util/ioutils.h"
 #include "util/Log.h"
 #include "core/Config.h"
-#include "core/HodlStatus.h"
 #include "util/ConfigReader.h"
 #include "util/Files.h"
 #include <QFileDevice>
@@ -91,6 +88,9 @@
 #include "bridge/wnd/k_accounttransfer_b.h"
 #include "bridge/wnd/u_nodeInfo_b.h"
 #include "core/MessageMapper.h"
+#include "node/TorProcess.h"
+#include "node/NodeWalletLogs.h"
+
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -111,16 +111,9 @@ bool deployWalletFilesFromResources() {
         return false;
     }
 
-    QString mwc713conf = confPath.second + "/wallet713v3.toml";
     QString mwcGuiWalletConf = confPath.second + "/mwc-gui-wallet-v3.conf";
 
     bool ok = true;
-
-    if ( !QFile::exists(mwc713conf)) {
-        ok = ok && util::copyWithWinEol(mwc::MWC713_DEFAULT_CONFIG, mwc713conf);
-        if (ok)
-            QFile::setPermissions(mwc713conf, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
-    }
 
     if ( !QFile::exists(mwcGuiWalletConf)) {
         ok = ok && QFile::copy(mwc::QT_WALLET_DEFAULT_CONFIG, mwcGuiWalletConf);
@@ -129,7 +122,6 @@ bool deployWalletFilesFromResources() {
     }
 
     // Set default values
-    config::setMwc713conf(mwc713conf);
     config::setMwcGuiWalletConf(mwcGuiWalletConf);
 
     return ok;
@@ -139,30 +131,11 @@ bool deployWalletFilesFromResources() {
 // first - success flag
 // second - error message
 QPair<bool, QString> readConfig(QApplication & app) {
+    Q_UNUSED(app);
     QCoreApplication::setApplicationName("mwc-qt-wallet");
     QCoreApplication::setApplicationVersion("v0.1");
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("GUI wallet for MWC (MimbleWimbleCoin) https://www.mwc.mw/");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    parser.addOptions({
-                              {{"c", "config"},
-                                      "Path to the mwc-gui-wallet config ",
-                                      "mwc713 path",
-                                      ""},
-                      });
-
-    parser.process(app);
-
-    QString config = parser.value("config");
-    if (config.isEmpty()) {
-        config = config::getMwcGuiWalletConf();
-    }
-    else {
-        config::setMwcGuiWalletConf(config);
-    }
+    QString config = config::getMwcGuiWalletConf();
 
     util::ConfigReader reader;
     if ( !reader.readConfig(config) ) {
@@ -170,11 +143,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
         return QPair<bool, QString>(false, "Unable to parse config file " + config);
     }
 
-    QString mwc_path = reader.getString("mwc_path");
-    QString wallet713_path = reader.getString("wallet713_path");
-    QString mwczip_path = reader.getString("mwczip_path");
-    QString tor_path = reader.getString("tor_path");
-
+    //QString mwc_path = reader.getString("mwc_path");
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
     QString sendTimeoutMsStr = reader.getString("send_online_timeout_ms");
@@ -201,63 +170,8 @@ QPair<bool, QString> readConfig(QApplication & app) {
     if ( timeoutMultiplierVal < 0.01 )
         timeoutMultiplierVal = 1.0;
 
-    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() ) {
-        qDebug() << "Failed to read all expected data from config file " << config;
-        return QPair<bool, QString>(false, "Not found all expected fields at config file " + config);
-    }
-
-#ifdef WALLET_DESKTOP
-    if (wallet713_path == "build in") {
-        wallet713_path = QCoreApplication::applicationDirPath() + "/" + "mwc713";
-#ifdef Q_OS_WIN
-        wallet713_path += ".exe";
-#endif
-    }
-
-    if (mwc_path == "build in") {
-        mwc_path = QCoreApplication::applicationDirPath() + "/" + "mwc";
-#ifdef Q_OS_WIN
-        mwc_path += ".exe";
-#endif
-    }
-
-    if (mwczip_path == "build in") {
-        mwczip_path = QCoreApplication::applicationDirPath() + "/" + "mwczip";
-#ifdef Q_OS_WIN
-        mwczip_path += ".exe";
-#endif
-    }
-
-    if (tor_path == "build in") {
-        tor_path = QCoreApplication::applicationDirPath() + "/" + "tor";
-#ifdef Q_OS_WIN
-        tor_path += ".exe";
-#endif
-    }
-#endif
-
-#ifdef WALLET_MOBILE
-    // At Binary our binary are part of the data.
-    if (wallet713_path == "build in") {
-        wallet713_path = QCoreApplication::applicationDirPath() + "/libmwc713.so";
-    }
-
-    if (mwc_path == "build in") {
-        mwc_path = QCoreApplication::applicationDirPath() + "/libmwc.so";
-    }
-
-    if (mwczip_path == "build in") {
-        mwczip_path = QCoreApplication::applicationDirPath() + "/libmwczip.so";
-    }
-
-    if (tor_path == "build in") {
-        tor_path = QCoreApplication::applicationDirPath() + "/libtor.so";
-    }
-#endif
-
-
     Q_ASSERT(runMode.first);
-    config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, tor_path, logoutTimeout*1000L, timeoutMultiplierVal, sendTimeoutMs );
+    config::setConfigData( runMode.second, /*mwc_path,*/ logoutTimeout*1000L, timeoutMultiplierVal, sendTimeoutMs );
 
     return QPair<bool, QString>(true, "");
 }
@@ -380,7 +294,6 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
-
 #ifdef WALLET_DESKTOP
         // Update scale if screen resolution is low...
         // Unfortunatelly we can't do that before QApplication inited because Screen res API doesn't work
@@ -442,7 +355,13 @@ int main(int argc, char *argv[])
         // Logger must be start AFTER readConfig because logger require mwczip location and it is defined at the configs
         logger::initLogger(appContext.isLogsEnabled());
 
-        logger::logInfo("mwc-qt-wallet", QString("Starting mwc-gui-wallet version ") + BUILD_VERSION + " with config:\n" + config::toString() );
+
+/*        if (true) {
+            test::testMwcNodeApi();
+            return 1;
+        }*/
+
+        logger::logInfo( logger::QT_WALLET, QString("Starting mwc-gui-wallet version ") + BUILD_VERSION + " with config:\n" + config::toString() );
         qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
 
 #ifdef WALLET_DESKTOP
@@ -476,37 +395,33 @@ int main(int argc, char *argv[])
             homePath.second = homePath.second.left(idx-1);
 
             if ( !util::validateMwc713Str(homePath.second, false).first ) {
-                core::getWndManager()->messageTextDlg("Setup Issue", "Your home directory\n" + homePath.second + "\ncontains Unicode symbols. Unfortunatelly mwc713 unable to handle that.\n\n"
-                                         "Please reinstall mwc-qt-wallet under different user name with basic ASCII (Latin1) symbols only.");
+                core::getWndManager()->messageTextDlg("Setup Issue", "Your home directory\n" + homePath.second + "\ncontains Unicode symbols. Unfortunately, the wallet cannot handle that.\n\n"
+                                         "Please reinstall MWC Qt Wallet under a different user name with basic ASCII (Latin1) symbols only.");
                 return 1;
             }
         }
 
-        // Checking for Build Architecture.
-        // NOTE!!! Checking is needed for mwc713, not for this app.
-        // We assuming that everything runs from normal install and architectures of mwc713 and mwc-qt-wallet
-        // are the same.
-        QString runningArc = util::getBuildArch();
-        wallet::WalletConfig walletConfig = wallet::MWC713::readWalletConfig();
-        QString walletDataPath = walletConfig.getDataPath();
-
         if (!util::acquireAppGlobalLock() )
         {
             // Seems like we are blocked on global semaphore. It is mean that second instance does exist
-            core::getWndManager()->messageTextDlg("Second mwc-qt-wallet instance is detected",
-                    "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
+            core::getWndManager()->messageTextDlg("Second MWC Qt Wallet instance detected",
+                    "Another instance of MWC Qt Wallet is already running. You can run only one instance of the wallet at a time.");
             return 1;
         }
 
+        // Let's start Tor core and init core logs
+        rust_logs::initRustLogs("Info");
+
+        QFuture<QString> torStarter = wallet::startEmbeddedTor();
+
         // Update Node
-        node::MwcNode * mwcNode = new node::MwcNode( config::getMwcPath(), &appContext );
+        node::MwcNode * mwcNode = new node::MwcNode( &appContext, &torStarter );
 
 #ifdef WALLET_DESKTOP
-        //wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
-        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext, mwcNode );
+        wallet::Wallet * wallet = new wallet::Wallet(&torStarter);
 #else
         // wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
-        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext, mwcNode );
+        wallet::MWC713 * wallet = new wallet::MWC713();
         QtAndroidService *qtAndroidService = new QtAndroidService(&app);
         qtAndroidService->sendToService("Start Service");
 #endif
@@ -543,6 +458,7 @@ int main(int argc, char *argv[])
         }
 
         core::WalletApp::startExiting();
+        node::shutdown_tor();
 
         // Now we have to stop other object nicely.
         // Note, the order is different from creation.
@@ -559,6 +475,8 @@ int main(int argc, char *argv[])
         }
 
         delete mwcNode; mwcNode = nullptr;
+
+        torStarter.waitForFinished();
 
         util::releaseAppGlobalLock();
 

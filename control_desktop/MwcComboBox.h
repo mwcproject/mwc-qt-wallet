@@ -27,6 +27,8 @@ public:
     //On Windows this is not needed as long as the combobox is editable
     //This is untested since I don't have Linux
     void showPopup();
+private:
+    bool popupSet = false;
 };
 
 }

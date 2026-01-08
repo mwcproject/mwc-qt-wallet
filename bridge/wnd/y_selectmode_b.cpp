@@ -15,6 +15,7 @@
 #include "y_selectmode_b.h"
 #include "../BridgeManager.h"
 #include "../../state/y_selectmode.h"
+#include "../../util/Log.h"
 
 
 namespace bridge {
@@ -29,6 +30,7 @@ SelectMode::~SelectMode() {
 
 //  get wallet running mode id. Values: config::WALLET_RUN_MODE
 Q_INVOKABLE int SelectMode::getWalletRunMode() {
+    logger::logInfo(logger::BRIDGE, "Call SelectMode::getWalletRunMode");
     return int( state::SelectMode::getWalletRunMode() );
 }
 
@@ -36,6 +38,7 @@ Q_INVOKABLE int SelectMode::getWalletRunMode() {
 // Change wallet running mode. This call will retart the wallet app.
 // walletRunMode :  config::WALLET_RUN_MODE
 void SelectMode::updateWalletRunMode( int walletRunMode ) {
+    logger::logInfo(logger::BRIDGE, "Call SelectMode::updateWalletRunMode with walletRunMode=" + QString::number(walletRunMode));
     state::SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE(walletRunMode) );
 }
 

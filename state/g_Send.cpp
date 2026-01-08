@@ -28,6 +28,9 @@
 #include <QFileInfo>
 #include <QCoreApplication>
 #include <QThread>
+
+#include "core/Notification.h"
+#include "util/message_mapper.h"
 #ifdef WALLET_MOBILE
 #include "../core_mobile/qtandroidservice.h"
 #endif
@@ -63,24 +66,6 @@ Send::Send(StateContext * context) :
 
     QObject::connect(context->wallet, &wallet::Wallet::onSend,
                      this, &Send::sendRespond, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onSendFile,
-                     this, &Send::respSendFile, Qt::QueuedConnection);
-    QObject::connect(context->wallet, &wallet::Wallet::onSendSlatepack,
-                     this, &Send::respSendSlatepack, Qt::QueuedConnection);
-
-    // Need to update mwc node status because send can fail if node is not healthy.
-    QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
-                     this, &Send::onNodeStatus, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onRequestRecieverWalletAddress,
-                     this, &Send::onRequestRecieverWalletAddress, Qt::QueuedConnection);
-
-#ifdef WALLET_MOBILE
-    androidDevice = new QtAndroidService(this);
-    QObject::connect(androidDevice, &QtAndroidService::sgnOnFileReady,
-                     this, &Send::sgnOnFileReady, Qt::QueuedConnection);
-#endif
 }
 
 Send::~Send() {}
@@ -110,7 +95,7 @@ bool Send::mobileBack() {
 void Send::switchToStartingWindow() {
     core::getWndManager()->pageSendStarting();
     atSendInitialPage = true;
-    context->wallet->updateWalletBalance(true,true); // request update, respond at onWalletBalanceUpdated
+    context->wallet->update_wallet_state();
 }
 
 // onlineOffline => Next step
@@ -119,12 +104,13 @@ void Send::switchToStartingWindow() {
 //   0 - ok
 //   1 - account error
 //   2 - amount error
-int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString account, QString sendAmount, bool gotoNextPage ) {
+int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString accountPath, QString sendAmount, bool gotoNextPage ) {
+    logger::logInfo(logger::STATE, "Call Send::initialSendSelection with sendSelectedMethod=" + QString::number(sendSelectedMethod) + " accountPath=" + accountPath + " sendAmount=" + sendAmount + " gotoNextPage=" + QString(gotoNextPage ? "true" : "false"));
 
-    QVector<wallet::AccountInfo> balance = context->wallet->getWalletBalance();
+    QVector<wallet::AccountInfo> balance = context->wallet->getWalletBalance( context->appContext->getSendCoinsParams().inputConfirmationNumber, true, context->appContext->getLockedOutputs() );
     wallet::AccountInfo selectedAccount;
     for (const auto & a : balance) {
-        if (a.accountName == account) {
+        if (a.accountPath == accountPath) {
             selectedAccount = a;
             break;
         }
@@ -155,7 +141,7 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
 
     // Check if we have extra for fee
     QStringList txnOutputList;
-    uint64_t fee = util::getTxnFee( selectedAccount.accountName, mwcAmount.second, context->wallet,
+    uint64_t fee = util::getTxnFee2( selectedAccount.accountPath, mwcAmount.second, context->wallet,
                        context->appContext, sendParams.changeOutputs,
                        txnOutputList);
     if (fee < mwc::BASE_TRANSACTION_FEE) {
@@ -163,7 +149,7 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
         return 2;
     }
 
-    tmpAccountName = selectedAccount.accountName;
+    tmpAccountPath = selectedAccount.accountPath;
     tmpAmount = mwcAmount.second;
 
     if (!gotoNextPage)
@@ -172,10 +158,10 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
     // Switching to some dependent windows.
     atSendInitialPage = false;
     if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::ONLINE_ID ) {
-        core::getWndManager()->pageSendOnline(selectedAccount.accountName, mwcAmount.second);
+        core::getWndManager()->pageSendOnline(selectedAccount.accountName, selectedAccount.accountPath, mwcAmount.second);
     }
     else if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::SLATEPACK_ID ) {
-        core::getWndManager()->pageSendSlatepack(selectedAccount.accountName, mwcAmount.second);
+        core::getWndManager()->pageSendSlatepack(selectedAccount.accountName, selectedAccount.accountPath, mwcAmount.second);
     }
     else {
         Q_ASSERT(false);
@@ -184,134 +170,154 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
     return 0;
 }
 
+QString Send::getAccountPathByName(const QString account, bool showErrMessage) {
+    QString accountPath;
+    QVector<wallet::Account> accounts = context->wallet->listAccounts();
+    for (const auto & a : accounts) {
+        if (a.label == account) {
+            accountPath = a.path;
+            break;
+        }
+    }
+
+    if (accountPath.isEmpty() && showErrMessage) {
+        core::getWndManager()->messageTextDlg("Incorrect account name",
+                                         "Internal error. Not found account to send from." );
+    }
+    return accountPath;
+}
+
+
 // Handle whole workflow to send offline
-bool Send::sendMwcOffline( QString account, int64_t amount, QString message, bool isLockLater, QString slatepackRecipientAddress) {
+bool Send::sendMwcOffline( const QString & account, const QString & accountPath, int64_t amount, const QString & message, bool isLockLater, const QString & slatepackRecipientAddress) {
+    logger::logInfo(logger::STATE, "Call Send::sendMwcOffline with account=" + accountPath + " amount=" + QString::number(amount) +
+            " message=" + (message.isEmpty() ? "<empty>" : "<hidden>") + " isLockLater=" + QString(isLockLater ? "true" : "false") + " slatepackRecipientAddress=" + (slatepackRecipientAddress.isEmpty() ? "<empty>" : "<hidden>"));
+
+
+    if (context->appContext->getGenerateProof() && slatepackRecipientAddress.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Recipient address",
+                                              "Transaction proof is enabled. Please specify the recipient's Slatepack address.");
+
+        return false;
+    }
 
     core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
     // !!!! NOTE.  For mobile HODL not a case, first case can be skipped, Directly can be called util->getTxnFee
     QStringList outputs;
     uint64_t txnFee = 0;
-    util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+    util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
                                   context->wallet, context->appContext,
                                   outputs, &txnFee);
     if (txnFee == 0 && outputs.size() == 0) {
-        txnFee = util::getTxnFee(account, amount, context->wallet,
+        txnFee = util::getTxnFee2(accountPath, amount, context->wallet,
                                  context->appContext, sendParams.changeOutputs, outputs);
     }
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
-    QString hash = context->wallet->getPasswordHash();
     int ttl_blocks = 1440;
     if ( core::getWndManager()->sendConfirmationSlatepackDlg("Confirm Send Request",
                             "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
                            " MWC from account: " + account, 1.0,
-                           outputs.size(), &ttl_blocks, hash))  {
+                           outputs.size(), &ttl_blocks))  {
 
         core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
 
         if (prms.changeOutputs != sendParams.changeOutputs) {
             // Recalculating the outputs and fees. There is a chance that outputs will be different.
-            util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+            util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
                               context->wallet, context->appContext,
                               outputs, &txnFee);
             if (outputs.size() == 0) {
-                util::getTxnFee(account, amount, context->wallet,
+                util::getTxnFee2(accountPath, amount, context->wallet,
                                          context->appContext, sendParams.changeOutputs, outputs);
             }
         }
 
-        // Check signal:  onSendSlatepack
-        context->wallet->sendSlatepack( account, amount, message,
-                                        prms.inputConfirmationNumber, prms.changeOutputs, outputs, ttl_blocks, context->appContext->getGenerateProof(),
-                                        slatepackRecipientAddress, // optional. Encrypt SP if it is defined.
-                                        isLockLater, "");
+        // Check signal: sendRespond
+        bool sent = context->wallet->sendTo( accountPath,
+                "sp_send",
+                amount, //  -1  - mean All
+                false,
+                message, // can be empty, means None
+                prms.inputConfirmationNumber,
+                "smallest", //  Values: all, smallest. Default: Smallest
+                "slatepack",  // Values:  http, file, slatepack, self, mwcmqs
+                slatepackRecipientAddress, // Values depends on 'method' Send the transaction to the provided server (start with http://), destination for encrypting/proofs. For method self, dest can point to account name to move
+                context->appContext->getGenerateProof(),
+                prms.changeOutputs,
+                false,
+                ttl_blocks, // pass -1 to skip
+                false,
+                outputs, // Outputs to use. If None, all outputs can be used
+                isLockLater,
+                0);
+
+        if (!sent) {
+            core::getWndManager()->messageTextDlg("Error",
+                        "Another Send operation is still in the progress. Please wait until it finished and retry after.");
+
+        }
+        return sent;
     }
     else {
         return false;
     }
-
-
     return true;
 }
 
-void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
-#ifdef WALLET_MOBILE
-    if (success) {
-        // requesting the file name for storage
-        scrFileName = fileName;
-        QString pickerInitialUri = context->appContext->getPathFor("fileGen");
-        QString dstFile = scrFileName.mid( scrFileName.lastIndexOf('/') );
-        androidDevice->createFile( pickerInitialUri, "*/*", dstFile, 301 );
-        return;
-    }
-#endif
+void Send::sendRespond( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag ) {
+    logger::logInfo(logger::STATE, "Call Send::sendRespond with success=" + QString(success ? "true" : "false") + " error=" + (error.isEmpty() ? "<empty>" : error) + " tx_uuid=" + tx_uuid + " tag=" + tag + " method=" + method);
 
-    implRespSendFile( success, errors, fileName );
-}
+    if (!success) {
+        QString errMsg;
+        if (!error.isEmpty()) {
+            errMsg = "Your send request has failed:\n\n" + util::mapMessage(error);
+        }
 
-void Send::implRespSendFile( bool success, QStringList errors, QString fileName ) {
-    QString message;
-    Q_UNUSED(fileName)
-    if (success) {
-#ifdef WALLET_MOBILE
-        message = "Transaction file was successfully generated";
-#else
-        message = "Transaction file was successfully generated at " + fileName;
-#endif
-    }
-    else
-        message = "Unable to generate transaction file.\n" + util::formatErrorMessages(errors);
-
-    if ( state::getStateMachine()->getCurrentStateId() == STATE::SEND ) {
         for (auto b : bridge::getBridgeManager()->getSend())
-            b->showSendResult(success, message);
-
-        if (success) {
-            switchToStartingWindow();
-        }
+            b->showSendResult(success, errMsg);
+       return;
     }
-}
 
+    if (tag=="sp_send") {
+        // It is a slatepack. We need to show it. SP data in stored in the wallet directory. Let's read it from there
+        QString spFilePath = context->wallet->getWalletDataPath() + "/slatepack/" + tx_uuid + ".send_init.slatepack";
+        QStringList sp_data = util::readTextFile( spFilePath );
+        QString slatepack = sp_data.size()<1 ? "" : sp_data[0];
 
-#ifdef WALLET_MOBILE
-void Send::sgnOnFileReady( int eventCode, QString fileUri ) {
-    qDebug() << "Receive::sgnOnFileReady get " << eventCode << " " <<  fileUri;
-    if (eventCode == 301 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
-        context->appContext->updatePathFor("fileGen", fileUri);
-        if (util::copyFileToUri(scrFileName, fileUri)) {
-            implRespSendFile( true, {}, fileUri);
+        if (slatepack.isEmpty()) {
+            core::getWndManager()->messageTextDlg("Invalid data",
+                                 "Unable to read the resulting slatepack data from " + spFilePath );
+            return;
         }
-        else {
-            core::getWndManager()->messageTextDlg("Access Error",
-                 "Unable to save result to " + fileUri);
-        }
-        scrFileName = "";
-    }
-}
-#endif
 
+        context->appContext->addSendSlatepack(tx_uuid, slatepack);
 
-void Send::respSendSlatepack( QString tagId, QString error, QString slatepack, QString txId ) {
-    Q_UNUSED(tagId)
-    if (!error.isEmpty()) {
-        // show error...
-        if ( state::getStateMachine()->getCurrentStateId() == STATE::SEND ) {
-            for (auto b : bridge::getBridgeManager()->getSend())
-                b->showSendResult(false, error);
-        }
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "You successfully generated slatepack " + tx_uuid + " with " + util::nano2one(amount) + " MWC" + (dest.isEmpty() ? "" : " to " + dest) );
+        // Let's show the slatepack and enable in place finalization
+        core::getWndManager()->pageShowSlatepack( slatepack, tx_uuid, STATE::SEND, ".tx", true );
         return;
     }
 
-    if (!txId.isEmpty() && !slatepack.isEmpty())
-        context->appContext->addSendSlatepack(txId, slatepack);
+    // It is a non slatepack case (send online)
+    if (tag == "online_send") {
+        if (success && state::getStateMachine()->getCurrentStateId() == STATE::SEND) {
+            switchToStartingWindow();
+            // Because of switch, need to show success window
 
-    // Let's show the slatepack and enable in place finalization
-    core::getWndManager()->pageShowSlatepack( slatepack, STATE::SEND, ".tx", true );
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "You successfully sent slate " + tx_uuid + " with " + util::nano2one(amount) + " MWC to " + dest );
+            core::getWndManager()->messageTextDlg("Success", "Your MWC was successfully sent to recipient");
+        }
+    }
+
+    // Alos we have self send, that will be skipped
 }
 
+bool Send::sendMwcOnline( const QString & account, const QString & accountPath, int64_t amount, QString address, const QString & message) {
+    logger::logInfo(logger::STATE, "Call Send::sendMwcOnline with accountPath=" + accountPath + " amount=" + QString::number(amount) +
+                " address=" + address + " message=" + (message.isEmpty() ? "<empty>" : "<hidden>"));
 
-bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QString apiSecret, QString message) {
     while(address.endsWith("/"))
         address = address.left(address.length()-1);
 
@@ -319,158 +325,125 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
     QPair< QString, util::ADDRESS_TYPE > addressRes = util::verifyAddress(address);
     if ( !addressRes.first.isEmpty() ) {
         core::getWndManager()->messageTextDlg("Incorrect Input",
-                                         "Please specify correct address to send your MWC.\n" + addressRes.first );
+                                         "Please specify a correct address to send your MWC.\n" + addressRes.first );
         return false;
     }
 
     const wallet::ListenerStatus listenerStatus = context->wallet->getListenerStatus();
 
-    bool genProof = context->appContext->getGenerateProof();
+    QString send_method;
 
     switch (addressRes.second) {
         case util::ADDRESS_TYPE::MWC_MQ: {
             if (!context->appContext->isFeatureMWCMQS()) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",
-                        "You are trying to connect to another wallet with MWCMQS, but MWCMQS is disabled for your wallet. Please activate MWCMQS feature at wallet configuration page." );
+                        "You are trying to connect to another wallet with MWCMQS, but MWCMQS is disabled for your wallet. Please activate the MWCMQS feature on the wallet configuration page." );
                 return false;
             }
-            if (!listenerStatus.mqs) {
+            if (!listenerStatus.isMqsHealthy()) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",
-                             "MQS listener is offline. Please check your network connection and firewall settings." );
+                             "MWCMQS listener is offline. Please check your network connection and firewall settings." );
                 return false;
             }
+            send_method = "mwcmqs";
             break;
         }
         case util::ADDRESS_TYPE::TOR: {
             if (!context->appContext->isFeatureTor()) {
                     core::getWndManager()->messageTextDlg("Listener is Offline",
-                                                          "You are trying to connect to another wallet with Tor, but Tor is disabled for your wallet. Please activate Tor feature at wallet configuration page." );
+                                                          "You are trying to connect to another wallet with Tor, but Tor is disabled for your wallet. Please activate the Tor feature on the wallet configuration page." );
                 return false;
             }
 
-            // Let's convert tor address to the standard notation that mwc713 understands
+            // Let's convert the Tor address to the standard notation that the wallet understands.
             QString tor_pk = util::extractPubKeyFromAddress(address);
             address = "http://" + tor_pk + ".onion";
 
-            /*  Not checking offline because there is a high chance that send will work
-             if (!listenerStatus.tor) {
+             if (!listenerStatus.isTorHealthy()) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",
-                                                      "Tor listener is not online even it was started. Please check your network connection and firewall settings.");
+                                                      "Tor listener is not healthy. Please check your network connection and firewall settings.");
                 return false;
-            }*/
+            }
+
+            // Note, legacy naming convention. http&tor are both HTTP. The protocol will be decided from destination address
+            send_method = "http";
             break;
         }
         default: // Http is fine.
+            send_method = "http";
             break;
     }
+
+    Q_ASSERT(!send_method.isEmpty());
 
     core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
     QStringList outputs;
     uint64_t txnFee = 0;
-    util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+    util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
                                   context->wallet, context->appContext,
                                   outputs, &txnFee );
     if (txnFee == 0 && outputs.size() == 0) {
-        txnFee = util::getTxnFee( account, amount, context->wallet,
+        txnFee = util::getTxnFee2( accountPath, amount, context->wallet,
                                   context->appContext, sendParams.changeOutputs, outputs );
     }
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
-    respProofAddress = "";
-    restProofError = "";
-
-    if (genProof && addressRes.second == util::ADDRESS_TYPE::HTTPS ) {
-        // Requesting proof address
-        context->wallet->requestRecieverWalletAddress(address, apiSecret);
-
-        // waiting for the respose in sync mode...
-        // It is not good, but other solutions are more wierd.
-        while(respProofAddress.isEmpty() && restProofError.isEmpty()) {
-            QCoreApplication::processEvents();
-            QThread::usleep(50);
-        }
-
-        if (!restProofError.isEmpty()) {
-            core::getWndManager()->messageTextDlg("Error", "Unable to get a wallet proof address for the " + address);
-            return false;
-        }
-        Q_ASSERT(!respProofAddress.isEmpty());
-    }
-
-    // Ask for confirmation
-    QString hash = context->wallet->getPasswordHash();
     if ( core::getWndManager()->sendConfirmationDlg("Confirm Send Request",
                                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " MWC from account: " + account +
-                                        "\n\nTo: " + address +
-                                        (respProofAddress.isEmpty() ? "" : "\n\nReceiver wallet proof address:\n" + respProofAddress),
+                                        "\n\nTo: " + address,
                                         1.0,
-                                        outputs.size(),
-                                        hash ) ) {
+                                        outputs.size()) ) {
 
         core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
 
         if (prms.changeOutputs != sendParams.changeOutputs) {
             // Recalculating the outputs and fees. There is a chance that outputs will be different.
-            util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+            util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
                               context->wallet, context->appContext,
                               outputs, &txnFee);
             if (outputs.size() == 0) {
-                util::getTxnFee(account, amount, context->wallet,
+                util::getTxnFee2(accountPath, amount, context->wallet,
                                          context->appContext, sendParams.changeOutputs, outputs);
             }
         }
 
-        context->wallet->sendTo( account, amount, util::fullFormalAddress( addressRes.second, address), apiSecret, message,
-                                 prms.inputConfirmationNumber, prms.changeOutputs,
-                                 outputs, context->appContext->isFluffSet(), -1 /* Not used for online sends */,
-                                 genProof, respProofAddress);
+        // Check signal: sendRespond
+        bool sent = context->wallet->sendTo( accountPath,
+                "online_send",
+                amount, //  -1  - mean All
+                false,
+                message, // can be empty, means None
+                prms.inputConfirmationNumber,
+                "smallest", //  Values: all, smallest. Default: Smallest
+                send_method,  // Values:  http, file, slatepack, self, mwcmqs
+                util::fullFormalAddress( addressRes.second, address), // Values depends on 'method' Send the transaction to the provided server (start with http://), destination for encrypting/proofs. For method self, dest can point to account name to move
+                context->appContext->getGenerateProof(),
+                prms.changeOutputs,
+                context->appContext->isFluffSet(),
+                -1, // pass -1 to skip
+                false,
+                outputs, // Outputs to use. If None, all outputs can be used
+                false, // For online doesn't make sense use late lock feature. Also it will require higher slate version
+                0);
 
-        return true;
+        if (!sent) {
+            core::getWndManager()->messageTextDlg("Error",
+                      "Another Send operation is still in the progress. Please wait until it finished and retry after.");
+
+        }
+
+        return sent;
     }
     return false;
 }
 
-// Response from requestRecieverWalletAddress(url)
-void Send::onRequestRecieverWalletAddress(QString url, QString proofAddress, QString error) {
-    Q_UNUSED(url)
-    respProofAddress = proofAddress;
-    restProofError = error;
+QString Send::getSpendAllAmount(QString accountPath) {
+    logger::logInfo(logger::STATE, "Call Send::getSpendAllAmount with accountPath=" + accountPath);
+    return util::getAllSpendableAmount2(accountPath, context->wallet, context->appContext);
 }
 
 
-QString Send::getSpendAllAmount(QString account) {
-    return util::getAllSpendableAmount(account, context->wallet, context->appContext);
-}
-
-
-void Send::sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
-    Q_UNUSED(address)
-    Q_UNUSED(txid)
-    Q_UNUSED(slate)
-
-    QString errMsg;
-
-    if (!success) {
-        errMsg = util::formatErrorMessages(errors);
-        if (errMsg.isEmpty())
-            errMsg = "Your send request has failed by some reasons";
-        else
-            errMsg = "Your send request has failed:\n\n" + errMsg;
-    }
-
-    for (auto b : bridge::getBridgeManager()->getSend())
-        b->showSendResult(success, errMsg);
-
-    if (success && state::getStateMachine()->getCurrentStateId() == STATE::SEND)
-        switchToStartingWindow();
-}
-
-void Send::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-    Q_UNUSED(errMsg)
-    nodeIsHealthy = online &&
-                    ((config::isColdWallet() || connections > 0) && totalDifficulty > 0 && nodeHeight > peerHeight - 5);
-}
 
 QString Send::getHelpDocName() {
     bool isSp = context->appContext->isFeatureSlatepack();

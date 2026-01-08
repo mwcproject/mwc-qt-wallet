@@ -1,7 +1,7 @@
 #ifndef PANELTITLE_H
 #define PANELTITLE_H
 
-#include <QWidget>
+#include "../control_desktop/MwcWidget.h"
 
 namespace Ui {
 class PanelTitle;
@@ -9,7 +9,7 @@ class PanelTitle;
 
 namespace core {
 
-class PanelTitle : public QWidget {
+class PanelTitle : public control::MwcWidget {
 Q_OBJECT
 
 public:

@@ -23,6 +23,7 @@ class FinalizeConfirmationDlg;
 
 namespace bridge {
 class Config;
+class Wallet;
 }
 
 namespace dlg {
@@ -38,8 +39,7 @@ class FinalizeConfirmationDlg: public control::MwcDialog
     Q_OBJECT
 public:
     // widthScale - Horizontal scale for the dialog. Sometimes we need it wider.
-    explicit FinalizeConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale,
-                QString passwordHash );
+    explicit FinalizeConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale);
     ~FinalizeConfirmationDlg();
 
 private slots:
@@ -52,8 +52,7 @@ private:
 private:
     Ui::FinalizeConfirmationDlg *ui;
     bridge::Config * config = nullptr;
-
-    QString passwordHash;
+    bridge::Wallet * wallet = nullptr;
 };
 
 }

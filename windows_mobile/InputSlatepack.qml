@@ -67,7 +67,7 @@ Item {
                     else {
                         let spDesk = ""
                         let senderStr = ""
-                        if (sender === "None") {
+                        if (sender === "") {
                             spDesk = "non encrypted Slatepack"
                         } else {
                             spDesk = "encrypted Slatepack"

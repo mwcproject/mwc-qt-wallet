@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>InputSlatepackDlg</class>
- <widget class="QDialog" name="InputSlatepackDlg">
+ <widget class="control::MwcDialog" name="InputSlatepackDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,9 +11,9 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Input Slatepack</string>
   </property>
-  <widget class="QTextEdit" name="slatepackEdit">
+  <widget class="control::MwcTextEdit" name="slatepackEdit">
    <property name="geometry">
     <rect>
      <x>35</x>
@@ -50,7 +50,7 @@
     <bool>false</bool>
    </property>
    <property name="placeholderText">
-    <string>Please paste the slatepack content below</string>
+    <string>Please paste the Slatepack content below.</string>
    </property>
   </widget>
   <widget class="control::MwcLabelLarge" name="title">
@@ -183,6 +183,16 @@
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

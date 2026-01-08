@@ -16,56 +16,67 @@
 
 namespace control {
 
-MwcLabelTiny::MwcLabelTiny(QWidget *parent, Qt::WindowFlags f) :
+MwcLabel::MwcLabel(QWidget *parent, Qt::WindowFlags f) :
    QLabel(parent,f)
 {}
 
-MwcLabelTiny::MwcLabelTiny(const QString &text, QWidget *parent, Qt::WindowFlags f) :
+MwcLabel::MwcLabel(const QString &text, QWidget *parent, Qt::WindowFlags f) :
     QLabel(text,parent, f)
+{}
+
+MwcLabel::~MwcLabel() {}
+
+
+MwcLabelTiny::MwcLabelTiny(QWidget *parent, Qt::WindowFlags f) :
+   MwcLabel(parent,f)
+{}
+
+MwcLabelTiny::MwcLabelTiny(const QString &text, QWidget *parent, Qt::WindowFlags f) :
+    MwcLabel(text,parent, f)
 {}
 
 MwcLabelTiny::~MwcLabelTiny() {}
 
 
 MwcLabelMini::MwcLabelMini(QWidget *parent, Qt::WindowFlags f) :
-   QLabel(parent,f)
+   MwcLabel(parent,f)
 {}
 
 MwcLabelMini::MwcLabelMini(const QString &text, QWidget *parent, Qt::WindowFlags f) :
-    QLabel(text,parent, f)
+    MwcLabel(text,parent, f)
 {}
 
 MwcLabelMini::~MwcLabelMini() {}
 
 
 MwcLabelSmall::MwcLabelSmall(QWidget *parent, Qt::WindowFlags f) :
-    QLabel(parent,f)
+    MwcLabel(parent,f)
 {}
 
 MwcLabelSmall::MwcLabelSmall(const QString &text, QWidget *parent, Qt::WindowFlags f) :
-    QLabel(text,parent, f)
+    MwcLabel(text,parent, f)
 {}
 
 MwcLabelSmall::~MwcLabelSmall() {}
 
 
 MwcLabelNormal::MwcLabelNormal(QWidget *parent, Qt::WindowFlags f) :
-    QLabel(parent,f)
+    MwcLabel(parent,f)
 {}
 
 MwcLabelNormal::MwcLabelNormal(const QString &text, QWidget *parent, Qt::WindowFlags f) :
-        QLabel(text,parent, f)
+        MwcLabel(text,parent, f)
 {}
 
 MwcLabelNormal::~MwcLabelNormal()
 {}
 
 MwcLabelLarge::MwcLabelLarge(QWidget *parent, Qt::WindowFlags f) :
-    QLabel(parent,f)
+    MwcLabel(parent,f)
 {}
 
 MwcLabelLarge::MwcLabelLarge(const QString &text, QWidget *parent, Qt::WindowFlags f) :
-    QLabel(text,parent, f)
+    MwcLabel(text,parent, f)
 {}
 
 MwcLabelLarge::~MwcLabelLarge()

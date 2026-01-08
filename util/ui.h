@@ -30,7 +30,7 @@ namespace util {
     // in: nanoCoins < 0 - ALL
     // out: resultOutputs - what we want include into transaction.
     //      txnFee        - txn fee for send using these resultOutputs
-    void getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
+    void getOutputsToSend2( const QString & accountPath, int outputsNumber, int64_t nanoCoins,
                            wallet::Wallet * wallet,
                            core::AppContext * appContext,
                            QStringList & resultOutputs, uint64_t* txnFee );
@@ -50,7 +50,7 @@ namespace util {
     //
     // returns 0 if the fee could not be calculated and the txnOutputList should not be used.
     //
-    uint64_t getTxnFee(const QString& accountName, int64_t amount, wallet::Wallet* wallet,
+    uint64_t getTxnFee2(const QString& accountPath, int64_t amount, wallet::Wallet* wallet,
                        core::AppContext* appContext, uint64_t changeOutputs,
                        QStringList& txnOutputList);
 
@@ -73,7 +73,7 @@ namespace util {
     // Returns a string representing the account's spendable balance minus the transaction fee.
     // If an error occurs, "all" is returned.
     //
-    QString getAllSpendableAmount(const QString& accountName, wallet::Wallet* wallet, core::AppContext* appContext);
+    QString getAllSpendableAmount2(const QString& accountPath, wallet::Wallet* wallet, core::AppContext* appContext);
 
 };
 

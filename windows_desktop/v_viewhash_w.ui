@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ViewHash</class>
- <widget class="QWidget" name="ViewHash">
+ <widget class="control::MwcWidget" name="ViewHash">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -232,7 +232,7 @@ Be cautious when sharing your viewing key - once it's shared,  your wallet loses
          </rect>
         </property>
         <property name="text">
-         <string>My veiwing key:</string>
+         <string>My viewing key:</string>
         </property>
        </widget>
        <widget class="control::MwcPushButtonNormal" name="startScanning">
@@ -316,10 +316,10 @@ Be cautious when sharing your viewing key - once it's shared,  your wallet loses
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Create ownership proof for this wallet's viewing key, Tor, and MWC MQS addresses</string>
+         <string>Create ownership proof for this wallet's viewing key, Tor, and MWCMQS addresses</string>
         </property>
         <property name="statusTip">
-         <string>Create ownership proof for this wallet's viewing key, Tor, and MWC MQS addresses</string>
+         <string>Create ownership proof for this wallet's viewing key, Tor, and MWCMQS addresses</string>
         </property>
         <property name="text">
          <string>Generate ownership proof</string>
@@ -420,6 +420,11 @@ Be cautious when sharing your viewing key - once it's shared,  your wallet loses
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

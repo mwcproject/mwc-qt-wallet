@@ -16,6 +16,7 @@
 #include "../state/state.h"
 #include "../state/statemachine.h"
 #include "../core/appcontext.h"
+#include "../util/Log.h"
 
 namespace bridge {
 
@@ -29,6 +30,7 @@ StateMachine::~StateMachine() {}
 
 // actionWindowState:  state::STATE
 bool StateMachine::setActionWindow( int actionWindowState, bool enforce ) {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::setActionWindow with actionWindowState=" + QString::number(actionWindowState) + " enforce=" + QString(enforce ? "true" : "false"));
     // Use Special methods for those states!
     Q_ASSERT(actionWindowState!=state::STATE::RESYNC && actionWindowState!=state::STATE::SHOW_SEED);
 
@@ -36,6 +38,7 @@ bool StateMachine::setActionWindow( int actionWindowState, bool enforce ) {
 }
 
 QString StateMachine::getCurrentHelpDocName() {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::getCurrentHelpDocName");
     state::State * state = getStateMachine()->getCurrentStateObj();
     QString docName = "";
     if (state != nullptr) {
@@ -52,17 +55,20 @@ QString StateMachine::getCurrentHelpDocName() {
 // Return true if current state is allow to exit. Note, this call is blocking because
 // it might requre some user input
 bool StateMachine::canSwitchState(int nextWindowState) {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::canSwitchState with nextWindowState=" + QString::number(nextWindowState));
     return getStateMachine()->canSwitchState( state::STATE(nextWindowState) );
 }
 
 // Return current active state. Value from state::STATE
 int StateMachine::getCurrentStateId() {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::getCurrentStateId");
     return getStateMachine()->getCurrentStateId();
 }
 
 // Resync require some more action as activate it properly.
 // That is why we have a special API for that
 void StateMachine::activateResyncState() {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::activateResyncState");
     auto appContext = state::getStateContext()->appContext;
     appContext->pushCookie("PrevState", (int)appContext->getActiveWndState());
     getStateMachine()->setActionWindow( state::STATE::RESYNC );
@@ -70,6 +76,7 @@ void StateMachine::activateResyncState() {
 
 // Switch to Show seed page
 void StateMachine::activateShowSeed(QString password) {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::activateShowSeed with <password>");
     auto appContext = state::getStateContext()->appContext;
     appContext->pushCookie<QString>("password", password);
     getStateMachine()->setActionWindow( state::STATE::SHOW_SEED );
@@ -77,21 +84,25 @@ void StateMachine::activateShowSeed(QString password) {
 
 // Switch to a logout screen
 void StateMachine::logout() {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::logout");
     getStateMachine()->logout();
 }
 
 // Block logout, put that ID into the stack
 void StateMachine::blockLogout(QString id) {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::blockLogout with id=" + id);
     getStateMachine()->blockLogout(id);
 }
 // Unblock logout. Release all stack until this id. If id not found, nothing will be done
 // EMpty id - unblock all
 void StateMachine::unblockLogout(QString id) {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::unblockLogout with id=" + id);
     getStateMachine()->unblockLogout(id);
 }
 
 // The back button is pressed. Switching to prev state.
 bool StateMachine::returnBack() {
+    logger::logInfo(logger::BRIDGE, "Call StateMachine::returnBack");
     return getStateMachine()->returnBack();
 }
 

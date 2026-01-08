@@ -15,9 +15,13 @@
 #ifndef TRANSACTIONSW_H
 #define TRANSACTIONSW_H
 
+#include <QVBoxLayout>
+
 #include "../core_desktop/navwnd.h"
 #include "../wallet/wallet.h"
 #include "../control_desktop/richbutton.h"
+#include "../control_desktop/richitem.h"
+#include "../control_desktop/MwcWidget.h"
 
 namespace Ui {
 class Transactions;
@@ -31,7 +35,6 @@ class Util;
 }
 
 namespace control {
-class RichItem;
 class RichButton;
 }
 
@@ -39,20 +42,47 @@ class QLabel;
 
 namespace wnd {
 
-struct TransactionData {
+class TransactionRecord : public control::MwcWidget {
+public:
+    // use 135 for unknown intialHeight value
+    explicit TransactionRecord(QString id, control::RichVBox *parent, const wallet::WalletTransaction & trans,
+            int expectedConfirmNumber, const QString & currentAccountPath, control::RichButtonPressCallback * btnCallBack,
+            bridge::Config * config, bridge::Wallet * wallet,
+            int intialHeight );
+
+    void updateNote(const QString & note);
+
+    int getCurrentHeight() {return size().height();}
+private:
+    virtual void paintEvent(QPaintEvent *) override;
+private:
+    // build the control instance
+    control::RichItem * buildRecordContent();
+
+private:
+    QString id;
+    control::RichVBox * parent;
     wallet::WalletTransaction trans;
-    QString tx_note;
-    QStringList tx_messages;
+    int expectedConfirmNumber = -1;
+    QString currentAccountPath;
+    control::RichButtonPressCallback * btnCallBack = nullptr;
+    bridge::Config * config = nullptr;
+    bridge::Wallet * wallet = nullptr;
 
-    control::RichItem * ritem = nullptr;
-    control::RichButton * cancelBtn = nullptr;
-    control::RichButton * repostBtn = nullptr;
-    control::RichButton * proofBtn = nullptr;
+    QVBoxLayout *    placeholderLayout = nullptr;
+    control::RichItem * control = nullptr;
+
     QLabel * noteL = nullptr;
+};
 
-    void setBtns(control::RichItem * ritem, control::RichButton * cancelBtn,
-                 control::RichButton * repostBtn, control::RichButton * proofBtn,
-                 QLabel * noteL);
+struct TransactionData {
+    // data
+    wallet::WalletTransaction trans;
+    // note
+    QString tx_note;
+    // Lazy init record
+    TransactionRecord * record = nullptr;
+
 };
 
 class Transactions : public core::NavWnd,  control::RichButtonPressCallback
@@ -66,25 +96,10 @@ public:
 private slots:
     void on_accountComboBox_activated(int index);
 
-    void on_refreshButton_clicked();
     void on_validateProofButton_clicked();
     void on_exportButton_clicked();
 
     void onSgnWalletBalanceUpdated();
-    void onSgnTransactions( QString account, QString height, QVector<QString> transactions);
-    void onSgnCancelTransacton(bool success, QString account, QString trIdx, QString errMessage);
-
-    void onSgnTransactionById(bool success, QString account, QString height, QString transaction,
-                              QVector<QString> outputs, QVector<QString> messages);
-
-    void onSgnExportProofResult(bool success, QString fn, QString msg );
-    void onSgnVerifyProofResult(bool success, QString fn, QString msg );
-
-    void onSgnNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, QString totalDifficulty, int connections );
-    void onSgnNewNotificationMessage(int level, QString message); // level: bridge::MESSAGE_LEVEL values
-
-    void onSgnRepost( int idx, QString err );
-
     void onItemActivated(QString itemId);
 
 protected:
@@ -92,8 +107,9 @@ protected:
 
 private:
     void requestTransactions(bool resetScroller);
-    void updateData(bool resetScroller);
+    void updateData(bool resetScroller, const QVector<int> & heights);
 
+    QVector<int> getItemsHeights();
 private:
     Ui::Transactions *ui;
     bridge::Config * config = nullptr;
@@ -101,13 +117,9 @@ private:
     bridge::Transactions * transaction = nullptr; // just a placeholder to signal that this window is online
     bridge::Util * util = nullptr;
 
-    QString account;
     QVector<TransactionData> allTrans;
 
-    int64_t nodeHeight    = 0;
-    QString exportingFileName;
-
-    int64_t    requestedTxIdx = -1;
+    bool showIntegrityAccount = false;
 };
 
 }

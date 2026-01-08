@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "s_mktinttx_w.h"
+
+#ifdef FEATURE_MKTPLACE
+
 #include "ui_s_mktinttx_w.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
@@ -87,7 +90,7 @@ void IntegrityTransactions::updateData() {
         if (txTimeStr.isEmpty() || txTimeStr == "None")
             txTimeStr = trans.creationTime;
 
-        QDateTime txTime = QDateTime::fromString(txTimeStr, "HH:mm:ss dd-MM-yyyy");
+        QDateTime txTime = QDateTime::fromString(txTimeStr, Qt::ISODate);
         txTimeStr = txTime.toString("MMM d, yyyy / H:mmap");
         bool blocksPrinted = false;
         //if (trans.confirmed && nodeHeight > 0 && trans.height > 0) {
@@ -97,6 +100,7 @@ void IntegrityTransactions::updateData() {
 
         control::RichItem *itm = control::createMarkedItem(QString::number(idx), ui->transactionTable,
                                                            trans.canBeCancelled(), "");
+        itm->setParent(ui->transactionTable);
 
         { // First line
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
@@ -179,5 +183,5 @@ void IntegrityTransactions::onSgnNewNotificationMessage(int level, QString messa
     }
 }
 
-
 }
+#endif

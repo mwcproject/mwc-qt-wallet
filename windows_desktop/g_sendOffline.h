@@ -35,7 +35,7 @@ class SendOffline : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit SendOffline(QWidget *parent, QString selectedAccount, int64_t amount);
+    explicit SendOffline(QWidget *parent, const QString & selectedAccountName, const QString & selectedAccountPath, int64_t amount);
     virtual ~SendOffline() override;
 
 private slots:
@@ -52,7 +52,8 @@ private:
     bridge::Config * config = nullptr;
     bridge::Send * send = nullptr;
 
-    QString selectedAccount;
+    QString selectedAccountName;
+    QString selectedAccountPath;
     int64_t amount;
 };
 

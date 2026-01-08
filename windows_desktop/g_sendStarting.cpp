@@ -14,6 +14,7 @@
 
 #include "g_sendStarting.h"
 #include "ui_g_sendStarting.h"
+#include "zz_utils.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../control_desktop/messagebox.h"
 #include "../bridge/wallet_b.h"
@@ -35,9 +36,9 @@ SendStarting::SendStarting(QWidget *parent) :
             Qt::QueuedConnection);
 
     // Waiting for account data
-    ui->progress->initLoader(true);
+    ui->progress->initLoader(false);
 
-    wallet->requestWalletBalanceUpdate();
+    updateAccountsData(wallet, ui->accountComboBox, true, false);
 
     ui->onlineChecked->setId(bridge::SEND_SELECTED_METHOD::ONLINE_ID);
     ui->slatepackChecked->setId(bridge::SEND_SELECTED_METHOD::SLATEPACK_ID);
@@ -65,27 +66,7 @@ SendStarting::SendStarting(QWidget *parent) :
 
 void SendStarting::onSgnWalletBalanceUpdated() {
     // init accounts
-    ui->accountComboBox->clear();
-
-    QString account = wallet->getCurrentAccountName();
-    QVector<QString> accountInfo = wallet->getWalletBalance(true, true,  false);
-
-    int selectedAccIdx = 0;
-    int idx = 0;
-
-    for (int i=1; i<accountInfo.size(); i+=2) {
-        if ( accountInfo[i-1] == "integrity")
-            continue;
-
-        if (accountInfo[i-1] == account)
-            selectedAccIdx = idx;
-
-        ui->accountComboBox->addItem( accountInfo[i], QVariant(accountInfo[i-1]));
-        idx++;
-    }
-    ui->accountComboBox->setCurrentIndex(selectedAccIdx);
-
-    ui->progress->hide();
+    updateAccountsData(wallet, ui->accountComboBox, true, false);
 }
 
 void SendStarting::onChecked(int id) {
@@ -113,15 +94,15 @@ SendStarting::~SendStarting() {
 void SendStarting::on_nextButton_clicked() {
     util::TimeoutLockObject to( "SendStarting" );
 
-    QString account = ui->accountComboBox->currentData().toString();
-    if (account.isEmpty())
+    QString accountPath = accountComboData2AccountPath(ui->accountComboBox->currentData().toString()).second;
+    if (accountPath.isEmpty())
         return;
 
     QString sendAmount = ui->amountEdit->text().trimmed();
 
     config->setSendMethod(selectedSendMethod);
 
-    int res = send->initialSendSelection( selectedSendMethod, account, sendAmount, true );
+    int res = send->initialSendSelection( selectedSendMethod, accountPath, sendAmount, true );
     if (res==1)
         ui->accountComboBox->setFocus();
     else if (res==2)
@@ -129,11 +110,11 @@ void SendStarting::on_nextButton_clicked() {
 }
 
 void SendStarting::on_allAmountButton_clicked() {
-    QString account = ui->accountComboBox->currentData().toString();
-    if (account.isEmpty())
+    QString accountPath = accountComboData2AccountPath(ui->accountComboBox->currentData().toString()).second;
+    if (accountPath.isEmpty())
         return;
     else {
-        QString amount = send->getSpendAllAmount(account);
+        QString amount = send->getSpendAllAmount(accountPath);
         ui->amountEdit->setText(amount);
     }
 }
@@ -141,11 +122,11 @@ void SendStarting::on_allAmountButton_clicked() {
 void SendStarting::on_accountComboBox_currentIndexChanged(int index)
 {
     Q_UNUSED(index)
-    QString account = ui->accountComboBox->currentData().toString();
-    if (account.isEmpty())
+    QString accountPath = accountComboData2AccountPath(ui->accountComboBox->currentData().toString()).second;
+    if (accountPath.isEmpty())
         return;
 
-    wallet->switchAccount(account);
+    wallet->switchAccountById(accountPath);
 }
 
 static bool showGenProofWarning = false;

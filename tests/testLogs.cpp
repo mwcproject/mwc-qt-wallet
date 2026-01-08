@@ -38,13 +38,10 @@ void testLogsRotation() {
         logDir.remove(fn);
     }
 
-    // It is a local test that is normally disabled. So using my custom build
-    config::setMwcZipPath("/Users/mw/mwc713/target/release/mwczip");
-
     logger::initLogger(true);
 
     for (int t=0; t<5000000; t++) {
-        logger::logInfo("testLogsRotation", "Long line " + QString::number(t) + " for testing dlksfjl kdskdsfhjflks dhfkldshf kljsdhdflkjsdhffslakjhfsdjfhdlks jfkjds fklshdfksdjhf lsdfjkdsafhsdkhfkshfkshf sjdh klsjdfhdskjhfskdjfhskjhdfskdjfhkfdsjh");
+        logger::logInfo(logger::QT_WALLET, "Long line " + QString::number(t) + " for testing dlksfjl kdskdsfhjflks dhfkldshf kljsdhdflkjsdhffslakjhfsdjfhdlks jfkjds fklshdfksdjhf lsdfjkdsafhsdkhfkshfkshf sjdh klsjdfhdskjhfskdjfhskjhdfskdjfhkfdsjh");
     }
 }
 

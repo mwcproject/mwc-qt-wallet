@@ -20,6 +20,10 @@
 #include "../core/WndManager.h"
 #include <QDir>
 
+#include "node/MwcNode.h"
+#include "node/node_client.h"
+#include "util/ioutils.h"
+
 namespace state {
 
 // Init the wallet. Then check how it is started. If it needs to have password or something
@@ -32,7 +36,8 @@ StartWallet::~StartWallet() {
 }
 
 NextStateRespond StartWallet::execute() {
-    if ( !context->wallet->isRunning() || !context->appContext->getCookie<QString>("checkWalletInitialized").isEmpty() ) {
+    if ( context->wallet->getStartStatus()==wallet::Wallet::STARTED_MODE::OFFLINE ||
+        !context->appContext->getCookie<QString>("checkWalletInitialized").isEmpty() ) {
 
         if ( context->appContext->getCookie<QString>("checkWalletInitialized").isEmpty() ) {
             // Check what are the wallet instances we have.
@@ -42,8 +47,10 @@ NextStateRespond StartWallet::execute() {
                 return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
             } else {
                 // Just update the wallet with a status. Then continue
+                QString basePath = instances.first[instances.second];
+                bool initialized = context->isWalletDataValid(basePath, true);
                 context->appContext->pushCookie<QString>("checkWalletInitialized",
-                                                         context->wallet->checkWalletInitialized(true) ? "OK" : "FAILED");
+                                                         initialized ? "OK" : "FAILED");
             }
         }
     }
@@ -52,6 +59,8 @@ NextStateRespond StartWallet::execute() {
 }
 
 void StartWallet::createNewWalletInstance(QString path, bool restoreWallet) {
+    logger::logInfo(logger::STATE, "Call StartWallet::createNewWalletInstance with path=" + path +
+        " restoreWallet=" + QString(restoreWallet ? "true" : "false"));
     // Check if this path already exist
     if (path.isEmpty()) {
         // Generating a new path for the wallet
@@ -87,6 +96,7 @@ void StartWallet::createNewWalletInstance(QString path, bool restoreWallet) {
         emptyWalletDir = baseDir.relativeFilePath(emptyWalletDir);
 
         context->appContext->addNewInstance(emptyWalletDir);
+        path = emptyWalletDir;
     }
     else {
         QVector<QString> network_arch_name = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(path, context->appContext);
@@ -102,14 +112,15 @@ void StartWallet::createNewWalletInstance(QString path, bool restoreWallet) {
         context->appContext->addNewInstance(path);
     }
 
-
     context->appContext->pushCookie<bool>("restoreWalletFromSeed",restoreWallet);
+    bool initialized = context->isWalletDataValid(path, true);
     context->appContext->pushCookie<QString>("checkWalletInitialized",
-                                             context->wallet->checkWalletInitialized(false) ? "OK" : "FAILED");
-    context->stateMachine->executeFrom(STATE::START_WALLET);
+                                             initialized ? "OK" : "FAILED");
+    context->stateMachine->executeFrom(STATE::STATE_INIT);
 }
 
 void StartWallet::cancel() {
+    logger::logInfo(logger::STATE, "Call StartWallet::cancel");
     context->stateMachine->executeFrom(STATE::NONE);
 }
 

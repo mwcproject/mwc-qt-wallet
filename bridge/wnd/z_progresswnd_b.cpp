@@ -17,6 +17,7 @@
 #include "../../state/a_initaccount.h"
 #include "../../state/x_Resync.h"
 #include "../../state/state.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
@@ -47,16 +48,7 @@ void ProgressWnd::updateProgress(QString _callerId, int pos, QString msgProgress
 }
 
 void ProgressWnd::cancelProgress() {
-    if (callerId == state::INIT_ACCOUNT_CALLER_ID) {
-        Q_ASSERT(false);
-        return;
-    }
-
-    if (callerId == state::RESYNC_CALLER_ID) {
-        Q_ASSERT(false);
-        return;
-    }
-
+    logger::logInfo(logger::BRIDGE, "Call ProgressWnd::cancelProgress");
     // So far nobody expect cancel to be available, but it exist. Let's keep it
     Q_ASSERT(false);
 }

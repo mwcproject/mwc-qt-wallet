@@ -46,16 +46,13 @@ private slots:
     // respond from signTransaction
     void onSgnTransactionActionIsFinished( bool success, QString message );
     void onSgnWalletBalanceUpdated();
-    void onSgnFileProofAddress(QString proofAddress);
 
     void on_accountComboBox_activated(int index);
 
     void on_slatepackEdit_textChanged();
     void on_continueButton_clicked();
-    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
 
 private:
-    void updateAccountList();
     void updateButtons();
     void initiateSlateVerification(const QString &slate2check);
 private:
@@ -69,7 +66,6 @@ private:
     QString slateJson;
     QString sender;
     bool isSpValid = false;
-    QString spInProgress;
 };
 
 }

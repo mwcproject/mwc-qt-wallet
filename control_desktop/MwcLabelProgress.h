@@ -15,7 +15,7 @@
 #ifndef GUI_WALLET_MWCLABELPROGRESS_H
 #define GUI_WALLET_MWCLABELPROGRESS_H
 
-#include <QLabel>
+#include "MwcLabel.h"
 
 namespace control {
 
@@ -23,7 +23,7 @@ namespace control {
 void onMessageBoxShown();
 
 // Progress movie control
-class MwcLabelProgress : public QLabel {
+class MwcLabelProgress : public MwcLabel {
 Q_OBJECT
 public:
     explicit MwcLabelProgress(QWidget * parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags(), bool hideWithMessageBox = true );

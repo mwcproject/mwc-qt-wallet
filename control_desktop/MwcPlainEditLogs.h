@@ -15,11 +15,12 @@
 #ifndef MWC_QT_WALLET_MWCPLAINEDITLOGS_H
 #define MWC_QT_WALLET_MWCPLAINEDITLOGS_H
 
-#include <QPlainTextEdit>
+#include "MwcPlainTextEdit.h"
+#include "MwcTextEdit.h"
 
 namespace control {
 
-class MwcPlainEditLogs : public QPlainTextEdit {
+class MwcPlainEditLogs : public MwcPlainTextEdit {
 Q_OBJECT
 public:
     explicit MwcPlainEditLogs(QWidget *parent = Q_NULLPTR);
@@ -27,7 +28,7 @@ public:
     virtual ~MwcPlainEditLogs() override;
 };
 
-class MwcPlainEditDlg : public QPlainTextEdit {
+class MwcPlainEditDlg : public MwcPlainTextEdit {
 Q_OBJECT
 public:
     explicit MwcPlainEditDlg(QWidget *parent = Q_NULLPTR);
@@ -35,7 +36,7 @@ public:
     virtual ~MwcPlainEditDlg() override;
 };
 
-class MwcTextEditDlg : public QTextEdit {
+class MwcTextEditDlg : public MwcTextEdit {
 Q_OBJECT
 public:
     explicit MwcTextEditDlg(QWidget *parent = Q_NULLPTR);

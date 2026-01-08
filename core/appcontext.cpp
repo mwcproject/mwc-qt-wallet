@@ -182,8 +182,8 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A9)
-         return false;
+    if (id<0x4783 || id>0x47AB)
+        return false;
 
     QString mockStr;
     in >> mockStr;
@@ -225,8 +225,8 @@ bool AppContext::loadDataImpl() {
     if (id>=0x4785)
         in >> logsEnabled;
 
-    wallet::MwcNodeConnection nodeConnectionMainNet;
-    wallet::MwcNodeConnection nodeConnectionFlooNet;
+    wallet::MwcNodeConnectionDeprecated nodeConnectionMainNet;
+    wallet::MwcNodeConnectionDeprecated nodeConnectionFlooNet;
 
     if (id>=0x4786) {
         nodeConnectionMainNet.loadData(in);
@@ -244,6 +244,7 @@ bool AppContext::loadDataImpl() {
     }
 
     if (id>=0x4789) {
+        QMap<QString, qulonglong> hodlRegistrations;
         in >> hodlRegistrations;
     }
 
@@ -298,20 +299,12 @@ bool AppContext::loadDataImpl() {
         for (int r=0; r<sz; r++) {
             QString key;
             in >> key;
-            wallet::MwcNodeConnection val;
+            wallet::MwcNodeConnectionDeprecated val;
             val.loadData(in);
-            nodeConnection.insert(key,val);
         }
 
         in >> walletInstancePaths;
         in >> currentWalletInstanceIdx;
-    }
-    else {
-        // Migration case
-        nodeConnection.insert( "OnlineWallet_Mainnet", nodeConnectionMainNet );
-        nodeConnection.insert( "OnlineWallet_Floonet", nodeConnectionFlooNet );
-
-        // walletInstancePaths  discovery is skipped because we handle that in the caller function
     }
 
     if (id>=0x4799) {
@@ -357,8 +350,10 @@ bool AppContext::loadDataImpl() {
         in >> acceptedSwaps;
     }
 
-    if (id>=0x47A2)
+    if (id>=0x47A2) {
+        bool noTorForEmbeddedNode;
         in >> noTorForEmbeddedNode;
+    }
 
     if (id>=0x47A3) {
         int sm = bridge::SEND_SELECTED_METHOD::ONLINE_ID;
@@ -388,8 +383,9 @@ bool AppContext::loadDataImpl() {
     }
 
     if (id>=0x47A6) {
-        in >> torBridgeLine;
-        in >> torClientOption;
+        QString tmp;
+        in >> tmp;
+        in >> tmp;
     }
 
     if (id>=0x47A7) {
@@ -405,6 +401,14 @@ bool AppContext::loadDataImpl() {
         in >> featureSlatepack;
         in >> featureMWCMQS;
         in >> featureTor;
+    }
+
+    if (id>=0x47AA) {
+        in >> faucetRequest;
+    }
+
+    if (id >= 0x47AB) {
+        in >> walletParams;
     }
 
     return true;
@@ -434,7 +438,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A9;
+    out << 0x47AB;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -451,7 +455,7 @@ void AppContext::saveData() const {
     out << guiScale;
     out << logsEnabled;
 
-    wallet::MwcNodeConnection nc;
+    wallet::MwcNodeConnectionDeprecated nc;
     nc.saveData(out);
     nc.saveData(out);
 
@@ -461,6 +465,7 @@ void AppContext::saveData() const {
 
     out << showOutputAll;
 
+    QMap<QString, qulonglong> hodlRegistrations;
     out << hodlRegistrations;
 
     out << true;
@@ -490,12 +495,12 @@ void AppContext::saveData() const {
 
     out << true;
 
-    int sz = nodeConnection.size();
+    int sz = 0;// nodeConnection.size();
     out << sz;
-    for (QMap<QString, wallet::MwcNodeConnection>::const_iterator i = nodeConnection.constBegin(); i != nodeConnection.constEnd(); ++i) {
+/*    for (QMap<QString, wallet::MwcNodeConnection>::const_iterator i = nodeConnection.constBegin(); i != nodeConnection.constEnd(); ++i) {
         out << i.key();
         i.value().saveData(out);
-    }
+    }*/
     out << walletInstancePaths;
     out << currentWalletInstanceIdx;
 
@@ -518,6 +523,7 @@ void AppContext::saveData() const {
 
     out << acceptedSwaps;
 
+    bool noTorForEmbeddedNode = false;
     out << noTorForEmbeddedNode;
 
     int sm = int(sendMethod);
@@ -539,8 +545,8 @@ void AppContext::saveData() const {
 
     out << swapBackupDir;
 
-    out << torBridgeLine;
-    out << torClientOption;
+    out << QString(""); //torBridgeLine;
+    out << QString(""); //torClientOption;
 
     out << transactionsWithCongrats;
 
@@ -550,6 +556,9 @@ void AppContext::saveData() const {
     out << featureSlatepack;
     out << featureMWCMQS;
     out << featureTor;
+    out << faucetRequest;
+
+    out << walletParams;
 }
 
 void AppContext::loadNotesData() {
@@ -702,33 +711,25 @@ void AppContext::setLogsEnabled(bool enabled) {
     saveData();
 }
 
-void AppContext::setTorBridgeLineClientOption(const QString & line, const QString & client) {
-    if (line == torBridgeLine && client == torClientOption)
-        return;
-    torBridgeLine = line;
-    torClientOption = client;
-    saveData();
-}
-
-bool AppContext::useTorForNode() const {
+//bool AppContext::useTorForNode() const {
 /*    bool tor = isAutoStartTorEnabled();
     if (config::isOnlineNode())
         tor = true;
     return tor && (!noTorForEmbeddedNode);*/
-    return !noTorForEmbeddedNode;
-}
+//    return !noTorForEmbeddedNode;
+//}
 
 void AppContext::setShowOutputAll(bool all) {
     showOutputAll = all;
 }
 
-void AppContext::setNoTorForEmbeddedNode(bool noTor) {
+/*void AppContext::setNoTorForEmbeddedNode(bool noTor) {
     if (noTorForEmbeddedNode == noTor)
         return;
 
     noTorForEmbeddedNode = noTor;
     saveData();
-}
+}*/
 
 void AppContext::setSendMethod(bridge::SEND_SELECTED_METHOD _sendMethod) {
     sendMethod = _sendMethod;
@@ -786,56 +787,11 @@ double AppContext::getGuiScale() const
     return guiScale<0.0 ? initScaleValue : guiScale;
 }
 
-wallet::MwcNodeConnection AppContext::getNodeConnection(const QString & network) {
-    switch (config::getWalletRunMode()) {
-        case config::WALLET_RUN_MODE::ONLINE_WALLET: {
-            wallet::MwcNodeConnection mwcNodeConnection = nodeConnection.value( "OnlineWallet_" + network );
-            return mwcNodeConnection;
-        }
-        case config::WALLET_RUN_MODE::COLD_WALLET: {
-            wallet::MwcNodeConnection mwcNodeConnection = nodeConnection.value( "ColdWallet_" + network );
-            if ( !mwcNodeConnection.isLocalNode() ) {
-                mwcNodeConnection.setAsLocal( "mwc-node" );
-                updateMwcNodeConnection(network, mwcNodeConnection );
-            }
-            return mwcNodeConnection;
-        }
-        case config::WALLET_RUN_MODE::ONLINE_NODE: {
-            wallet::MwcNodeConnection mwcNodeConnection = nodeConnection.value( "Node_" + network );
-            if ( !mwcNodeConnection.isLocalNode() ) {
-                mwcNodeConnection.setAsLocal( "mwc-node" );
-                updateMwcNodeConnection(network, mwcNodeConnection );
-            }
-            return mwcNodeConnection;
-        }
-        default: {
-            Q_ASSERT(false);
-            return wallet::MwcNodeConnection();
-        }
-    }
+QPair<QString, QString> AppContext::getOnlineNodeWalletNetworkAndPath() const {
+    QString network = isOnlineNodeRunsMainNetwork() ? "Mainnet" : "Floonet";
+    QString walletPath = QString("tmp") + QDir::separator() + "online_node_wallet"  + QDir::separator() + network;
+    return QPair<QString, QString>(network, walletPath);
 }
-
-void AppContext::updateMwcNodeConnection(const QString & network, const wallet::MwcNodeConnection & connection ) {
-    switch (config::getWalletRunMode()) {
-        case config::WALLET_RUN_MODE::ONLINE_WALLET: {
-            nodeConnection.insert( "OnlineWallet_" + network, connection );
-            break;
-        }
-        case config::WALLET_RUN_MODE::COLD_WALLET: {
-            nodeConnection.insert( "ColdWallet_" + network, connection );
-            break;
-        }
-        case config::WALLET_RUN_MODE::ONLINE_NODE: {
-            nodeConnection.insert( "Node_" + network, connection );
-            break;
-        }
-        default: {
-            Q_ASSERT(false);
-        }
-    }
-    saveData();
-}
-
 
 // Wallet instances. Return instances paths that are valid and current selected index
 QPair<QVector<QString>, int> AppContext::getWalletInstances(bool hasSeed) const {
@@ -865,10 +821,8 @@ QPair<QVector<QString>, int> AppContext::getWalletInstances(bool hasSeed) const 
         }
         case config::WALLET_RUN_MODE::ONLINE_NODE: {
             // For network the wallet instance is predefined.
-            QString network = isOnlineNodeRunsMainNetwork() ? "Mainnet" : "Floonet";
-            QString walletPath = QString("tmp") + QDir::separator() + "online_node_wallet"  + QDir::separator() + network;
-
-            QVector<QString> paths{walletPath};
+            QPair<QString, QString> nw_path = getOnlineNodeWalletNetworkAndPath();
+            QVector<QString> paths{ nw_path.second };
             return QPair<QVector<QString>, int> (paths,0);
         }
     }
@@ -922,15 +876,6 @@ void AppContext::setGenerateProof(bool proof) {
 }
 
 
-// HODL registration time.
-int64_t AppContext::getHodlRegistrationTime(const QString & hash) const {
-    return hodlRegistrations.value(hash, 0);
-}
-
-void AppContext::setHodlRegistrationTime(const QString & hash, int64_t time) {
-    hodlRegistrations.insert( hash, qlonglong(time) );
-}
-
 static QString imp_val("IMPOSSIBLE_VALUE");
 
 QPair<bool, QString> AppContext::isLockedOutputs(const QString & output) const {
@@ -948,21 +893,20 @@ QPair<bool, QString> AppContext::isLockedOutputs(const QString & output) const {
     return QPair<bool, QString>(true, val);
 }
 
-void AppContext::setLockOutputEnabled(bool enabled) {
+void AppContext::setLockOutputEnabled(bool enabled, wallet::Wallet * wallet) {
     if (lockOutputEnabled == enabled)
         return;
 
     lockOutputEnabled = enabled;
     saveData();
+    wallet->emitWalletBalanceUpdated();
 }
 
-void AppContext::setLockedOutput(const QString & output, bool lock, QString id) {
+void AppContext::setLockedOutput(const QString & output, bool lock, QString id, wallet::Wallet * wallet) {
     if (lock) {
             lockedOutputs.insert(output, id);
-            if (id.isEmpty())
-                saveData();
-            logger::logEmit("AppContext", "onOutputLockChanged", output + " locked" );
-            emit onOutputLockChanged(output);
+            saveData();
+            wallet->emitWalletBalanceUpdated();
     }
     else {
         QString prevKey = lockedOutputs.value(output, "");
@@ -971,10 +915,8 @@ void AppContext::setLockedOutput(const QString & output, bool lock, QString id) 
             return;
         }
         if (lockedOutputs.remove(output)) {
-            if (prevKey.isEmpty())
-                saveData();
-            logger::logEmit("AppContext", "onOutputLockChanged", output + " unlocked" );
-            emit onOutputLockChanged(output);
+            saveData();
+            wallet->emitWalletBalanceUpdated();
         }
     }
 }
@@ -992,10 +934,6 @@ void AppContext::unlockOutputsById(QString id) {
 
     if (!updatedOutputs.isEmpty()) {
         saveData();
-        for (auto & o : updatedOutputs) {
-            logger::logEmit("AppContext", "onOutputLockChanged", o + " unlocked");
-            emit onOutputLockChanged(o);
-        }
     }
 }
 
@@ -1008,6 +946,17 @@ QVector<QString> AppContext::getLockedOutputsById(QString id) const {
         }
     }
 
+    return result;
+}
+
+QStringList AppContext::getLockedOutputs() const {
+    QStringList result;
+    if (!lockOutputEnabled)
+        return result;
+
+    for ( auto i=lockedOutputs.begin(); i!=lockedOutputs.end(); i++ ) {
+        result.append(i.key());
+    }
     return result;
 }
 
@@ -1190,6 +1139,31 @@ void AppContext::setFeatureTor(bool val) {
         return;
     featureTor = val;
     saveData();
+}
+
+bool AppContext::isFaucetRequested() {
+    return faucetRequest;
+}
+
+void AppContext::faucetRequested() {
+    if (faucetRequest)
+        return;
+
+    faucetRequest = true;
+    saveData();
+}
+
+QString AppContext::getWalletParam(int walletId, QString key, QString defaultValue) {
+    QString dtKey = QString::number(walletId) + "_" + key;
+    return walletParams.value(dtKey, defaultValue);
+}
+
+void AppContext::setWalletParam(int walletId, QString key, QString value, bool saveDataNow) {
+    QString dtKey = QString::number(walletId) + "_" + key;
+    walletParams.insert(dtKey, value);
+    if (saveDataNow) {
+        saveData();
+    }
 }
 
 

@@ -28,6 +28,8 @@
 #include "../bridge/wnd/a_startwallet_b.h"
 #include "../bridge/wallet_b.h"
 #include "../core_desktop/DesktopWndManager.h"
+#include "bridge/heartbeat_b.h"
+#include <QJsonArray>
 
 namespace wnd {
 
@@ -41,15 +43,14 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
     inputPassword = new bridge::InputPassword(this);
     startWallet = new bridge::StartWallet(this);
     wallet = new bridge::Wallet(this);
+    heartBeat = new bridge::HeartBeat(this);
 
-    QObject::connect(wallet, &bridge::Wallet::sgnUpdateSyncProgress,
-                     this, &InputPassword::onSgnUpdateSyncProgress, Qt::QueuedConnection);
-    QObject::connect(wallet, &bridge::Wallet::sgnLoginResult,
-                     this, &InputPassword::onSgnLoginResult, Qt::QueuedConnection);
-    QObject::connect(wallet, &bridge::Wallet::sgnUpdateListenerStatus,
+    QObject::connect(wallet, &bridge::Wallet::sgnScanProgress,
+                     this, &InputPassword::onSgnScanProgress, Qt::QueuedConnection);
+    QObject::connect(wallet, &bridge::Wallet::sgnScanDone,
+                 this, &InputPassword::onSgnScanDone, Qt::QueuedConnection);
+    QObject::connect(heartBeat, &bridge::HeartBeat::sgnUpdateListenerStatus,
                      this, &InputPassword::onSgnUpdateListenerStatus, Qt::QueuedConnection);
-    QObject::connect(wallet, &bridge::Wallet::sgnStartingCommand,
-                     this, &InputPassword::onSgnStartingCommand, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
@@ -57,8 +58,10 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
 
     if (lockMode) {
         if (config->isOnlineWallet()) {
-            updateMwcMqState(wallet->getMqsListenerStatus());
-            updateTorState(wallet->getTorListenerStatus());
+            QVector<bool> res = wallet->getListenerStatus();
+
+            updateMwcMqState( res[1]);
+            updateTorState(res[3]);
 
             if (!walletConfig->isFeatureMWCMQS()) {
                 ui->mqsFrame->hide();
@@ -77,7 +80,7 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
         ui->listeningStatusFrameHolder->hide();
     }
 
-    ui->mwcMQlable->setText("MWC MQS");
+    ui->mwcMQlable->setText("MWCMQS");
 
     ui->syncStatusMsg->setText("");
 
@@ -138,15 +141,8 @@ void InputPassword::on_submitButton_clicked() {
     QString selectedPath = ui->accountComboBox->currentData().toString();
     config->setActiveInstance(selectedPath);
 
-    ui->progress->show();
-
     // Submit the password and wait until state will push us.
-    inputPassword->submitPassword(pswd);
-    // Because of event driven, the flow is not linear
-}
-
-
-void InputPassword::onSgnLoginResult(bool ok) {
+    bool ok = inputPassword->submitPassword(pswd, selectedPath);
     if (!ok) {
         ui->progress->hide();
         ui->passwordEdit->setText("");
@@ -164,15 +160,16 @@ void InputPassword::onSgnLoginResult(bool ok) {
     ui->openWalletButton->setEnabled(!ok);
 }
 
+
 void InputPassword::updateMwcMqState(bool online) {
     ui->mwcMqStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
-    ui->mwcMqStatusImg->setToolTip(online ? "Listener connected to mwcmq" : "Listener diconnected from mwcmq");
+    ui->mwcMqStatusImg->setToolTip(online ? "Listener connected to MWCMQS" : "Listener disconnected from MWCMQS");
     ui->mwcMqStatusTxt->setText(online ? "Online" : "Offline");
 }
 
 void InputPassword::updateTorState(bool online) {
     ui->torStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
-    ui->torStatusImg->setToolTip(online ? "Listener connected to TOR" : "Listener diconnected from TOR");
+    ui->torStatusImg->setToolTip(online ? "Listener connected to Tor" : "Listener disconnected from Tor");
     ui->torStatusTxt->setText(online ? "Online" : "Offline");
 }
 
@@ -181,10 +178,25 @@ void InputPassword::onSgnUpdateListenerStatus(bool mwcOnline, bool tor) {
     updateTorState(tor);
 }
 
-void InputPassword::onSgnUpdateSyncProgress(double progressPercent) {
-    ui->syncStatusMsg->setText(
-            "Wallet state update, " + util::trimStrAsDouble(QString::number(progressPercent), 4) + "% complete");
+// Show updates for any ID.
+void InputPassword::onSgnScanProgress(QString responseId, QJsonObject statusMessage) {
+    Q_UNUSED(responseId)
+    if (statusMessage.contains("Scanning")) {
+        QJsonArray vals = statusMessage["Scanning"].toArray();
+        int percent_progress = vals[2].toInt();
+        ui->syncStatusMsg->setText("Wallet state update, " + QString::number(percent_progress) + "% complete");
+    }
 }
+
+void InputPassword::onSgnScanDone( QString responseId, bool fullScan, int height, QString errorMessage ) {
+    Q_UNUSED(responseId)
+    Q_UNUSED(fullScan)
+    Q_UNUSED(height)
+    Q_UNUSED(errorMessage)
+
+    ui->syncStatusMsg->setText("");
+}
+
 
 void InputPassword::on_restoreInstanceButton_clicked() {
     startWallet->createNewWalletInstance("", true);
@@ -202,9 +214,5 @@ void InputPassword::on_openWalletButton_clicked()
     startWallet->createNewWalletInstance(wallet_dir, false);
 }
 
-void InputPassword::onSgnStartingCommand(QString actionName) {
-    ui->syncStatusMsg->setText(actionName);
-}
 
 }
-

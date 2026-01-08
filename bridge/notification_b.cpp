@@ -14,15 +14,25 @@
 
 #include "notification_b.h"
 #include "../core/Notification.h"
+#include "../util/Log.h"
 
 namespace bridge {
 
-Notification::Notification(QObject * parent) : QObject(parent) {}
+Notification::Notification(QObject * parent) : QObject(parent) {
+    QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
+                  this, &Notification::onSgnNewNotificationMessage, Qt::QueuedConnection);
+
+}
 Notification::~Notification() {}
 
 void Notification::appendNotificationMessage(MESSAGE_LEVEL level, QString message) {
+    logger::logInfo(logger::BRIDGE, "Call Notification::appendNotificationMessage with level=" + QString::number(static_cast<int>(level)) + " message=" + message);
     notify::appendNotificationMessage( level, message );
 }
 
+void Notification::onSgnNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message) // level: bridge::MESSAGE_LEVEL
+{
+    emit sgnNewNotificationMessage( int(level), message);
+}
 
 }

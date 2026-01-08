@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>AdjustStateDlg</class>
- <widget class="QDialog" name="AdjustStateDlg">
+ <widget class="control::MwcDialog" name="AdjustStateDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Adjust State</string>
   </property>
   <widget class="control::MwcPushButtonNormal" name="cancelButton">
    <property name="geometry">
@@ -38,7 +38,7 @@
     <enum>Qt::StrongFocus</enum>
    </property>
    <property name="toolTip">
-    <string>Skip the backup. I understand that I can loose my funds.</string>
+    <string>Skip the backup. I understand that I can lose my funds.</string>
    </property>
    <property name="text">
     <string>Cancel</string>
@@ -90,7 +90,7 @@ If you don't know what you are doing please close this dialog.</string>
     <enum>Qt::StrongFocus</enum>
    </property>
    <property name="toolTip">
-    <string>Backup the data</string>
+    <string>Back up the data</string>
    </property>
    <property name="text">
     <string>Apply</string>
@@ -187,6 +187,11 @@ If you don't know what you are doing please close this dialog.</string>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

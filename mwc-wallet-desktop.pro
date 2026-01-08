@@ -1,9 +1,9 @@
 # MWC QT Wallet project for QtCreator
 
-QT       += core gui widgets network svg
+QT       += core gui widgets network svg concurrent
 requires(qtConfig(completer))
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
 TARGET = mwc-qt-wallet
 TEMPLATE = app
@@ -26,6 +26,15 @@ CONFIG += c++14
 
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
+# Rust static library
+CONFIG(debug, debug|release) {
+    LIBS += $$PWD/../mwc-wallet/target/debug/libmwc_wallet_lib.a
+}
+
+CONFIG(release, debug|release) {
+    LIBS += $$PWD/../mwc-wallet/target/release/libmwc_wallet_lib.a
+}
+
 macx {
     CONFIG += app_bundle
     ICON = mw-logo.icns
@@ -35,7 +44,14 @@ macx {
 #QMAKE_BUNDLE_DATA += mySetOfExtraFiles
 
     OBJECTIVE_SOURCES += macos/changetitlebarcolor.mm
-    LIBS +=        -framework AppKit
+    LIBS += -framework AppKit
+    LIBS += -framework Security
+    LIBS += -framework CoreFoundation
+    LIBS += -framework SecurityFoundation
+    LIBS += -framework SystemConfiguration
+    LIBS += -framework CFNetwork
+    LIBS += -lsqlite3
+    LIBS += -lresolv
 }
 
 
@@ -51,6 +67,7 @@ SOURCES += $$files(util/*.cpp)
 SOURCES += $$files(util_desktop/*.cpp)
 SOURCES += $$files(wallet/*.cpp)
 SOURCES += $$files(node/*.cpp)
+SOURCES += $$files(wallet/api/*.cpp)
 SOURCES += $$files(wallet/tasks/*.cpp)
 SOURCES += $$files(windows_desktop/*.cpp)
 SOURCES += $$files(dialogs_desktop/*.cpp)
@@ -71,6 +88,7 @@ HEADERS += $$files(util/*.h)
 HEADERS += $$files(util_desktop/*.h)
 HEADERS += $$files(wallet/*.h)
 HEADERS += $$files(node/*.h)
+HEADERS += $$files(wallet/api/*.h)
 HEADERS += $$files(wallet/tasks/*.h)
 HEADERS += $$files(windows_desktop/*.h)
 HEADERS += $$files(dialogs_desktop/*.h)

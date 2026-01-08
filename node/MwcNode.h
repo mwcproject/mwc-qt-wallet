@@ -18,7 +18,8 @@
 #include <QObject>
 #include <QProcess>
 #include <QVector>
-#include "../tries/NodeOutputParser.h"
+#include "MwcNodeApi.h"
+#include "wallet/tasks/TorEmbeddedStarter.h"
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -27,25 +28,11 @@ namespace core {
 class AppContext;
 }
 
-namespace tries{
-class NodeOutputParser;
+namespace wallet {
+class Wallet;
 }
 
 namespace node {
-
-// Node management timeouts.
-const int64_t CHECK_NODE_PERIOD = 5 * 1000; // Timer check period. API calls to node will be issued
-const int64_t NODE_OUT_OF_SYNC_FAILURE_LIMIT = 60; // Node ouf of sync and nothing was updated...
-const int64_t NODE_NO_PEERS_FAILURE_LIMITS = 60; // Let's wait 5 minutes before restarts
-
-const int64_t START_TIMEOUT   = 120*1000;
-const int64_t START_TOR_TIMEOUT = 60*10*1000; // Tor can start for a very long time. Let's wait for extra 10 minutes if we are using tor
-
-// messages from NodeOutputParser
-const int64_t MWC_NODE_STARTED_TIMEOUT = 180*1000; // It can take some time to find peers
-const int64_t MWC_NODE_SYNC_MESSAGES = 5*60*1000; // Sync supposed to be agile
-const int64_t RECEIVE_BLOCK_LISTEN = 10*60*1000; // 10 minutes can be delay due non consistancy. API call expected to catch non sync cases
-const int64_t NETWORK_ISSUES = 0; // Let's not consider network issues. API call will restart the node
 
 struct PeerInfo {
     QString address;
@@ -65,108 +52,54 @@ struct NodeStatus {
 
 enum class SYNC_STATE {GETTING_HEADERS, GETTING_PIBD, VERIFY_KERNELS_HISTORY, VERIFY_HEADERS, VERIFY_KERNEKLS_POS, VERIFY_RANGEPROOFS, VERIFY_KERNEL, GETTING_BLOCKS };
 
+class MwcNode;
+
 // mwc-node lifecycle management
 class MwcNode : public QObject {
 Q_OBJECT
 public:
     // nodePath - path to the executable
-    MwcNode(const QString & nodePath, core::AppContext * appContext);
+    MwcNode(core::AppContext * appContext, QFuture<QString> * torStarter);
     virtual ~MwcNode() override;
 
-    bool isRunning() const {return nodeProcess!= nullptr;}
-    const QString & getCurrentNetwork() const { return lastUsedNetwork; }
-    bool usingTor() const {return lastTor;}
+    bool isRunning() const {return nodeContextId>=0 || startingNode.isValid();}
+    const QString & getCurrentNetwork() const { return nodeNetwork; }
+    const QString & getNodeDataPath() const {return nodeDataPath;}
 
-    void start( const QString & dataPath, const QString & network, bool tor );
+    void setNodeContextId(int id) {nodeContextId = id;}
+
+    // Tor will be started only if it is not running yet
+    void start( const QString & nodeDataPath, const QString & network );
     void stop();
 
-    QString getMwcStatus() const { return nodeStatusString; }
+    // Return status And progress String
+    QPair<ServerStats, QString> getServerStats();
 
-    // Last Many node output lines. There are many of them.
-    // Call from the same thread
-    const QStringList & getOutputLines() const {return outputLines;}
-
-    QString getLogsLocation() const;
-private:
-    QProcess * initNodeProcess( const QString & dataPath, const QString & network, bool tor );
-
-    void nodeProcDisconnect();
-    void nodeProcConnect(QProcess * process);
-
-    enum class REQUEST_TYPE { GET, POST };
-    void sendRequest( const QString & tag, QString secret, const QString & api, REQUEST_TYPE reqType = REQUEST_TYPE::GET);
-
-    QString getNodeSecret();
+    QString callForiegnApi(const QString & request);
 
     void reportNodeFatalError( QString message );
 
-    void updateRunningStatus();
-
-    bool isFinalRun() {return restartCounter>2;}
+    void submitStartNodeResult(QString errorStr, int context_id, bool isStartCancelled);
 private:
-    virtual void timerEvent(QTimerEvent *event) override;
+    void waitCancelStart();
 
+private:
     QString calcProgressStr( bool pibdSync, SYNC_STATE syncState, int minVal, int cur, int max );
 
-private: signals:
-    void onMwcOutputLine(QString line);
-    void onMwcStatusUpdate(QString status);
-    void onMwcNodeStarted();
-
 private slots:
-    void nodeErrorOccurred(QProcess::ProcessError error);
-    void nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
-    void mwcNodeReadyReadStandardError();
-    void mwcNodeReadyReadStandardOutput();
-
-    void replyFinished(QNetworkReply* reply);
-
-    void nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString message);
-
-    // One short timer to restart the node. Usinng instead of sleep
-    void onRestartNode();
 private:
     core::AppContext *appContext; // app context to store current account name
+    QFuture<QString> * torStarter;
 
-    QString nodePath; // path to the backed binary
-    QProcess *nodeProcess = nullptr;
-    tries::NodeOutputParser *nodeOutputParser = nullptr; // logs will come from stdout
-
-    QString lastUsedNetwork;
-    PeerConnectionInfo peers; // connected peers. Polling with API
-    NodeStatus         nodeStatus;
-    QString nodeSecret;
-    QString nodeWorkDir;
-
-    int64_t respondTimelimit = 0; // Get some respond from node. Will be happy until that time.
-
-    QVector< QMetaObject::Connection > processConnections; // open connection to mwc713
-
-    int nodeNoPeersFailCounter = 0;
-    int nodeOutOfSyncCounter = 0;
-    int nodeHeight = 0;
-    int peersMaxHeight = 0;
-
-    QNetworkAccessManager *nwManager;
-
-    QString nonEmittedOutput;
-
-    QString nodeStatusString = "Waiting";
-    bool    pibdSyncPhase = false;
-    bool    syncIsDone = false;
-
-    // Last Many node output lines
-    QStringList outputLines;
-
-    // Will try to restart the node several times.
-    // The reason that because of another instance is running
-    int restartCounter = 0;
-
-    QString lastDataPath;
-    bool lastTor = false;
-
-    QString commandLine;
+    int nodeContextId = -1;
+    QString nodeDataPath;
+    QString nodeNetwork;
+    QAtomicInt stoppingFlag;
+    QFuture<void> startingNode;
+    bool pibdSyncPhase = false;
 };
+
+QString calculateRunningStatus(bool & pibdSyncPhase, ServerStats stats);
 
 }
 

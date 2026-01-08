@@ -19,6 +19,9 @@
 #include "../dialogs_desktop/v_showviewoutputdlg.h"
 #include "../util_desktop/widgetutils.h"
 #include <QDebug>
+#include <QJsonArray>
+
+#include "control_desktop/richitem.h"
 
 namespace wnd {
 
@@ -50,12 +53,12 @@ void ViewOutputs::on_backButton_clicked()
     viewAcounts->backFromOutputsView();
 }
 
-void ViewOutputs::onSgnViewOutputs(QString viewingKey, QVector<QString> outputs, QString totalAmount) {
+void ViewOutputs::onSgnViewOutputs(QString viewingKey, QJsonArray outputs, QString totalAmount) {
     allData.clear();
 
-    for (const QString & s : outputs) {
+    for (const auto & s : outputs) {
         OutputData out;
-        out.output = wallet::WalletOutput::fromJson(s);
+        out.output = wallet::WalletOutput::fromJson(s.toObject());
         allData.push_back( out );
     }
 
@@ -78,6 +81,7 @@ void ViewOutputs::updateShownData(bool resetScrollData) {
         // Data filtering was done on outputs request level. No need to filter out anything
 
         control::RichItem * itm = control::createMarkedItem(QString::number(i), ui->outputsTable, false, "" );
+        itm->setParent(ui->outputsTable);
 
         QWidget * markWnd = (QWidget *) itm->getCurrentWidget();
 

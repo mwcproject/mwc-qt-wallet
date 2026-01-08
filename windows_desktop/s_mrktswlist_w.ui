@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MrktSwList</class>
- <widget class="QWidget" name="MrktSwList">
+ <widget class="control::MwcWidget" name="MrktSwList">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -62,10 +62,10 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Show Marketplace offers</string>
+        <string>Show marketplace offers</string>
        </property>
        <property name="statusTip">
-        <string>Show Marketplace offers</string>
+        <string>Show marketplace offers</string>
        </property>
        <property name="text">
         <string>Marketplace Offers</string>
@@ -191,7 +191,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="feesHolder" native="true">
+    <widget class="control::MwcWidget" name="feesHolder" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -305,7 +305,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QWidget" name="feeFixedHolder" native="true">
+         <widget class="control::MwcWidget" name="feeFixedHolder" native="true">
           <property name="minimumSize">
            <size>
             <width>800</width>
@@ -318,7 +318,7 @@
             <height>400</height>
            </size>
           </property>
-          <widget class="QPushButton" name="feeLevelHelpBtn">
+          <widget class="control::MwcPushButton" name="feeLevelHelpBtn">
            <property name="geometry">
             <rect>
              <x>765</x>
@@ -403,13 +403,13 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>How much fee you agree to pay for your offers. Use Help for more details</string>
+            <string>Fee you agree to pay for your offers. Use Help for details.</string>
            </property>
            <property name="statusTip">
-            <string>How much fee you agree to pay for your offers. Use Help for more details</string>
+            <string>Fee you agree to pay for your offers. Use Help for details.</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="depositAccountHelpBtn">
+          <widget class="control::MwcPushButton" name="depositAccountHelpBtn">
            <property name="geometry">
             <rect>
              <x>765</x>
@@ -500,7 +500,7 @@
             <string>Account to pay the fees</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="reservedAmountHelpBtn">
+          <widget class="control::MwcPushButton" name="reservedAmountHelpBtn">
            <property name="geometry">
             <rect>
              <x>765</x>
@@ -601,7 +601,7 @@
             <string>MWC</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="activeFeesHelpBtn">
+          <widget class="control::MwcPushButton" name="activeFeesHelpBtn">
            <property name="geometry">
             <rect>
              <x>765</x>
@@ -655,7 +655,7 @@
             <string>Active Fees:</string>
            </property>
           </widget>
-          <widget class="QTextEdit" name="activeFees">
+          <widget class="control::MwcTextEdit" name="activeFees">
            <property name="geometry">
             <rect>
              <x>10</x>
@@ -735,7 +735,7 @@
             <string>Withdraw XX MWC</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="withdrawHelpBtn">
+          <widget class="control::MwcPushButton" name="withdrawHelpBtn">
            <property name="geometry">
             <rect>
              <x>765</x>
@@ -757,10 +757,10 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="statusTip">
-            <string>Click for help</string>
+            <string>Open help</string>
            </property>
            <property name="styleSheet">
             <string notr="true">#withdrawHelpBtn{border: none;}</string>
@@ -867,7 +867,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="filterPlaceholder" native="true">
+    <widget class="control::MwcWidget" name="filterPlaceholder" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,1">
       <item>
        <widget class="control::MwcComboBox" name="buySellCombo">
@@ -916,7 +916,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_7">
+       <widget class="control::MwcLabel" name="label_7">
         <property name="text">
          <string>MWC for </string>
         </property>
@@ -954,7 +954,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_8">
+       <widget class="control::MwcLabel" name="label_8">
         <property name="text">
          <string>Minimal fee:</string>
         </property>
@@ -986,7 +986,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="statusLabel">
+       <widget class="control::MwcLabel" name="statusLabel">
         <property name="text">
          <string>Status: </string>
         </property>
@@ -1023,7 +1023,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="refreshBtnsHolder" native="true">
+    <widget class="control::MwcWidget" name="refreshBtnsHolder" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -1169,7 +1169,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -1247,6 +1247,26 @@
    <class>control::MwcToolButtonUnderscore</class>
    <extends>QToolButton</extends>
    <header>control_desktop/MwcToolButton.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButton</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

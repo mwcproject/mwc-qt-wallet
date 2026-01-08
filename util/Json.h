@@ -17,6 +17,10 @@
 
 #include <QJsonObject>
 
+namespace wallet {
+    class Wallet;
+}
+
 namespace util {
 
 // Return empty if not able to parse.
@@ -47,8 +51,7 @@ struct FileTransactionInfo {
 
     QString resultingFN; // cookie data
 
-    QPair<bool, QString> parseSlateContent( QString slateContent, FileTransactionType type, QString slateSenderAddress );
-    QPair<bool, QString> parseSlateFile( QString fileName, FileTransactionType type );
+    QPair<bool, QString> parseSlateContent( QString slateContent, FileTransactionType type, QString slateSenderAddress, wallet::Wallet * wallet );
 };
 
 

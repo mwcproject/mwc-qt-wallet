@@ -32,15 +32,14 @@ InputPassword::InputPassword( StateContext * _context) :
     State(_context, STATE::INPUT_PASSWORD)
 {
     // Result of the login
-    QObject::connect( context->wallet, &wallet::Wallet::onLoginResult, this, &InputPassword::onLoginResult, Qt::QueuedConnection );
-    QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &InputPassword::onWalletBalanceUpdated, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onScanDone, this, &InputPassword::onScanDone, Qt::QueuedConnection );
 }
 
 InputPassword::~InputPassword() {
 }
 
 NextStateRespond InputPassword::execute() {
-    bool running = context->wallet->isRunning();
+    bool running = context->wallet->getStartStatus() != wallet::Wallet::STARTED_MODE::OFFLINE;
     QString lockStr = context->appContext->pullCookie<QString>("LockWallet");
     inLockMode = false;
 
@@ -55,7 +54,6 @@ NextStateRespond InputPassword::execute() {
         if (config::isOnlineNode()) {
             core::getWndManager()->pageNodeInfo();
             // Starting the wallet normally for the node
-            context->wallet->start();
             return NextStateRespond( NextStateRespond::RESULT::DONE );
         }
 
@@ -66,7 +64,6 @@ NextStateRespond InputPassword::execute() {
 
     if (!lockStr.isEmpty()) {
         inLockMode = true;
-        lockedWalletPath = context->appContext->getCurrentWalletInstance(true);
         mwc::setWalletLocked(inLockMode);
         // wallet locking mode
         core::getWndManager()->pageInputPassword(mwc::PAGE_A_ACCOUNT_UNLOCK, true);
@@ -77,85 +74,81 @@ NextStateRespond InputPassword::execute() {
     return NextStateRespond( NextStateRespond::RESULT::DONE );
 }
 
-void InputPassword::submitPassword(const QString & password) {
+bool InputPassword::submitPassword(const QString & password, const QString & selectedPath) {
+    logger::logInfo(logger::STATE, "Call InputPassword::submitPassword with <password> selectedPath=" + selectedPath);
+    bool running = context->wallet->getStartStatus() != wallet::Wallet::STARTED_MODE::OFFLINE;
     // Check if we can skip logout/login step.
     // If wallet wasn't changed, there is no reason logout and restart all listeners.
-    if (inLockMode && lockedWalletPath == context->appContext->getCurrentWalletInstance(true) &&
+    if (inLockMode && running && context->getCurrentBasePath() == selectedPath &&
                 context->appContext->getActiveWndState() != STATE::SHOW_SEED) {
         // We can just verify the password and we should be good
 
-        if (crypto::calcHSA256Hash(password) !=
-                context->wallet->getPasswordHash() ) {
-            // mwaasage match with mwc713 returns
+        if (!context->wallet->checkPassword(password)) {
             core::getWndManager()->messageTextDlg("Password", "Password supplied was incorrect. Please input correct password.");
-            return;
+            return false;
         }
-        // We are good here, let's unlock the wallet
 
+        // We are good here, let's unlock the wallet
         inLockMode = false;
         mwc::setWalletLocked(inLockMode);
 
         context->stateMachine->executeFrom(STATE::NONE);
-        return;
+        return true;
     }
 
     // Check if we need to logout first. It is very valid case if we in lock mode
-    if ( context->wallet->isRunning() )
-        context->wallet->logout(true);
+    context->wallet->logout();
 
     if (inLockMode) {
         inLockMode = false;
         mwc::setWalletLocked(inLockMode);
     }
 
-    context->wallet->start();
-    context->wallet->loginWithPassword( password );
+    if (!context->initWalletNode(selectedPath)) {
+        logger::logError(logger::QT_WALLET, "Unable to init wallet for data location " + selectedPath);
+        return false;
+    }
+
+    QString err = context->wallet->loginWithPassword( password, context->appContext );
+    if (!err.isEmpty()) {
+        logger::logDebug(logger::QT_WALLET, "Log attempt was failed. Error: " + err);
+        core::getWndManager()->messageTextDlg("Login error", err);
+        return false;
+    }
+
+    // Going forward by initializing the wallet
+    if ( context->wallet->getStartStatus() == wallet::Wallet::STARTED_MODE::NORMAL ) {
+        if (! config::isOnlineNode()) {
+            // Updating the wallet balance
+            updateRespId = context->wallet->update_wallet_state();
+        }
+
+        // Starting listeners after balance to speed up the init process
+        if ( config::isOnlineWallet() ) {
+            // Start listening, no feedback interested
+            context->wallet->listeningStart(context->appContext->isFeatureMWCMQS(),
+                                            context->appContext->isFeatureTor());
+        }
+    }
 
     if ( context->appContext->getActiveWndState() == STATE::SHOW_SEED ) {
         context->appContext->pushCookie<QString>("password", password);
     }
-
+    return true;
 }
 
-//static bool foreignAPIwasReported = false;
+void InputPassword::onScanDone( QString responseId, bool fullScan, int height, QString errorMessage ) {
+    if (updateRespId!=responseId)
+        return;
 
-void InputPassword::onLoginResult(bool ok) {
-
-    if (ok) {
-        // Going forward by initializing the wallet
-        if ( context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
-
-            if (! config::isOnlineNode()) {
-                // Updating the wallet balance and a node status
-                context->wallet->updateWalletBalance(true, true);
-            }
-
-            // Starting listeners after balance to speed up the init process
-            if ( config::isOnlineWallet() && context->wallet->hasPassword() ) {
-                // Start listening, no feedback interested
-                context->wallet->listeningStart(context->appContext->isFeatureMWCMQS(),
-                                                context->appContext->isFeatureTor(),
-                                                true);
-            }
-
-            context->wallet->getNodeStatus();
-        }
-
-    }
-}
-
-
-// Account info is updated
-void InputPassword::onWalletBalanceUpdated() {
-
-    if (context->wallet->getWalletBalance().isEmpty() )
-        return; // in restart mode
+    Q_UNUSED(fullScan);
+    Q_UNUSED(height);
+    Q_UNUSED(errorMessage);
 
     // Using wnd as a flag that we are active.
     if ( !inLockMode && state::getStateMachine()->getCurrentStateId() == STATE::INPUT_PASSWORD) {
         context->stateMachine->executeFrom(STATE::INPUT_PASSWORD);
     }
 }
-
 
 }

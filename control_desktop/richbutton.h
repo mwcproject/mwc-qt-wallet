@@ -15,7 +15,7 @@
 #ifndef MWC_QT_WALLET_RICHBUTTON_H
 #define MWC_QT_WALLET_RICHBUTTON_H
 
-#include <QPushButton>
+#include "MwcPushButton.h"
 
 namespace control {
 
@@ -27,7 +27,7 @@ public:
     virtual void richButtonPressed(RichButton * button, QString coockie) = 0;
 };
 
-class RichButton : public QPushButton {
+class RichButton : public MwcPushButton {
 Q_OBJECT
 public:
     RichButton(QWidget * parent, QString text, int cx, int cy, QString tooltip, int fontSize=10);

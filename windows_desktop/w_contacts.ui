@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Contacts</class>
- <widget class="QWidget" name="Contacts">
+ <widget class="control::MwcWidget" name="Contacts">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -163,10 +163,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Delete seleted contact</string>
+          <string>Delete selected contact</string>
          </property>
          <property name="statusTip">
-          <string>Delete seleted contact</string>
+          <string>Delete selected contact</string>
          </property>
          <property name="styleSheet">
           <string notr="true">#deleteButton{border:none}</string>
@@ -271,6 +271,11 @@
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
    <header>control_desktop/listwithcolumns.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

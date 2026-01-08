@@ -15,6 +15,8 @@
 #include "e_receiveSpOnly_w.h"
 #include "ui_e_receiveSpOnly.h"
 #include <QFileInfo>
+#include <QJsonDocument>
+
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
@@ -23,6 +25,8 @@
 #include "../bridge/wnd/e_receive_b.h"
 #include "../core/global.h"
 #include "../dialogs_desktop/g_inputslatepackdlg.h"
+#include "util/message_mapper.h"
+#include "zz_utils.h"
 
 namespace wnd {
 
@@ -42,19 +46,15 @@ ReceiveSpOnly::ReceiveSpOnly(QWidget *parent) :
 
     QObject::connect( wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
                       this, &ReceiveSpOnly::onSgnWalletBalanceUpdated, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnFileProofAddress,
-                      this, &ReceiveSpOnly::onSgnFileProofAddress, Qt::QueuedConnection);
-
-    QObject::connect(wallet, &bridge::Wallet::sgnDecodeSlatepack,
-                     this, &ReceiveSpOnly::onSgnDecodeSlatepack, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
     ui->slatepack_status->hide();
     ui->continueButton->setEnabled(false);
 
-    updateAccountList();
+    updateAccountsData(wallet, ui->accountComboBox, true, true);
 
-    wallet->requestFileProofAddress();
+    QString address = wallet->getTorSlatepackAddress();
+    ui->torAddress->setText(address);
 }
 
 ReceiveSpOnly::~ReceiveSpOnly() {
@@ -71,110 +71,21 @@ void ReceiveSpOnly::onSgnTransactionActionIsFinished( bool success, QString mess
 void ReceiveSpOnly::on_accountComboBox_activated(int index)
 {
     Q_UNUSED(index);
-    auto accountName = ui->accountComboBox->currentData(); // QVariant
-    if (accountName.isValid())
-        wallet->setReceiveAccount(accountName.toString());
-}
-
-void ReceiveSpOnly::updateAccountList() {
-    // accountInfo - pairs of [name, longInfo]
-    QVector<QString> accountInfo = wallet->getWalletBalance(true, false, true);
-    QString selectedAccount = wallet->getReceiveAccount();
-
-    int selectedAccIdx = 0;
-
-    ui->accountComboBox->clear();
-
-    int idx=0;
-    for (int i=1; i<accountInfo.size(); i+=2) {
-        if ( accountInfo[i-1] == "integrity")
-            continue;
-
-        if (accountInfo[i-1] == selectedAccount)
-            selectedAccIdx = idx;
-
-        ui->accountComboBox->addItem( accountInfo[i], QVariant(accountInfo[i-1]) );
-        idx++;
-    }
-    ui->accountComboBox->setCurrentIndex(selectedAccIdx);
+    auto accountPath = ui->accountComboBox->currentData(); // QVariant
+    if (accountPath.isValid())
+        wallet->setReceiveAccountById(accountComboData2AccountPath(accountPath.toString()).second);
 }
 
 void ReceiveSpOnly::onSgnWalletBalanceUpdated() {
-    updateAccountList();
-}
-
-void ReceiveSpOnly::onSgnFileProofAddress(QString proofAddress) {
-    ui->torAddress->setText(proofAddress);
-}
-
-void ReceiveSpOnly::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
-    Q_UNUSED(recipient)
-
-    if (tag != "ReceiveSpOnly")
-        return;
-
-    isSpValid = false;
-    spInProgress = "";
-    ui->slatepack_status->hide();
-    if (!error.isEmpty()) {
-        ui->slatepack_status->show();
-        ui->slatepack_status->setText("<b>" + error + "</b>");
-    }
-    else {
-        if ("SendInitial" != content) {
-            ui->slatepack_status->show();
-            ui->slatepack_status->setText( "<b>Wrong slatepack content. Expected SendInitial, but got " + content + "</b>" );
-        }
-        else {
-            // Validating Json
-            QVector<QString> slateParseRes = util->parseSlateContent(slateJson, int(util::FileTransactionType::RECEIVE), sender );
-            Q_ASSERT(slateParseRes.size() == 1 || slateParseRes.size() >= 2);
-            if (slateParseRes.size() == 1) {
-                // parser reported error
-                ui->slatepack_status->show();
-                ui->slatepack_status->setText("<b>" + slateParseRes[0] + "</b>" );
-            }
-            else {
-                QString spDesk;
-                QString senderStr;
-                if (sender == "None") {
-                    spDesk = "non encrypted Slatepack";
-                } else {
-                    spDesk = "encrypted Slatepack";
-                    senderStr = " from " + sender;
-                }
-
-                // mwc is on nano units
-                QString mwcStr = util->nano2one(slateParseRes[1]);
-
-                ui->slatepack_status->setText("You receive " + spDesk + " for " + mwcStr + " MWC" + senderStr);
-                isSpValid = true;
-                this->slatepack = slatepack;
-                this->slateJson = slateJson;
-                this->sender = sender;
-                ui->slatepack_status->show();
-            }
-        }
-    }
-
-    QString textSp = ui->slatepackEdit->toPlainText().trimmed();
-
-    if (slatepack != textSp) {
-        initiateSlateVerification(textSp);
-        isSpValid = false;
-    }
-
-    updateButtons();
+    updateAccountsData(wallet, ui->accountComboBox, true, true);
 }
 
 void ReceiveSpOnly::on_slatepackEdit_textChanged() {
     isSpValid = false;
     updateButtons();
 
-    if (spInProgress.isEmpty()) {
-        QString sp = ui->slatepackEdit->toPlainText().trimmed();
-        initiateSlateVerification(sp);
-    }
+    QString sp = ui->slatepackEdit->toPlainText().trimmed();
+    initiateSlateVerification(sp);
 }
 
 // Accepting the slatepack and continue to process it
@@ -196,8 +107,57 @@ void ReceiveSpOnly::initiateSlateVerification(const QString &slate2check) {
         return;
     }
 
-    spInProgress = slate2check;
-    wallet->decodeSlatepack(slate2check, "ReceiveSpOnly");
+    QJsonObject decodeRes = wallet->decodeSlatepack(slate2check);
+    wallet::DecodedSlatepack decodedSp = wallet::DecodedSlatepack::fromJson(decodeRes);
+
+    isSpValid = false;
+    ui->slatepack_status->hide();
+    if (!decodedSp.error.isEmpty()) {
+        ui->slatepack_status->show();
+        ui->slatepack_status->setText("<b>" + decodedSp.error + "</b>");
+    }
+    else {
+        if ("SendInitial" != decodedSp.content) {
+            ui->slatepack_status->show();
+            ui->slatepack_status->setText( "<b>Wrong slatepack content. Expected SendInitial, but got " + decodedSp.content + "</b>" );
+        }
+        else {
+            // Validating Json
+
+            QString slateAsStr = QJsonDocument(decodedSp.slate).toJson(QJsonDocument::Compact);
+
+            QVector<QString> slateParseRes = util->parseSlateContent(slateAsStr, int(util::FileTransactionType::RECEIVE), decodedSp.sender );
+            Q_ASSERT(slateParseRes.size() == 1 || slateParseRes.size() >= 2);
+            if (slateParseRes.size() == 1) {
+                // parser reported error
+                ui->slatepack_status->show();
+                ui->slatepack_status->setText("<b>" + slateParseRes[0] + "</b>" );
+            }
+            else {
+                QString spDesk;
+                QString senderStr;
+                if (decodedSp.sender.isEmpty()) {
+                    spDesk = "non encrypted Slatepack";
+                } else {
+                    spDesk = "encrypted Slatepack";
+                    senderStr = " from " + decodedSp.sender;
+                }
+
+                // mwc is on nano units
+                QString mwcStr = util->nano2one(slateParseRes[1]);
+
+                ui->slatepack_status->setText("You receive " + spDesk + " for " + mwcStr + " MWC" + senderStr);
+                isSpValid = true;
+                this->slatepack = slate2check;
+                this->slateJson = slateAsStr;
+                this->sender = decodedSp.sender;
+                ui->slatepack_status->show();
+            }
+        }
+    }
+
+    QString textSp = ui->slatepackEdit->toPlainText().trimmed();
+    updateButtons();
 }
 
 }

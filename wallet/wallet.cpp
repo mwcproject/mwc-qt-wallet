@@ -13,615 +13,974 @@
 // limitations under the License.
 
 #include "wallet/wallet.h"
-#include <QDataStream>
-#include <QDateTime>
-#include "../core/global.h"
-#include "../core/Config.h"
-#include <QDir>
-#include "../util/Files.h"
-#include "../util/Process.h"
-#include "../core/WndManager.h"
-#include "../core/appcontext.h"
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QJsonArray>
+
+#include <qjsondocument.h>
+
+#include "api/MwcWalletApi.h"
+#include "core/global.h"
+#include "core/WndManager.h"
+#include "util/Log.h"
+#include "../node/node_client.h"
+#include "../../mwc-wallet/mwc_wallet_lib/c_header/mwc_wallet_interface.h"
+#include "tasks/StartStopListeners.h"
+#include "wallet_macro.h"
+#include "bridge/wnd/u_nodeInfo_b.h"
+#include "tasks/Scan.h"
+#include "tasks/ScanRewindHash.h"
+#include "tasks/Send.h"
+#include "../node/node_client.h"
+#include "core/appcontext.h"
+#include "core/WalletApp.h"
+#include "tasks/requestFaucet.h"
+#include "util/message_mapper.h"
+
+// Problem that we return pointer to a string from the callback. It is mean that we must
+// store somewhere an instance. Using buffer for that
+static std::string node_client_callback_responses[50];
+static QAtomicInt resp_idx(0);
+
+extern "C"
+const int8_t* node_client_callback(void* ctx, const int8_t* message)
+{
+    node::NodeClient * nodeClient = (node::NodeClient *) ctx;
+    Q_ASSERT(nodeClient);
+
+    int respIdx = std::abs(resp_idx.fetchAndAddRelaxed(1)) % 50;
+
+    QString request((const char*)message);
+    QString response = nodeClient->foreignApiRequest(request);
+
+    node_client_callback_responses[respIdx] = response.toStdString();
+    const char * resp = node_client_callback_responses[respIdx].c_str();
+
+    return (const int8_t*) resp;
+}
+
+extern "C"
+const int8_t* update_status_callback(void* ctx, const int8_t* message)
+{
+    wallet::Wallet * wallet = (wallet::Wallet *) ctx;
+    Q_ASSERT(wallet);
+
+    QString updateMsg((const char*)message);
+    logger::logDebug(logger::MWC_WALLET, "Status update : " + updateMsg);
+
+    QJsonParseError err;
+    QJsonDocument doc = QJsonDocument::fromJson(updateMsg.toUtf8(), &err);
+
+    if (err.error != QJsonParseError::NoError) {
+        logger::logError(logger::MWC_WALLET,
+            "Unable to parse state update message: " + updateMsg + ".  Error: " + err.errorString() +  " at offset " + QString::number(err.offset));
+        return nullptr;
+    }
+    QJsonObject updateJson = doc.object();
+
+    QString response_id = updateJson["response_id"].toString();
+    QJsonObject status = updateJson["status"].toObject();
+
+    wallet->emitStatusUpdate( response_id, status );
+
+    return nullptr;
+}
+
+extern "C"
+int8_t const * new_tx_callback(void* ctx, const int8_t* msg) {
+    wallet::Wallet * wallet = (wallet::Wallet *) ctx;
+    Q_ASSERT(wallet);
+
+    // message is a json string with ReceiveData
+    QString newTransaction((const char*)msg);
+    logger::logDebug(logger::MWC_WALLET, "Receive transaction message: " + newTransaction);
+
+    QJsonParseError err;
+    QJsonDocument doc = QJsonDocument::fromJson(newTransaction.toUtf8(), &err);
+
+    if (err.error != QJsonParseError::NoError) {
+        logger::logError(logger::MWC_WALLET,
+            "Unable to parse Receive transaction message: " + newTransaction + ".  Error: " + err.errorString() +  " at offset " + QString::number(err.offset));
+        return nullptr;
+    }
+    QJsonObject newTx = doc.object();
+
+    int context_id = newTx["context_id"].toInt();
+    if (wallet->getContextId()!=context_id) {
+        logger::logError(logger::MWC_WALLET, "Get new Tx message with invalid context id");
+        return nullptr;
+    }
+
+    QString tx_uuid = newTx["tx_uuid"].toString();
+    QString from = newTx["from"].toString();
+    int64_t amount = newTx["amount"].toInteger();
+    QString message = newTx["message"].toString();
+
+    wallet->emitSlateReceivedFrom(tx_uuid, amount, from, message );
+    return nullptr;
+}
 
 namespace wallet {
 
-
-static QJsonObject str2json(const QString & jsonStr) {
-    QJsonParseError error;
-    QJsonDocument   jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8(), &error);
-    // It is internal data, no errors expected
-    Q_ASSERT(error.error == QJsonParseError::NoError);
-    Q_ASSERT(jsonDoc.isObject());
-
-    return jsonDoc.object();
-}
-
-
-//////////////////////////////////////////////////////////
-//  AccountInfo
-
-void AccountInfo::setData(QString account,
-                        int64_t _total,
-                        int64_t _awaitingConfirmation,
-                        int64_t _lockedByPrevTransaction,
-                        int64_t _currentlySpendable,
-                        int64_t _height,
-                        bool _mwcServerBroken)
-{
-    accountName = account;
-    total = _total;
-    awaitingConfirmation = _awaitingConfirmation;
-    lockedByPrevTransaction = _lockedByPrevTransaction;
-    currentlySpendable = _currentlySpendable;
-    height = _height;
-    mwcServerBroken = _mwcServerBroken;
-}
-
-QString AccountInfo::getLongAccountName() const {
-    return accountName + "  Total: " + util::nano2one(total) + " MWC  " +
-                "Spendable: " + util::nano2one(currentlySpendable) + "  Locked: " +
-                util::nano2one(lockedByPrevTransaction) +
-                "  Unconfirmed: " + util::nano2one(awaitingConfirmation);
-}
-
-QString AccountInfo::getSpendableAccountName() const {
-    return  util::expandStrR(accountName, 15) +
-           "   Available: " + util::nano2one(currentlySpendable) + " MWC";
-
-}
-
-
-// return true is this account can be concidered as deleted
-bool AccountInfo::isDeleted() const {
-    return  accountName.startsWith( mwc::DEL_ACCONT_PREFIX ) &&
-            total == 0 && awaitingConfirmation==0 && lockedByPrevTransaction==0 && currentlySpendable==0;
-}
-
-
-// Debug/Log printing
-QString AccountInfo::toString() const {
-    return "AccountInfo(acc=" + accountName + ", total=" + util::nano2one(total) +
-               " spend=" + util::nano2one(currentlySpendable) + " locked=" +
-               util::nano2one(lockedByPrevTransaction) +
-               " awaiting=" + util::nano2one(awaitingConfirmation) + ")";
-}
-
-/////////////////////////////////////////////////////////////////////
-//  MwcNodeConnection
-
-void MwcNodeConnection::saveData(QDataStream & out) const {
-    int id = 0x4355a2;
-    out << id;
-    out << (int)connectionType;
-    out << mwcNodeURI;
-    out << mwcNodeSecret;
-    out << localNodeDataPath;
-}
-
-bool MwcNodeConnection::loadData(QDataStream & in) {
-    int id = 0;
-    in >> id;
-    if (id<0x4355a1 || id>0x4355a2)
-        return false;
-
-    int conType = (int)NODE_CONNECTION_TYPE::CLOUD;
-    in >> conType;
-    connectionType = (NODE_CONNECTION_TYPE) conType;
-    in >> mwcNodeURI;
-    in >> mwcNodeSecret;
-
-    if (id>=0x4355a2)
-        in >> localNodeDataPath;
-
-    return true;
-}
-
-QString MwcNodeConnection::toJson() {
-    QJsonObject obj;
-    obj.insert("connectionType", int(connectionType) );
-    obj.insert("localNodeDataPath", localNodeDataPath );
-    obj.insert("mwcNodeURI", mwcNodeURI );
-    obj.insert("mwcNodeSecret", mwcNodeSecret );
-
-    return QJsonDocument(obj).toJson(QJsonDocument::JsonFormat::Compact);
-
-}
-// static
-MwcNodeConnection MwcNodeConnection::fromJson(const QString & str) {
-    QJsonParseError error;
-    QJsonDocument   jsonDoc = QJsonDocument::fromJson(str.toUtf8(), &error);
-    // Internal data, no error expected
-    Q_ASSERT( error.error == QJsonParseError::NoError );
-    Q_ASSERT(jsonDoc.isObject());
-    QJsonObject obj = jsonDoc.object();
-
-    MwcNodeConnection res;
-    res.setData( NODE_CONNECTION_TYPE(obj.value("connectionType").toInt()),
-                obj.value("localNodeDataPath").toString(),
-                obj.value("mwcNodeURI").toString(),
-                obj.value("mwcNodeSecret").toString() );
-    return res;
-}
-
-void MwcNodeConnection::setData(NODE_CONNECTION_TYPE _connectionType, const QString & _localNodeDataPath,
-             const QString & _mwcNodeURI,  const QString & _mwcNodeSecret) {
-    connectionType = _connectionType;
-    localNodeDataPath = _localNodeDataPath;
-    mwcNodeURI = _mwcNodeURI;
-    mwcNodeSecret = _mwcNodeSecret;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//  WalletConfig
-
-bool WalletConfig::operator == (const WalletConfig & other) const {
-    bool ok = dataPath==other.dataPath;
-    return ok;
-}
-
-
-WalletConfig & WalletConfig::setData(QString _network,
-                            QString _dataPath) {
-    updateNetwork(_network);
-    updateDataPath(_dataPath);
-
-    return * this;
-}
-
-
-QString WalletConfig::toString() const {
-    return "network=" + network + "\n" +
-            "dataPath=" + dataPath;
-}
-
-// Return empty if not found
-//static
-QVector<QString>  WalletConfig::readNetworkArchInstanceFromDataPath(QString configPath, core::AppContext * context) // local path as writen in config
-{
-    QString defaultNetwork = "Mainnet";
-    if (config::isOnlineNode()) {
-        if ( context->isOnlineNodeRunsMainNetwork() )
-            defaultNetwork = "Mainnet";
-        else
-            defaultNetwork = "Floonet";
-    }
-
-    QVector<QString> res{defaultNetwork, util::getBuildArch(), configPath};
-
-    QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
-    if (!path.first) {
-        core::getWndManager()->messageTextDlg("Error", path.second);
-        return res;
-    }
-
-    QStringList lns = util::readTextFile(path.second + QDir::separator() + "net.txt" );
-    if (lns.isEmpty())
-        return res;
-
-
-    QString nw = lns[0];
-    if (!nw.contains("net"))
-        return res;
-
-    res[0] = nw;
-
-    // Architecture
-    if (lns.size()>1)
-        res[1] = lns[1];
-
-    // Instance name
-    if (lns.size()>2)
-        res[2] = lns[2];
-
-    return res;
-}
-
-//static
-bool  WalletConfig::doesSeedExist(QString configPath) {
-    QPair<bool,QString> path = ioutils::getAppDataPath( configPath, false );
-    if (!path.first) {
-        core::getWndManager()->messageTextDlg("Error", path.second);
-        return false;
-    }
-    return QFile::exists( path.second + QDir::separator() + "wallet.seed" );
-}
-
-//static
-void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QString arch, QString instanceName) // Save the network into the data path
-{
-    QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
-    if (!path.first) {
-        core::getWndManager()->messageTextDlg("Error", path.second);
-        return;
-    }
-    util::writeTextFile(path.second + "/net.txt", {network, arch, instanceName} );
-}
-
-//////////////////////////////////////////////////////////////
-// WalletTransaction
-
-// initialize static csvHeaders
-// the CSV headers must match the output from mwc713 for 'txs --show-full'
-QString WalletTransaction::csvHeaders = "Id,Type,Shared Transaction Id,Address,Creation Time,TTL Cutoff Height,"
-                                        "Confirmed?,Height,Confirmation Time,Num. Inputs,Num. Outputs,Amount Credited,"
-                                        "Amount Debited,Fee,Net Difference,Payment Proof,Kernel";
-
-
-void WalletTransaction::setData(int64_t _txIdx,
-                                uint    _transactionType,
-                                QString _txid,
-                                QString _address,
-                                QString _creationTime,
-                                bool    _confirmed,
-                                int64_t _ttlCutoffHeight,
-                                int64_t _height,
-                                QString _confirmationTime,
-                                int     _numInputs,
-                                int     _numOutputs,
-                                int64_t _credited,
-                                int64_t _debited,
-                                int64_t _fee,
-                                int64_t _coinNano,
-                                bool    _proof,
-                                QString _kernel)
-{
-    txIdx = _txIdx;
-    transactionType = _transactionType;
-    txid = _txid;
-    address = _address;
-    creationTime = util::mwc713time2ThisTime(_creationTime);
-    confirmed = _confirmed;
-    height = _height;
-    confirmationTime = util::mwc713time2ThisTime(_confirmationTime);
-    coinNano = _coinNano;
-    proof = _proof;
-    ttlCutoffHeight = _ttlCutoffHeight;
-    numInputs = _numInputs;
-    numOutputs = _numOutputs;
-    credited = _credited;
-    debited = _debited;
-    fee = _fee;
-    kernel = _kernel;
-}
-
-// return transaction age (time interval from creation moment) in Seconds.
-int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) const {
-    // Example: 2019-06-22 05:44:53
-    QDateTime setTime = QDateTime::fromString (creationTime, mwc::DATETIME_TEMPLATE_THIS );
-//    setTime.setOffsetFromUtc(0);
-    return setTime.secsTo(current);
-}
-
-QString WalletTransaction::toStringCSV(const QStringList & extraData) const {
-    QString separator = ",";
-    // always enclose the type string in quotes as it could contain a comma
-
-    // The non confirmed or cancelled transactions need to have balance 0.
-    int64_t tx_credited = credited;
-    int64_t tx_debited = debited;
-    int64_t tx_fee = fee;
-    int64_t tx_coinNano = coinNano;
-
-    if (!confirmed) {
-        tx_credited = tx_debited = tx_fee = tx_coinNano = 0;
-    }
-
-    QString txTypeStr = "\"" + getTypeAsStr() + "\"";
-    QString csvStr = QString::number(txIdx) + separator +       // Id
-                      txTypeStr + separator +                   // Type
-                      txid + separator +                        // Shared Transaction Id
-                      address + separator +                     // Address
-                      creationTime + separator +                // Creation Time
-                      QString::number(ttlCutoffHeight) + separator + // TTL Cutoff Height
-                      (confirmed ? "YES" : "NO") + separator +  // Confirmed?
-                      QString::number(height) + separator +     // height
-                      confirmationTime + separator +            // Confirmation Time
-                      QString::number(numInputs) + separator +  // Num. Inputs
-                      QString::number(numOutputs) + separator + // Num. Outputs
-                      util::nano2one(tx_credited) + separator +    // Amount Credited
-                      util::nano2one(tx_debited) + separator +     // Amount Debited
-                      util::nano2one(tx_fee) + separator +         // Fee
-                      util::nano2one(tx_coinNano) + separator +    // Net Difference
-                      (proof ? "yes" : "no") + separator +      // Payment Proof
-                      kernel;                                   // Kernel
-    for (const auto & dt : extraData)
-        csvStr += separator + dt;
-
-    return csvStr;
-}
-
-QString WalletTransaction::toJson() const {
-    QJsonObject obj;
-    obj.insert("txIdx", QString::number(txIdx) );
-    obj.insert("transactionType", int(transactionType) );
-    obj.insert("txid", txid );
-    obj.insert("address", address);
-    obj.insert("creationTime", creationTime);
-    obj.insert("ttlCutoffHeight", QString::number(ttlCutoffHeight) );
-    obj.insert("confirmed", confirmed);
-    obj.insert("height", QString::number(height) );
-    obj.insert("confirmationTime", confirmationTime);
-    obj.insert("numInputs", numInputs);
-    obj.insert("numOutputs", numOutputs);
-    obj.insert("credited", QString::number(credited));
-    obj.insert("debited", QString::number(debited));
-    obj.insert("fee", QString::number(fee));
-    obj.insert("coinNano", QString::number(coinNano) );
-    obj.insert("proof", proof);
-    obj.insert("kernel", kernel);
-
-    return QJsonDocument(obj).toJson(QJsonDocument::JsonFormat::Compact);
-}
-//static
-WalletTransaction WalletTransaction::fromJson(QString str) {
-    QJsonParseError error;
-    QJsonDocument   jsonDoc = QJsonDocument::fromJson(str.toUtf8(), &error);
-    // Internal data, no error expected
-    Q_ASSERT( error.error == QJsonParseError::NoError );
-    Q_ASSERT(jsonDoc.isObject());
-    QJsonObject obj = jsonDoc.object();
-
-    WalletTransaction res;
-    res.setData(obj.value("txIdx").toString().toLongLong(),
-            uint(obj.value("transactionType").toInt()),
-            obj.value("txid").toString(),
-            obj.value("address").toString(),
-            obj.value("creationTime").toString(),
-            obj.value("confirmed").toBool(),
-            obj.value("ttlCutoffHeight").toString().toLongLong(),
-            obj.value("height").toString().toLongLong(),
-            obj.value("confirmationTime").toString(),
-            obj.value("numInputs").toInt(),
-            obj.value("numOutputs").toInt(),
-            obj.value("credited").toString().toLongLong(),
-            obj.value("debited").toString().toLongLong(),
-            obj.value("fee").toString().toLongLong(),
-            obj.value("coinNano").toString().toLongLong(),
-            obj.value("proof").toBool(),
-            obj.value("kernel").toString());
-    return res;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  WalletOutput
-
-void WalletOutput::setData(QString _outputCommitment,
-        QString     _MMRIndex,
-        QString     _blockHeight,
-        QString     _lockedUntil,
-        QString     _status,
-        bool        _coinbase,
-        QString     _numOfConfirms,
-        int64_t     _valueNano,
-        int64_t     _txIdx)
-{
-    outputCommitment = _outputCommitment;
-    MMRIndex = _MMRIndex;
-    blockHeight = _blockHeight;
-    lockedUntil = _lockedUntil;
-    status = _status;
-    coinbase = _coinbase;
-    numOfConfirms = _numOfConfirms;
-    valueNano = _valueNano;
-    txIdx = _txIdx;
-}
-
-QString WalletOutput::toString() const {
-    return  "Output(" + outputCommitment + ", MMR=" + MMRIndex + ", Height=" + blockHeight + ", Locked=" + lockedUntil + ", status=" +
-            status + ", coinbase=" + (coinbase?"true":"false") + ", confirms=" + numOfConfirms, ", value=" + QString::number(valueNano) + ", txIdx=" + QString::number(txIdx) + ")";
-}
-
-QString WalletOutput::toJson() const {
-    QJsonObject obj;
-    obj.insert("outputCommitment", outputCommitment);
-    obj.insert("MMRIndex", MMRIndex);
-    obj.insert("blockHeight", blockHeight);
-    obj.insert("lockedUntil", lockedUntil);
-    obj.insert("status", status);
-    obj.insert("coinbase", coinbase);
-    obj.insert("numOfConfirms", numOfConfirms);
-    obj.insert("valueNano", QString::number(valueNano) );
-    obj.insert("txIdx", QString::number(txIdx) );
-    obj.insert("weight", weight);
-
-    return QJsonDocument(obj).toJson(QJsonDocument::JsonFormat::Compact);
-}
-
-//static
-WalletOutput WalletOutput::fromJson(QString str) {
-    QJsonParseError error;
-    QJsonDocument   jsonDoc = QJsonDocument::fromJson(str.toUtf8(), &error);
-    // Internal data, no error expected
-    Q_ASSERT( error.error == QJsonParseError::NoError );
-    Q_ASSERT(jsonDoc.isObject());
-    QJsonObject obj = jsonDoc.object();
-
-    WalletOutput res;
-    res.setData(obj.value("outputCommitment").toString(),
-                obj.value("MMRIndex").toString(),
-                obj.value("blockHeight").toString(),
-                obj.value("lockedUntil").toString(),
-                obj.value("status").toString(),
-                obj.value("coinbase").toBool(),
-                obj.value("numOfConfirms").toString(),
-                obj.value("valueNano").toString().toLongLong(),
-                obj.value("txIdx").toString().toLongLong());
-    return res;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//  WalletUtxoSignature
-
-void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
-        QString _messageHash,
-        QString _pubKeyCompressed,
-        QString _messageSignature)
-{
-    coinNano = _coinNano;
-    messageHash = _messageHash;
-    pubKeyCompressed = _pubKeyCompressed;
-    messageSignature = _messageSignature;
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-// SwapInfo
-
-void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _secondaryCurrency,
-              QString _swapId, QString _tag, int64_t _startTime, QString _stateCmd, QString _state, QString _action, int64_t _expiration,
-              bool _isSeller, QString _secondaryAddress, QString _lastProcessError ) {
-    mwcAmount = _mwcAmount;
-    secondaryAmount = _secondaryAmount;
-    secondaryCurrency = _secondaryCurrency;
-    swapId = _swapId;
-    tag = _tag;
-    startTime = _startTime;
-    stateCmd = _stateCmd;
-    state = _state;
-    action = _action;
-    expiration = _expiration;
-    isSeller = _isSeller;
-    secondaryAddress = _secondaryAddress;
-    lastProcessError = _lastProcessError;
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-// SwapTradeInfo
-
-void SwapTradeInfo::setData( QString _swapId, QString _tag, bool _isSeller, double _mwcAmount, double _secondaryAmount,
-              QString _secondaryCurrency,  QString _secondaryAddress, double _secondaryFee,
-              QString _secondaryFeeUnits, int _mwcConfirmations, int _secondaryConfirmations,
-              int _messageExchangeTimeLimit, int _redeemTimeLimit, bool _sellerLockingFirst,
-              int _mwcLockHeight, int64_t _mwcLockTime, int64_t _secondaryLockTime,
-              QString _communicationMethod, QString _communicationAddress, QString _electrumNodeUri ) {
-
-    swapId = _swapId;
-    tag = _tag;
-    isSeller = _isSeller;
-    mwcAmount = _mwcAmount;
-    secondaryAmount = _secondaryAmount;
-    secondaryCurrency = _secondaryCurrency;
-    secondaryAddress = _secondaryAddress;
-    secondaryFee = _secondaryFee;
-    secondaryFeeUnits = _secondaryFeeUnits;
-    mwcConfirmations = _mwcConfirmations;
-    secondaryConfirmations = _secondaryConfirmations;
-    messageExchangeTimeLimit = _messageExchangeTimeLimit;
-    redeemTimeLimit = _redeemTimeLimit;
-    sellerLockingFirst = _sellerLockingFirst;
-    mwcLockHeight = _mwcLockHeight;
-    mwcLockTime = _mwcLockTime;
-    secondaryLockTime = _secondaryLockTime;
-    communicationMethod = _communicationMethod;
-    communicationAddress = _communicationAddress;
-    electrumNodeUri = _electrumNodeUri;
-}
-
-////////////////////////////////////////////////////////////////////
-// SwapExecutionPlanRecord
-
-void SwapExecutionPlanRecord::setData( bool _active, int64_t _end_time, QString _name ) {
-    active = _active;
-    end_time = _end_time;
-    name = _name;
-}
-
-///////////////////////////////////////////////////////////////////
-//  SwapJournalMessage
-
-void SwapJournalMessage::setData( QString _message, int64_t _time ) {
-    message = _message;
-    time = _time;
-}
-
-///////////////////////////////////////////////////////////////////
-// IntegrityFees
-
-IntegrityFees::IntegrityFees(QString jsonString) : IntegrityFees(str2json(jsonString)) {
-}
-
-IntegrityFees::IntegrityFees(QJsonObject json) {
-    confirmed = json["confirmed"].toBool();
-    expiration_height = json["expiration_height"].toInt();
-    ask_fee = json["ask_fee"].toString().toLongLong();
-    fee = json["fee"].toString().toLongLong();
-    uuid = json["uuid"].toString();
-}
-
-QJsonObject IntegrityFees::toJSon() const {
-    QJsonObject res {
-            {"confirmed" , confirmed },
-            {"expiration_height", int(expiration_height) }, // int for height is fine
-            {"ask_fee", QString::number(ask_fee) },
-            {"fee", QString::number(fee) },
-            {"uuid" , uuid },
-    };
-    return res;
-}
-
-QString IntegrityFees::toJSonStr() const {
-    QJsonDocument doc(toJSon());
-    QString offerStrJson( doc.toJson(QJsonDocument::Compact));
-    return offerStrJson;
-}
-
-//////////////////////////////////////////////////////////////////
-//  BroadcastingMessage
-
-BroadcastingMessage::BroadcastingMessage(const QJsonObject & json) {
-    uuid = json["uuid"].toString();
-    broadcasting_interval = json["broadcasting_interval"].toInt();
-    fee = json["fee"].toString().toLongLong();
-    message = json["message"].toString();
-    published_time = json["published_time"].toInt();
-}
-
-//////////////////////////////////////////////////////////////////
-//  MessagingStatus
-
-MessagingStatus::MessagingStatus(const QJsonObject & json) {
-    if ( json["gossippub_peers"].isNull() ) {
-        connected = false;
-    }
-    else {
-        connected = true;
-        QJsonArray peers = json["gossippub_peers"].toArray();
-        for ( int i=0; i<peers.size(); i++ ) {
-            gossippub_peers.push_back( peers[i].toString() );
-        }
-    }
-
-    received_messages = json["received_messages"].toInt();
-    QJsonArray tps = json["topics"].toArray();
-    for (int i=0; i<tps.size(); i++) {
-        topics.push_back( tps[i].toString() );
-    }
-
-    QJsonArray myMsgs = json["broadcasting"].toArray();
-    for (int i=0; i<myMsgs.size(); i++) {
-        broadcasting.push_back( BroadcastingMessage(myMsgs[i].toObject()) );
-    }
-}
-
-// Status for logs
-QString MessagingStatus::toString() const {
-    return "MessagingStatus(gossippub_peers=" + gossippub_peers.join(", ") +
-        ", received_messages=" + QString::number(received_messages) +
-        " topics=" + topics.join(",") +
-        " broadcasting.size()=" + QString::number(broadcasting.size());
-}
-
 //////////////////////////////////////////////////////////////////
 //  Wallet
-Wallet::Wallet()
+Wallet::Wallet(QFuture<QString> * _torStarter)
 {
+    torStarter = _torStarter;
+
+    // Note, expected single instance of Wallet at the same time. If not, newTxUpdate need to be generated
+    set_receive_tx_callback( "newTxUpdate", new_tx_callback, this );
 }
 
 Wallet::~Wallet()
 {
+    // There is a
+    clean_receive_tx_callback("newTxUpdate");
+    release();
+}
+
+bool Wallet::isBusy() const {
+    if (restart_listeners.isRunning() || scanOp.isRunning() || sendOp.isRunning() || scanRewindHashOp.isRunning())
+        return true;
+
+    if (check_wallet_busy(context_id).response)
+        return true;
+
+    return false;
+}
+
+bool Wallet::isUpdateInProgress() const {
+    return scanOp.isRunning();
+}
+
+
+Wallet::STARTED_MODE Wallet::getStartStatus() {
+    return started_state;
+}
+
+QString Wallet::init(QString _network, QString _walletDataPath, node::NodeClient * _nodeClient) {
+    network = _network;
+    walletDataPath = _walletDataPath;
+
+    mwc_api::ApiResponse<int> init_wallet_res = init_wallet(network, walletDataPath);
+    if (init_wallet_res.hasError()) {
+        return "Unable to create a context. " + init_wallet_res.error;
+    }
+    Q_ASSERT(context_id<0);
+    context_id = init_wallet_res.response;
+    logger::logInfo(logger::MWC_WALLET, "new Wallet is initialized for " + network + " at " + walletDataPath + ". Resulting context_id: " + QString::number(context_id));
+    Q_ASSERT(context_id>=0);
+
+    nodeClient = _nodeClient;
+    Q_ASSERT(nodeClient);
+
+    // registering a callback
+    Q_ASSERT(node_client_callback_name.isEmpty());
+    node_client_callback_name = "node_client_" + QString::number(context_id);
+    register_lib_callback(node_client_callback_name.toStdString().c_str(), node_client_callback, nodeClient);
+
+    Q_ASSERT(update_status_callback_name.isEmpty());
+    update_status_callback_name = "scan_status_" + QString::number(context_id);
+    register_lib_callback(update_status_callback_name.toStdString().c_str(), update_status_callback, this);
+
+    started_state = STARTED_MODE::OFFLINE;
+
+    return "";
+}
+
+#define CANCEL_FUTURE(future) if (future.isValid() && !future.isFinished()) { future.cancel();}
+
+void Wallet::release() {
+    started_state = STARTED_MODE::OFFLINE;
+
+    CANCEL_FUTURE(restart_listeners);
+    CANCEL_FUTURE(scanOp);
+    CANCEL_FUTURE(sendOp);
+    CANCEL_FUTURE(scanRewindHashOp);
+
+    restart_listeners.waitForFinished();
+    scanOp.waitForFinished();
+    sendOp.waitForFinished();
+    scanRewindHashOp.waitForFinished();
+
+    if (context_id>=0) {
+        if (started_state != STARTED_MODE::OFFLINE) {
+            mwc_api::ApiResponse<bool> res = close_wallet(context_id);
+            LOG_CALL_RESULT("logout close_wallet", "OK" );
+        }
+
+        mwc_api::ApiResponse<bool> res = release_wallet(context_id);
+        LOG_CALL_RESULT("logout release_wallet", "OK" );
+
+        context_id = -1;
+    }
+
+    mqs_running = false;
+    tor_running = false;
+
+    if (!node_client_callback_name.isEmpty()) {
+        unregister_lib_callback(node_client_callback_name.toStdString().c_str());
+        node_client_callback_name = "";
+    }
+    if (!update_status_callback_name.isEmpty()) {
+        unregister_lib_callback(update_status_callback_name.toStdString().c_str());
+        update_status_callback_name = "";
+    }
+}
+
+// Create new wallet and generate a seed for it
+QPair<QStringList, QString> Wallet::start2init(const QString & password, int seedLength) {
+    mwc_api::ApiResponse<QStringList> res = create_new_wallet(context_id, node_client_callback_name, seedLength, password );
+    LOG_CALL_RESULT("start2init", "get a new seed");
+
+    if (!res.hasError()) {
+        started_state = STARTED_MODE::INIT;
+    }
+
+    mqs_running = false;
+    tor_running = false;
+    return QPair<QStringList, QString>(res.response, util::mapMessage(res.error));
+}
+
+// Recover the wallet with a mnemonic phrase
+// recover wallet with a passphrase. Scan call needs to be done.
+// Return: Error
+QString Wallet::start2recover(const QStringList & seed, const QString & password) {
+    mwc_api::ApiResponse<bool> res = restore_new_wallet(context_id, node_client_callback_name, seed.join(" "), password );
+    LOG_CALL_RESULT("start2recover", "OK");
+
+    if (!res.hasError()) {
+        started_state = STARTED_MODE::RECOVER;
+    }
+
+    mqs_running = false;
+    tor_running = false;
+    return util::mapMessage(res.error);
+}
+
+static bool validateAccPath(const QVector<wallet::Account> & accounts, const QString & accPath) {
+    if (accPath.isEmpty())
+        return false;
+
+    for (const auto & acc : accounts) {
+        if (acc.label.startsWith(mwc::DEL_ACCONT_PREFIX))
+            continue;
+
+        if (acc.path == accPath)
+            return true;
+    }
+    return false;
+}
+
+// Note, return error include invalid password case as well
+// Return: Error
+QString Wallet::loginWithPassword(const QString & password, core::AppContext * appContext) {
+    mwc_api::ApiResponse<bool> res = open_wallet(context_id, node_client_callback_name, password );
+    LOG_CALL_RESULT("loginWithPassword", "OK");
+
+    if (!res.hasError()) {
+        started_state = STARTED_MODE::NORMAL;
+        emit onLogin();
+    }
+
+    // restoring current selected accounts
+    int wallet_id = getWalletId();
+    QVector<wallet::Account> accounts = listAccounts();
+
+    QString selectedAccPath = appContext->getWalletParam(wallet_id, core::WALLET_PARAM_SELECTED_ACCOUNT_PATH, "");
+    if (validateAccPath(accounts, selectedAccPath)) {
+        switchAccountById(selectedAccPath);
+    }
+
+    QString receiveAccPath = appContext->getWalletParam(wallet_id, core::WALLET_PARAM_RECEIVE_ACCOUNT_PATH, "");
+    if (validateAccPath(accounts, receiveAccPath)) {
+        setReceiveAccountById(receiveAccPath);
+    }
+
+    mqs_running = false;
+    tor_running = false;
+    return util::mapMessage(res.error);
+}
+
+// Return true if wallet has this password. Wallet might not have password (has empty password) if it was created manually.
+// Expected that the wallet is already open,
+bool Wallet::checkPassword(const QString & password) const {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return false;
+
+    QPair <bool, QString> passCheck = util::validateMwc713Str(password, true);
+    if (!passCheck.first) {
+        QThread::msleep(100); // Brute force attack mitigation
+        return false;
+    }
+
+    mwc_api::ApiResponse<bool> res = validate_password(context_id, password );
+    if (!password.isEmpty()) {
+        LOG_CALL_RESULT("checkPassword", (res.response ? "True" : "False") );
+    }
+
+    if (res.hasError()) {
+        QThread::msleep(100); // Brute force attack mitigation
+        return false;
+    }
+    else {
+        if (!res.response) {
+            QThread::msleep(100); // Brute force attack mitigation
+        }
+        return res.response;
+    }
+}
+
+// Exit from the wallet. Expected that state machine will switch to Init state
+// Signal:  onLogout
+void Wallet::logout() {
+    if (getStartStatus() != wallet::Wallet::STARTED_MODE::OFFLINE) {
+        emit onLogout();
+    }
+    release();
+}
+
+// Current seed for runnign wallet
+QPair<QStringList, QString> Wallet::getSeed(const QString & walletPassword) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return QPair<QStringList, QString>({}, "Wallet is offline");
+
+    mwc_api::ApiResponse<QStringList> res = get_mnemonic(context_id, walletPassword );
+    LOG_CALL_RESULT("getSeed", "OK" );
+
+    return QPair<QStringList, QString>(res.response, util::mapMessage(res.error));
+}
+
+void Wallet::restartRunningListeners() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    if (! (mqs_running || tor_running)) {
+        logger::logError(logger::MWC_WALLET, "restartRunningListeners skipped because no Tor or MQS are running" );
+        return; // nothing to restart
+    }
+
+    // Restart inb a separate thread
+    logger::logError(logger::MWC_WALLET, "restartRunningListeners initiate Tor and MQS restart in the background");
+    if (mqs_running)
+        nextListenersTask = apply_operation(nextListenersTask, LISTENER_MQS_RESTART );
+    if (tor_running)
+        nextListenersTask = apply_operation(nextListenersTask, LISTENER_TOR_RESTART );
+
+    startNextStartStopListeners();
+}
+
+// Checking if wallet is listening through services
+ListenerStatus Wallet::getListenerStatus() {
+    ListenerStatus result;
+
+    if (started_state == STARTED_MODE::OFFLINE || context_id<0)
+        return result;
+
+    if (tor_running) {
+        mwc_api::ApiResponse<ResListenerStatus> res = get_tor_listener_status(context_id);
+        //LOG_CALL_RESULT("get_tor_listener_status", "OK" );
+        result.tor_healthy = res.response.healthy;
+        result.tor_started = res.response.running;
+    }
+
+    if (mqs_running) {
+        mwc_api::ApiResponse<ResListenerStatus> res = get_mqs_listener_status(context_id);
+        //LOG_CALL_RESULT("get_mws_listener_status", "OK" );
+        result.mqs_healthy = res.response.healthy;
+        result.mqs_started = res.response.running;
+    }
+
+    /*logger::logDebug( logger::MWC_WALLET, QString("getListenerStatus response: tor_healthy=") + (result.tor_healthy?"true":"false") +
+        " tor_started=" +  (result.tor_started?"true":"false") +
+        " mqs_healthy=" +  (result.mqs_healthy?"true":"false") +
+        " mqs_started=" +  (result.mqs_started?"true":"false"));*/
+
+    return result;
+}
+
+// Start listening through services
+void Wallet::listeningStart(bool startMq, bool startTor) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    if (startMq) {
+        if (!mqs_running) {
+            nextListenersTask = apply_operation(nextListenersTask, LISTENER_MQS_START );
+            mqs_running = true;
+        }
+    }
+
+    if (startTor) {
+        if (!tor_running) {
+            nextListenersTask = apply_operation(nextListenersTask, LISTENER_TOR_START );
+            tor_running = true;
+        }
+    }
+
+    startNextStartStopListeners();
+}
+
+// Stop listening through services
+void Wallet::listeningStop(bool stopMq, bool stopTor) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    if (stopMq) {
+        if (mqs_running) {
+            nextListenersTask = apply_operation(nextListenersTask, LISTENER_MQS_STOP );
+            mqs_running = false;
+        }
+    }
+
+    if (stopTor) {
+        if (tor_running) {
+            nextListenersTask = apply_operation(nextListenersTask, LISTENER_TOR_STOP );
+            tor_running = false;
+        }
+    }
+
+    startNextStartStopListeners();
+}
+
+// Request MQS address
+QString Wallet::getMqsAddress() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    mwc_api::ApiResponse<QString> res = mqs_address(context_id);
+    LOG_CALL_RESULT("getMqsAddress", "OK" );
+    return res.response;
+}
+
+// Request Tor address
+QString Wallet::getTorSlatepackAddress() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    mwc_api::ApiResponse<QString> res = tor_address(context_id);
+    LOG_CALL_RESULT("tor_address", "OK" );
+    return res.response;
+}
+
+// requst current address index
+int Wallet::getAddressIndex() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return 0;
+
+    mwc_api::ApiResponse<int> res = get_address_index(context_id);
+    LOG_CALL_RESULT("get_address_index", QString::number(res.response) );
+    return res.response;
+}
+
+// Note, set address index does update the MQS and Tor addresses
+// The Listeners, if running, will be restarted automatically
+void Wallet::setAddressIndex(int index) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    mwc_api::ApiResponse<bool> res = set_address_index(context_id, index);
+    LOG_CALL_RESULT("get_address_index", "OK" );
+
+    if (mqs_running || tor_running) {
+        logger::logInfo(logger::MWC_WALLET, "Address index was changed, restarting listeners...");
+        restartRunningListeners();
+    }
+}
+
+// Get all accounts with balances.
+QVector<AccountInfo> Wallet::getWalletBalance(int confirmations, bool filterDeleted, const QStringList & manuallyLockedOutputs) const {
+    if (started_state == STARTED_MODE::OFFLINE || context_id<0)
+        return {};
+
+    mwc_api::ApiResponse<QVector<Account>> res = list_accounts(context_id);
+    LOG_CALL_RESULT("getWalletBalance list_accounts", QString::number(res.response.size()) + " accounts" );
+
+    QVector<AccountInfo> result;
+    for (const Account & acc : res.response ) {
+        mwc_api::ApiResponse<ResWalletInfo> balance = info(context_id, confirmations, acc.path, manuallyLockedOutputs );
+        LOG_CALL_RESULT("getWalletBalance info", QString::number(res.response.size()) + " accounts" );
+        if (!balance.hasError()) {
+            AccountInfo wi;
+            wi.setData( acc.label,
+                acc.path,
+                balance.response.total.toLongLong() + balance.response.amount_locked.toLongLong(), // total plus locked (by some reasons mwc-wallet doesn't count locked, I think it is wrong)
+                balance.response.amount_awaiting_confirmation.toLongLong() + balance.response.amount_awaiting_finalization.toLongLong() +  balance.response.amount_immature.toLongLong(), // awaitingConfirmation
+                balance.response.amount_locked.toLongLong(),  // lockedByPrevTransaction
+                balance.response.amount_currently_spendable.toLongLong(), // currentlySpendable
+                balance.response.last_confirmed_height.toLongLong()); // hegiht
+            if (filterDeleted && wi.isDeleted())
+                continue;
+            result.push_back(wi);
+        }
+    }
+
+    return result;
+}
+
+QVector<Account> Wallet::listAccounts() const {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return {};
+
+    mwc_api::ApiResponse<QVector<Account>> res = list_accounts(context_id);
+    LOG_CALL_RESULT("getWalletBalance list_accounts", QString::number(res.response.size()) + " accounts" );
+    return res.response;
+}
+
+
+QString Wallet::getCurrentAccountId() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    mwc_api::ApiResponse<QString> res = current_account(context_id);
+    LOG_CALL_RESULT("current_account", res.response );
+
+    return res.response;
+}
+
+// Create another account, note no delete exist for accounts
+QString Wallet::createAccount( const QString & accountName ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    mwc_api::ApiResponse<QString> res = create_account(context_id, accountName);
+    LOG_CALL_RESULT("create_account", res.response );
+
+    return res.response;
+}
+
+// Switch to different account
+void Wallet::switchAccountById(const QString & accountPath) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    mwc_api::ApiResponse<bool> res = switch_account(context_id, accountPath);
+    LOG_CALL_RESULT("switch_account", "OK" );
+}
+
+// Rename account
+void Wallet::renameAccountById( const QString & accountPath, const QString & newAccountName) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    mwc_api::ApiResponse<bool> res = rename_account(context_id, accountPath, newAccountName);
+    LOG_CALL_RESULT("rename_account", "OK" );
+}
+
+// Check and repair the wallet. Will take a while
+// Check Signal: onScanProgress, onScanDone
+// Return responseId
+QString Wallet::scan(bool delete_unconfirmed) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    if (scanOp.isRunning())
+        return lastScanResponseId;
+
+    int id = response_id_counter.fetchAndAddRelaxed(1);
+    QString responseId = "scan_" + QString::number(id);
+
+    // Scan started in any case
+    lastScanResponseId = responseId;
+
+    scanOp = startScan(this, update_status_callback_name, responseId, true, delete_unconfirmed);
+    return responseId;
+}
+
+// Update the wallet state, resync with a current node state
+// Check Signal: onScanProgress, onScanDone
+// Return responseId
+QString Wallet::update_wallet_state() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    if (scanOp.isRunning())
+        return lastScanResponseId;
+
+    int id = response_id_counter.fetchAndAddRelaxed(1);
+    QString responseId = "upd_" + QString::number(id);
+
+    lastScanResponseId = responseId;
+
+    // Scan started in any case
+    scanOp = startScan(this, update_status_callback_name, responseId, false, false);
+    return responseId;
+}
+
+// Get current configuration of the wallet.
+WalletConfig  Wallet::getWalletConfig() {
+    WalletConfig config;
+    config.setData(network, walletDataPath);
+    return config;
+}
+
+void Wallet::setReceiveAccountById(const QString & accountPath) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    mwc_api::ApiResponse<bool> res = switch_receive_account(context_id, accountPath);
+    LOG_CALL_RESULT("setReceiveAccount", "OK" );
+}
+
+QString Wallet::getReceiveAccountPath() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    mwc_api::ApiResponse<QString> res = receive_account(context_id);
+    LOG_CALL_RESULT("setReceiveAccount", res.response );
+    return res.response;
+}
+
+// Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
+// Return error or JsonObject
+QString Wallet::generateTransactionProof( const QString & transactionUuid ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    mwc_api::ApiResponse<QJsonObject> res = get_proof(context_id, transactionUuid);
+    LOG_CALL_RESULT("get_proof", "OK" );
+
+    if (res.hasError())
+        return util::mapMessage(res.error);
+    else
+        return QJsonDocument(res.response).toJson(QJsonDocument::Compact);
+}
+
+// Verify the proof for transaction
+// Return error or JsonObject
+QString Wallet::verifyTransactionProof(const QString & proof) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    mwc_api::ApiResponse<QJsonObject> res = verify_proof(context_id, proof);
+    LOG_CALL_RESULT("verify_proof", "OK" );
+
+    if (res.hasError())
+        return util::mapMessage(res.error);
+    else
+        return QJsonDocument(res.response).toJson(QJsonDocument::Compact);
+}
+
+// Send some coins to address. Return false if another send is already in progress. Need to wait more, one send at a time
+// Before send, wallet always do the switch to account to make it active
+// Check signal:  onSend
+bool Wallet::sendTo( const QString &accountPathFrom,
+                const QString & responseTag,
+                int64_t amount, //  -1  - mean All
+                bool amount_includes_fee,
+                const QString & message, // can be empty, means None
+                int minimum_confirmations,
+                const QString & selection_strategy, //  Values: all, smallest. Default: Smallest
+                const QString & method,  // Values:  http, file, slatepack, self, mwcmqs
+                const QString & dest, // Values depends on 'method' Send the transaction to the provided server (start with http://), destination for encrypting/proofs. For method self, dest can point to account name to move
+                bool generate_proof,
+                int change_outputs,
+                bool fluff,
+                int ttl_blocks, // pass -1 to skip
+                bool exclude_change_outputs,
+                const QStringList & outputs, // Outputs to use. If None, all outputs can be used
+                bool late_lock,
+                int64_t min_fee)  // 0 or negative to skip. Currently no needs to define it
+{
+    if (started_state == STARTED_MODE::OFFLINE)
+        return false;
+
+    if (sendOp.isRunning()) {
+        logger::logInfo(logger::QT_WALLET, "Send task is already running, can't start another one");
+        return false;
+    }
+
+    sendOp = send(this, accountPathFrom, responseTag, amount, amount_includes_fee,
+                    message, minimum_confirmations, selection_strategy, method,
+                    dest, generate_proof, change_outputs, fluff, ttl_blocks,
+                    exclude_change_outputs, outputs,
+                    late_lock, min_fee);
+    return true;
+}
+
+// Receive slatepack. Will generate the resulting slatepack.
+// Return: <SlatePack, Error>
+// In case of error SlatePack is empty
+QPair<ResReceive,QString> Wallet::receiveSlatepack( QString slatePack, QString description) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return QPair<ResReceive,QString>(ResReceive(), "Wallet is offline");
+
+    mwc_api::ApiResponse<ResReceive> res = receive(context_id, slatePack, description, "");
+    LOG_CALL_RESULT("receive", "OK" );
+    return QPair<ResReceive,QString>(res.response, util::mapMessage(res.error));
+}
+
+// finalize SP transaction and broadcast it
+// Return error message
+QString Wallet::finalizeSlatepack( const QString & slatepack, bool fluff, bool nopost ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "Wallet is offline";
+
+    mwc_api::ApiResponse<bool> res = finalize(context_id, slatepack, fluff, nopost);
+    LOG_CALL_RESULT("finalize", "OK" );
+    return util::mapMessage(res.error);
+}
+
+// submit finalized transaction. Make sense for cold storage => online node operation
+// Return Error message
+QString Wallet::submitFile( QString fileTx, bool fluff ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "Wallet is offline";
+
+    mwc_api::ApiResponse<bool> res = post(context_id, fileTx,
+             fluff);
+    LOG_CALL_RESULT("post", "OK" );
+    return util::mapMessage(res.error);
+}
+
+// Show outputs for the wallet
+QVector<WalletOutput> Wallet::getOutputs(const QString & accountPath, bool show_spent) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return {};
+
+    mwc_api::ApiResponse<QVector<WalletOutput>> res = outputs(context_id, accountPath, show_spent );
+    LOG_CALL_RESULT("outputs", QString::number(res.response.size()) +  " output" );
+    return res.response;
+}
+
+// Show all transactions for current account
+QVector<WalletTransaction> Wallet::getTransactions( const QString & accountPath ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return {};
+
+    mwc_api::ApiResponse<QVector<WalletTransaction>> res = transactions(context_id, accountPath);
+    LOG_CALL_RESULT("transactions", QString::number(res.response.size()) +  " transactions" );
+    return res.response;
+}
+
+WalletTransaction Wallet::getTransactionByUUID( const QString & tx_uuid ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return WalletTransaction();
+
+    mwc_api::ApiResponse<WalletTransaction> res = transaction_by_uuid(context_id, tx_uuid);
+    LOG_CALL_RESULT("transactions", "OK" );
+    return res.response;
+}
+
+// Cancelt TX by UUID (in case of multi accouns, we want to cancel both)
+// Return erro string
+QString  Wallet::cancelTransacton(const QString & txUUID) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "Wallet is offline";
+
+    mwc_api::ApiResponse<bool> res = cancel(context_id, txUUID);
+    LOG_CALL_RESULT("cancel", "OK" );
+    emitWalletBalanceUpdated();
+    return util::mapMessage(res.error);
+}
+
+// True if transaction was finalized and can be reposted
+bool Wallet::hasFinalizedData(const QString & txUUID) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return false;
+
+    mwc_api::ApiResponse<bool> res = has_finalized_data(context_id, txUUID);
+    LOG_CALL_RESULT("has_finalized_data", "OK" );
+    return res.response;
+}
+
+
+// Repost the transaction.
+// Retunr Error
+QString Wallet::repostTransaction(const QString & txUUID, bool fluff) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "Wallet is offline";
+
+    mwc_api::ApiResponse<bool> res = repost(context_id, txUUID, fluff);
+    LOG_CALL_RESULT("repost", "OK" );
+    return util::mapMessage(res.error);
+}
+
+// Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
+DecodedSlatepack Wallet::decodeSlatepack(const QString & slatepackContent) {
+    if (started_state == STARTED_MODE::OFFLINE) {
+        DecodedSlatepack res;
+        res.error = "Wallet is offline";
+        return res;
+    }
+
+    DecodedSlatepack res = decode_slatepack(context_id, slatepackContent );
+    if (!res.error.isEmpty())
+        logger::logError(logger::MWC_WALLET, QString("decode_slatepack for id ") + QString::number(context_id) + " is failed: " + res.error);
+    else
+        logger::logInfo(logger::MWC_WALLET, QString("decode_slatepack for id ") + QString::number(context_id) + ", is OK");
+    return res;
+}
+
+// Request rewind hash
+QString Wallet::viewRewindHash() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    mwc_api::ApiResponse<QString> res = rewind_hash(context_id);
+    LOG_CALL_RESULT("rewind_hash", "OK" );
+    return res.response;
+}
+
+// Scan with revind hash. That will generate bunch or messages similar to scan
+// Check Signal: onScanProgress
+// Check Signal: onScanRewindHash( QString responseId, ViewWallet walletOutputs, QString errors );
+// Return responseId
+QString Wallet::scanRewindHash( const QString & rewindHash ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return "";
+
+    if (scanRewindHashOp.isRunning())
+        return "";
+
+    int id = response_id_counter.fetchAndAddRelaxed(1);
+    QString responseId = "rw_h_" + QString::number(id);
+
+    // Scan started in any case
+    scanRewindHashOp = wallet::scanRewindHash(this, rewindHash,
+                update_status_callback_name, responseId );
+    return responseId;
+}
+
+// Generate ownership proof
+QJsonObject Wallet::generateOwnershipProof(const QString & message, bool includeRewindHash, bool includeTorAddress, bool includeMqsAddress ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return QJsonObject();
+
+    mwc_api::ApiResponse<QJsonObject> res = generate_ownership_proof(context_id, message,
+        includeRewindHash, includeTorAddress, includeMqsAddress );
+    LOG_CALL_RESULT("generate_ownership_proof", "OK" );
+    return res.response;
+}
+
+// Validate ownership proof
+OwnershipProofValidation Wallet::validateOwnershipProof(const QJsonObject & proof) {
+    if (started_state == STARTED_MODE::OFFLINE) {
+        OwnershipProofValidation res;
+        res.error = "Wallet is offline";
+        return res;
+    }
+
+    OwnershipProofValidation res = validate_ownership_proof(context_id, proof);
+    if (!res.error.isEmpty())
+        logger::logError(logger::MWC_WALLET, QString("validate_ownership_proof for id ") + QString::number(context_id) + " is failed: " + res.error);
+    else
+        logger::logInfo(logger::MWC_WALLET, QString("validate_ownership_proof for id ") + QString::number(context_id) + ", is OK");
+
+    return res;
+}
+
+// Sync long call, wallet will process QT events and show Success/Error Dlg
+bool Wallet::requestFaucetMWC() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return false;
+
+    // requesting 3 MWC
+    QPair<bool, int64_t> amount = util::one2nano("3.0");
+    Q_ASSERT(amount.first);
+
+    QFuture<QPair<bool, QString>> rsp = wallet::requestMwcFromFlooFaucet(this, amount.second);
+
+    while (!rsp.isFinished()) {
+        QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 50);
+        QThread::msleep(10);
+    }
+
+    QPair<bool, QString> res = rsp.result();
+    if (res.first) {
+        core::getWndManager()->messageTextDlg("Faucet request", "Your faucet request for 3 MWC was submitted successfully.\nThe funds will be spendable after the transaction is confirmed on the Floonet blockchain.\n\nExplorer: https://explorer.floonet.mwc.mw/");
+        return true;
+    }
+    else {
+        core::getWndManager()->messageTextDlg("Request failed", "Yout faucet request was failed with error:\n" + res.second + "\n\nIf faucet is not running, please notify devs about that.");
+        return false;
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Wallet::reportWalletFatalError( QString message ) const {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    core::getWndManager()->messageTextDlg("MWC Wallet Error", message);
+    mwc::closeApplication();
+}
+
+void Wallet::startNextStartStopListeners() {
+    if (restart_listeners.isRunning())
+        return;
+
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    if (context_id>0 && nextListenersTask!=0) {
+        restart_listeners = startStopListeners(this, nextListenersTask, torStarter);
+        nextListenersTask = 0;
+    }
+}
+
+
+void Wallet::startStopListenersDone(int operation) {
+    Q_UNUSED(operation)
+
+    if (core::WalletApp::isExiting())
+        return;
+
+    restart_listeners = QFuture<void>();
+
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    startNextStartStopListeners();
+}
+
+void Wallet::scanDone(QString responseId, bool fullScan, int height, QString errorMessage ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    emit onScanDone( responseId, fullScan, height, errorMessage );
+
+    if (height>0 && height != lastTopHeight) {
+        lastTopHeight = height;
+    }
+}
+
+void Wallet::emitStatusUpdate( const QString & response_id, const QJsonObject & status ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    emit  onScanProgress( response_id, status );
+}
+
+void Wallet::sendDone( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    emit onSend(success, util::mapMessage(error), tx_uuid, amount, method, dest, tag);
+}
+
+void Wallet::scanRewindDone( const QString & responseId, const ViewWallet & result, const QString & error ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    emit onScanRewindHash( responseId, result, util::mapMessage(error) );
+}
+
+void Wallet::emitSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message ) {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    emit onSlateReceivedFrom(slate, mwc, fromAddr, message );
+    emit onWalletBalanceUpdated();
+}
+
+// Account info is updated
+void Wallet::emitWalletBalanceUpdated() {
+    if (started_state == STARTED_MODE::OFFLINE)
+        return;
+
+    emit onWalletBalanceUpdated();
 }
 
 }

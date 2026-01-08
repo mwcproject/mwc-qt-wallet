@@ -19,7 +19,15 @@
 
 namespace control {
 
-class MwcLabelTiny : public QLabel {
+class MwcLabel : public QLabel {
+    Q_OBJECT
+public:
+    explicit MwcLabel(QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());
+    explicit MwcLabel(const QString &text, QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());
+    virtual ~MwcLabel() override;
+};
+
+class MwcLabelTiny : public MwcLabel {
     Q_OBJECT
 public:
     explicit MwcLabelTiny(QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());
@@ -27,7 +35,7 @@ public:
     virtual ~MwcLabelTiny() override;
 };
 
-class MwcLabelMini : public QLabel {
+class MwcLabelMini : public MwcLabel {
     Q_OBJECT
 public:
     explicit MwcLabelMini(QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());
@@ -35,7 +43,7 @@ public:
     virtual ~MwcLabelMini() override;
 };
 
-class MwcLabelSmall : public QLabel {
+class MwcLabelSmall : public MwcLabel {
     Q_OBJECT
 public:
     explicit MwcLabelSmall(QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());
@@ -43,7 +51,7 @@ public:
     virtual ~MwcLabelSmall() override;
 };
 
-class MwcLabelNormal : public QLabel {
+class MwcLabelNormal : public MwcLabel {
 Q_OBJECT
 public:
     explicit MwcLabelNormal(QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());
@@ -51,7 +59,7 @@ public:
     virtual ~MwcLabelNormal() override;
 };
 
-class MwcLabelLarge : public QLabel {
+class MwcLabelLarge : public MwcLabel {
 Q_OBJECT
 public:
     explicit MwcLabelLarge(QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());

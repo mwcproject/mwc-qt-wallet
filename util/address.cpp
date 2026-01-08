@@ -88,7 +88,7 @@ static bool decodeBase58( QString sz, QByteArray & vch)
 static QPair<QString, ADDRESS_TYPE> checkTorAddress( QString address ) {
     QString pk = extractPubKeyFromAddress(address);
     if (pk.length() != TOR_ADDR_LEN) {
-        return QPair<QString, ADDRESS_TYPE>("Not a TOR address", ADDRESS_TYPE::UNKNOWN);
+        return QPair<QString, ADDRESS_TYPE>("Not a Slatepack/Tor address", ADDRESS_TYPE::UNKNOWN);
     }
 
     // Check optional suffix '.onion'
@@ -96,7 +96,7 @@ static QPair<QString, ADDRESS_TYPE> checkTorAddress( QString address ) {
     if (idx>=0) {
         // Check for bad extention
         if (address.mid(idx).compare(".onion", Qt::CaseInsensitive) != 0)
-            return QPair<QString, ADDRESS_TYPE>("Expecting onion suffix for TOR address", ADDRESS_TYPE::UNKNOWN);
+            return QPair<QString, ADDRESS_TYPE>("Expecting onion suffix for Tor address", ADDRESS_TYPE::UNKNOWN);
     }
 
     return QPair<QString, ADDRESS_TYPE>("", ADDRESS_TYPE::TOR);
@@ -191,7 +191,7 @@ QPair<QString, ADDRESS_TYPE> verifyAddress(QString address) {
         if (protocol.isEmpty() || protocol=="http") {
             return QPair<QString, ADDRESS_TYPE>("", ADDRESS_TYPE::TOR);
         }
-        return QPair<QString, ADDRESS_TYPE>("TOR address support 'http' prefix only", ADDRESS_TYPE::UNKNOWN);
+        return QPair<QString, ADDRESS_TYPE>("Tor address supports the 'http' prefix only", ADDRESS_TYPE::UNKNOWN);
     }
 
     // both http and https are required

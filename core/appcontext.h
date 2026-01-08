@@ -17,16 +17,21 @@
 
 #include <QMap>
 #include "../state/state.h"
-#include "../state/m_airdrop.h"
 #include "../wallet/wallet.h"
 #include "../core/Config.h"
 #include "../bridge/wnd/g_send_b.h"
 #include <QDebug>
 #include <QHash>
 
+#include "wallet/wallet_objs.h"
+
 class QAction;
 
 namespace core {
+
+const QString WALLET_PARAM_SELECTED_ACCOUNT_PATH = "selectedAcc";
+const QString WALLET_PARAM_RECEIVE_ACCOUNT_PATH = "receiveAcc";
+
 
 struct SendCoinsParams {
     int inputConfirmationNumber;
@@ -135,26 +140,9 @@ public:
     bool isLogsEnabled() const {return logsEnabled;}
     void setLogsEnabled(bool enabled);
 
-
-    //  Tor bridge configs
-    QString getTorBridgeLine() const {return torBridgeLine;}
-    QString getTorClientOption() const {return torClientOption;}
-    void setTorBridgeLineClientOption(const QString & line, const QString & client);
-
-    // ----- Auto Start Tor ------
-    // Not will be started with TOR if it is online node or Tor autostart enabled
-    bool useTorForNode() const;
-
     // ----- Outputs: All/Unspent
     bool isShowOutputAll() const {return showOutputAll;}
     void setShowOutputAll(bool all);
-
-    wallet::MwcNodeConnection getNodeConnection( const QString & network );
-    void updateMwcNodeConnection( const QString & network, const wallet::MwcNodeConnection & connection );
-
-    // HODL registration time.
-    int64_t getHodlRegistrationTime(const QString & hash) const;
-    void    setHodlRegistrationTime(const QString & hash, int64_t time);
 
     QString getNote(const QString& key);
     void updateNote(const QString& key, const QString& note);
@@ -164,10 +152,11 @@ public:
     bool isLockOutputEnabled() const {return lockOutputEnabled;}
     // Return lock flag and output ID
     QPair<bool, QString> isLockedOutputs(const QString & output) const;
-    void setLockOutputEnabled(bool enabled);
-    void setLockedOutput(const QString & output, bool lock, QString Id);
+    void setLockOutputEnabled(bool enabled, wallet::Wallet * wallet);
+    void setLockedOutput(const QString & output, bool lock, QString Id, wallet::Wallet * wallet);
     void unlockOutputsById(QString id);
     QVector<QString> getLockedOutputsById(QString id) const;
+    QStringList getLockedOutputs() const;
 
     // Fluff transactions
     bool isFluffSet() const { return fluffTransactions; }
@@ -177,6 +166,9 @@ public:
     bool hasTxnNotesToMigrate();
     QStringList getTxnNotesToMigrate(QString walletId, QString accountId);
     void migrateTxnNote(QString walletId, QString accountId, QString txIdx, QString txUuid);
+
+    // Online node, tmp wallet params (network and path)
+    QPair<QString, QString> getOnlineNodeWalletNetworkAndPath() const;
 
     // Wallet instances. Return instances paths that are valid and current selected index
     QPair<QVector<QString>, int> getWalletInstances(bool hasSeed) const;
@@ -219,8 +211,8 @@ public:
     bool isTradeAccepted(const QString & swapId) const;
     void setTradeAcceptedFlag(const QString & swapId, bool accepted);
 
-    bool getNoTorForEmbeddedNode() const {return noTorForEmbeddedNode;}
-    void setNoTorForEmbeddedNode(bool noTor);
+    //bool getNoTorForEmbeddedNode() const {return noTorForEmbeddedNode;}
+    //void setNoTorForEmbeddedNode(bool noTor);
 
     bridge::SEND_SELECTED_METHOD getSendMethod() const {return sendMethod;}
     void setSendMethod(bridge::SEND_SELECTED_METHOD sendMethod);
@@ -267,12 +259,17 @@ public:
     void setFeatureSlatepack(bool val);
     void setFeatureMWCMQS(bool val);
     void setFeatureTor(bool val);
+
+    bool isFaucetRequested();
+    void faucetRequested();
+
+    QString getWalletParam(int walletId, QString key, QString defaultValue);
+    void setWalletParam(int walletId, QString key, QString value, bool saveDataNow);
 public:
     void saveData() const;
 
 private:
 signals:
-    void onOutputLockChanged(QString commit);
 
 private:
     bool loadData();
@@ -305,12 +302,6 @@ private:
 
     bool logsEnabled = true;
 
-    QString torBridgeLine;
-    QString torClientOption;
-
-    // Because of Custom node logic, we have to track config changes
-    QMap<QString, wallet::MwcNodeConnection> nodeConnection;
-
     // Contact list
     QVector<ContactRecord> contactList;
 
@@ -320,8 +311,6 @@ private:
     bool isOnlineNodeMainNetwork = true;
 
     bool showOutputAll = false; // Show all or Unspent outputs
-
-    QMap<QString, qulonglong> hodlRegistrations;
 
     //WalletNotes* walletNotes;
     // The app context is created early on in main.cpp and tries to load the app data
@@ -386,7 +375,7 @@ private:
     QMap<QString, bool> acceptedSwaps;
 
     // Ban tor usage for embedded node
-    bool noTorForEmbeddedNode = false;
+    //bool noTorForEmbeddedNode = false;
 
     // For offline send page, values for slatepack and lock after
     bridge::SEND_SELECTED_METHOD sendMethod = bridge::SEND_SELECTED_METHOD::ONLINE_ID;
@@ -411,6 +400,10 @@ private:
     bool featureSlatepack = true;
     bool featureMWCMQS = false;
     bool featureTor = false;
+
+    bool faucetRequest = false;
+
+    QMap<QString, QString> walletParams;
 };
 
 template <class T>

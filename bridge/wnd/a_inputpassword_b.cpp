@@ -17,6 +17,7 @@
 #include "../../state/a_inputpassword.h"
 #include "../../state/state.h"
 #include "../../state/statemachine.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
@@ -33,8 +34,10 @@ InputPassword::~InputPassword() {
 }
 
 // Try to login into the wallet with this password.
-void InputPassword::submitPassword(QString password) {
-    getState()->submitPassword(password);
+// return success. Error will be shown by internals
+bool InputPassword::submitPassword(QString password, QString selectedPath) {
+    logger::logInfo(logger::BRIDGE, "Call InputPassword::submitPassword with <password> selectedPath=" + selectedPath);
+    return getState()->submitPassword(password, selectedPath);
 }
 
 

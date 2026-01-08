@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>AccountTransfer</class>
- <widget class="QWidget" name="AccountTransfer">
+ <widget class="control::MwcWidget" name="AccountTransfer">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -89,7 +89,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="h20" native="true">
+        <widget class="control::MwcWidget" name="h20" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -146,7 +146,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="h20_2" native="true">
+        <widget class="control::MwcWidget" name="h20_2" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -192,7 +192,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QWidget" name="widget_2" native="true">
+          <widget class="control::MwcWidget" name="widget_2" native="true">
            <property name="minimumSize">
             <size>
              <width>20</width>
@@ -241,7 +241,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QWidget" name="h20_3" native="true">
+        <widget class="control::MwcWidget" name="h20_3" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -282,10 +282,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Return back to Account page</string>
+            <string>Return to the Accounts page</string>
            </property>
            <property name="statusTip">
-            <string>Return back to Account page</string>
+            <string>Return to the Accounts page</string>
            </property>
            <property name="text">
             <string>Back</string>
@@ -412,7 +412,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -482,6 +482,11 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

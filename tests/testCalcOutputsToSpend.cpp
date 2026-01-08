@@ -16,8 +16,6 @@
 #include <QDebug>
 #include "../util/ui.h"
 #include "../wallet/wallet.h"
-#include "../wallet/mwc713.h"
-#include "../core/HodlStatus.h"
 #include "../control_desktop/messagebox.h"
 #include "../core/appcontext.h"
 #include "../util/Log.h"
@@ -81,9 +79,6 @@ static void dotest_calcOutputsToSpend() {
                 WalletOutput::create("c32000", "", "", "", "Unspent", false, "", 32000L, 1L)
         };
 
-        for (auto & o : outputs )
-            o.weight = 1.0;
-
         runForTestSet( 100L, outputs, {"c1000"} );
         runForTestSet( 1000L, outputs, {"c1000"} );
         runForTestSet( 999L, outputs, {"c1000"} );
@@ -142,7 +137,6 @@ static void dotest_calcOutputsToSpend() {
             int64_t amount = (rand() % 1000) * 10000 + i;
 
             outputs.push_back( WalletOutput::create( QString::number(amount), "", "", "", "Unspent", false, "", amount, 1L));
-            outputs[i].weight = 1.0;
         }
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SelectMode</class>
- <widget class="QWidget" name="SelectMode">
+ <widget class="control::MwcWidget" name="SelectMode">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -46,7 +46,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="container" native="true">
+      <widget class="control::MwcWidget" name="container" native="true">
        <property name="minimumSize">
         <size>
          <width>538</width>
@@ -59,7 +59,7 @@
          <height>229</height>
         </size>
        </property>
-       <widget class="QRadioButton" name="radioOnlineWallet">
+       <widget class="control::MwcRadioButton" name="radioOnlineWallet">
         <property name="geometry">
          <rect>
           <x>3</x>
@@ -79,7 +79,7 @@
 full functionality. Internet connection is required.</string>
         </property>
        </widget>
-       <widget class="QRadioButton" name="radioColdWallet">
+       <widget class="control::MwcRadioButton" name="radioColdWallet">
         <property name="geometry">
          <rect>
           <x>3</x>
@@ -99,7 +99,7 @@ full functionality. Internet connection is required.</string>
 an &quot;Online Node&quot; in order to implement cold storage.</string>
         </property>
        </widget>
-       <widget class="QRadioButton" name="radioOnlineNode">
+       <widget class="control::MwcRadioButton" name="radioOnlineNode">
         <property name="geometry">
          <rect>
           <x>3</x>
@@ -221,7 +221,7 @@ the Cold Wallet</string>
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="control::MwcWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -276,6 +276,16 @@ the Cold Wallet</string>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>control_desktop/MwcRadioButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

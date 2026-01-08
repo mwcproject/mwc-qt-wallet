@@ -17,11 +17,11 @@
 namespace control {
 
 MwcPlainEditLogs::MwcPlainEditLogs( QWidget *parent ) :
-            QPlainTextEdit(parent)
+            MwcPlainTextEdit(parent)
 {}
 
 MwcPlainEditLogs::MwcPlainEditLogs(const QString &text, QWidget *parent ) :
-        QPlainTextEdit(text, parent)
+        MwcPlainTextEdit(text, parent)
 {}
 
 MwcPlainEditLogs::~MwcPlainEditLogs()  {}
@@ -29,11 +29,11 @@ MwcPlainEditLogs::~MwcPlainEditLogs()  {}
 ///////////////////////////////////////////////////////////////
 
 MwcPlainEditDlg::MwcPlainEditDlg(QWidget *parent ) :
-            QPlainTextEdit(parent)
+            MwcPlainTextEdit(parent)
 {}
 
 MwcPlainEditDlg::MwcPlainEditDlg(const QString &text, QWidget *parent ) :
-    QPlainTextEdit(text, parent)
+    MwcPlainTextEdit(text, parent)
 {}
 
 MwcPlainEditDlg::~MwcPlainEditDlg() {}
@@ -41,15 +41,14 @@ MwcPlainEditDlg::~MwcPlainEditDlg() {}
 ////////////////////////////////////////////////////////////////
 
 MwcTextEditDlg::MwcTextEditDlg( QWidget *parent ) :
-        QTextEdit(parent)
+        MwcTextEdit(parent)
 {}
 
 MwcTextEditDlg::MwcTextEditDlg(const QString &text, QWidget *parent ) :
-        QTextEdit(text, parent)
+        MwcTextEdit(text, parent)
 {}
 
 MwcTextEditDlg::~MwcTextEditDlg() {}
 
 
 }
-

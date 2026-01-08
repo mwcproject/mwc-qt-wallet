@@ -12,79 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <QTextStream>
+#include <QJsonDocument>
 #include "e_showproofdlg.h"
 #include "ui_e_showproofdlg.h"
 #include "../bridge/config_b.h"
 #include "../bridge/util_b.h"
 #include "../bridge/wallet_b.h"
+#include "../util/stringutils.h"
 
 namespace dlg {
 
 // Parse the data and fill the structure.
-bool ProofInfo::parseProofText(const QString & proof_str) {
+void ProofInfo::parseProofRes(const QString & proof_str) {
+    // Parse JSON data from Rust VerifyProofResult struct using Qt's built-in JSON parsing
+    QJsonObject json = QJsonDocument::fromJson(proof_str.toUtf8()).object();
 
-    // this file proves that [0.100000000] MWCs was sent to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU] from [xmiuyC3sdhXpJnR7pvQ8xNgZLWQRQziZ1FxhEQd8urYWvSusuC69]
-    int idx0 = proof_str.indexOf("this file proves that");
-    if (idx0<0)
-        return false;
-
-    QString streamText = proof_str;
-    QTextStream stream(&streamText);
-
-    QString ln = stream.readLine();
-
-    int mwcIdx1 = ln.indexOf('[', idx0);
-    int mwcIdx2 = ln.indexOf(']', mwcIdx1);
-    int addrToIdx1 = ln.indexOf('[', mwcIdx2);
-    int addrToIdx2 = ln.indexOf(']', addrToIdx1);
-    int addrFromIdx1 = ln.indexOf('[', addrToIdx2);
-    int addrFromIdx2 = ln.indexOf(']', addrFromIdx1);
-
-    if ( idx0<0 || mwcIdx1<0 || mwcIdx2<0 || addrToIdx1<0 || addrToIdx2<0 || addrFromIdx1<0 || addrFromIdx2<0)
-        return false;
-
-    mwc = ln.mid(mwcIdx1+1, mwcIdx2-mwcIdx1-1 );
-    while (mwc.size()>0 && mwc[mwc.size()-1]=='0')
-        mwc.resize(mwc.size()-1);
-
-    if (mwc.size()>0 && mwc[mwc.size()-1]=='.')
-        mwc.resize(mwc.size()-1);
-
-    toAdress = ln.mid( addrToIdx1+1, addrToIdx2-addrToIdx1-1 );
-    fromAdress = ln.mid( addrFromIdx1+1, addrFromIdx2-addrFromIdx1-1 );
-
-    while (!stream.atEnd()) {
-        ln = stream.readLine();
-        if (ln.startsWith("outputs:"))
-            break;
+    fromAdress = json["sender_address"].toString();
+    toAdress = json["reciever_address"].toString();
+    mwc = util::nano2one(int64_t(json["amount"].toInteger()));
+    // Extract outputs array
+    QJsonArray outputsArray = json["outputs"].toArray();
+    for (const QJsonValue &outputValue : outputsArray) {
+        outputs.push_back(outputValue.toString());
     }
-
-    while (!stream.atEnd()) {
-        ln = stream.readLine();
-        if (ln.startsWith("kernel:"))
-            break;
-
-        int outputIdx1 = ln.indexOf( ':');
-        if (outputIdx1>0) {
-            QString output = ln.left(outputIdx1).trimmed();
-            outputs.push_back(output);
-        }
-    }
-
-    ln = stream.readLine();
-    int kernelIdx = ln.indexOf( ':');
-    if (kernelIdx<0)
-        return false;
-
-    kernel = ln.left(kernelIdx).trimmed();
-
-    ln = stream.readLine();
-    if (!ln.startsWith("slate: "))
-        return false;
-
-    slate = ln.right( ln.length() - strlen("slate: ") ).trimmed();
-    return true;
+    kernel = json["kernel"].toString();
+    slate = json["slate"].toString();
 }
 
 

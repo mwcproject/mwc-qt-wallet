@@ -36,10 +36,9 @@ class ShowTransactionDlg : public control::MwcDialog
 
 public:
     explicit ShowTransactionDlg(QWidget *parent,
-            const QString& account,
             const wallet::WalletTransaction transaction,
             const QVector<wallet::WalletOutput> & outputs,
-            const QVector<QString> & messages,
+            const QVector<wallet::WalletTransactionMessage> & messages,
             const QString& note);
 
     ~ShowTransactionDlg();
@@ -65,7 +64,6 @@ private:
     QVector<wallet::WalletOutput> outputs;
     QString blockExplorerUrl;
 
-    QString account;
     QString txUuid;
     QString newTransactionNote;
 };

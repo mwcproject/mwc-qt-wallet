@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ShowOutputDlg</class>
- <widget class="QDialog" name="ShowOutputDlg">
+ <widget class="control::MwcDialog" name="ShowOutputDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Output</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_12">
    <property name="leftMargin">
@@ -188,7 +188,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Confirms</string>
+          <string>Confirmations</string>
          </property>
         </widget>
        </item>
@@ -357,7 +357,7 @@
           </size>
          </property>
          <property name="text">
-          <string>CoinBase</string>
+          <string>Coinbase</string>
          </property>
         </widget>
        </item>
@@ -536,7 +536,7 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Open output details with MWC block explorer</string>
+          <string>Open output details in the MWC block explorer</string>
          </property>
          <property name="text">
           <string>View</string>
@@ -604,7 +604,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Private note for output. Note is only visible in MWC Qt wallet.</string>
+          <string>Private note for output. Note is only visible in MWC Qt Wallet.</string>
          </property>
          <property name="text">
           <string/>
@@ -628,7 +628,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="lockOutput">
+    <widget class="control::MwcCheckBox" name="lockOutput">
      <property name="focusPolicy">
       <enum>Qt::ClickFocus</enum>
      </property>
@@ -722,12 +722,12 @@
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelSmall</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
@@ -736,10 +736,20 @@
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEditDlg.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>viewOutput</tabstop>
-  <tabstop>outputNote</tabstop>
   <tabstop>okButton</tabstop>
  </tabstops>
  <resources/>

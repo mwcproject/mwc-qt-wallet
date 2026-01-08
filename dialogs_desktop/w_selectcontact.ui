@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SelectContact</class>
- <widget class="QDialog" name="SelectContact">
+ <widget class="control::MwcDialog" name="SelectContact">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Select Contact</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -69,7 +69,7 @@
       </size>
      </property>
      <property name="toolTip">
-      <string>Start typing name for search</string>
+      <string>Start typing a name to search</string>
      </property>
      <property name="maxLength">
       <number>32</number>
@@ -280,7 +280,7 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Close contacts, nothing will be selected</string>
+        <string>Close contacts without selecting one</string>
        </property>
        <property name="text">
         <string>Cancel</string>
@@ -308,7 +308,7 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Choose selected contact</string>
+        <string>Select the highlighted contact</string>
        </property>
        <property name="text">
         <string>Select</string>
@@ -344,6 +344,11 @@
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
    <header>control_desktop/listwithcolumns.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

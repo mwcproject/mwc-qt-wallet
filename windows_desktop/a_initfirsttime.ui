@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>InitFirstTime</class>
- <widget class="QWidget" name="InitFirstTime">
+ <widget class="control::MwcWidget" name="InitFirstTime">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -46,7 +46,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="control::MwcLabel" name="label_2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -120,7 +120,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="ButtonsHolder" native="true">
+      <widget class="control::MwcWidget" name="ButtonsHolder" native="true">
        <property name="minimumSize">
         <size>
          <width>600</width>
@@ -136,7 +136,7 @@
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>
-       <widget class="QToolButton" name="newInstanceButton">
+       <widget class="control::MwcToolButton" name="newInstanceButton">
         <property name="geometry">
          <rect>
           <x>230</x>
@@ -155,7 +155,7 @@
          <string>Create a new wallet instance</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">#newInstanceButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
+         <string notr="true">#newInstanceButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} control--MwcToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
         </property>
         <property name="text">
          <string>New Instance</string>
@@ -174,7 +174,7 @@
          <enum>Qt::ToolButtonTextUnderIcon</enum>
         </property>
        </widget>
-       <widget class="QToolButton" name="restoreInstanceButton">
+       <widget class="control::MwcToolButton" name="restoreInstanceButton">
         <property name="geometry">
          <rect>
           <x>410</x>
@@ -187,10 +187,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Restore wallet from the mnemonic passphrase</string>
+         <string>Restore wallet from your mnemonic passphrase</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">#restoreInstanceButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
+         <string notr="true">#restoreInstanceButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} control--MwcToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
         </property>
         <property name="text">
          <string>Restore Instance</string>
@@ -209,7 +209,7 @@
          <enum>Qt::ToolButtonTextUnderIcon</enum>
         </property>
        </widget>
-       <widget class="QToolButton" name="openWalletButton">
+       <widget class="control::MwcToolButton" name="openWalletButton">
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -222,13 +222,13 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Open a wallet from not default location like USB stick or another drive</string>
+         <string>Open a wallet from a non-default location such as a USB drive</string>
         </property>
         <property name="statusTip">
-         <string>Open a wallet from not default location like USB stick or another drive</string>
+         <string>Open a wallet from a non-default location such as a USB drive</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">#openWalletButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
+         <string notr="true">#openWalletButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} control--MwcToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
         </property>
         <property name="text">
          <string>Open Wallet</string>
@@ -296,7 +296,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="runOnlineNodeButton">
+      <widget class="control::MwcToolButton" name="runOnlineNodeButton">
        <property name="minimumSize">
         <size>
          <width>190</width>
@@ -313,13 +313,13 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Run as a Online Node (needed for Cold Wallet).</string>
+        <string>Run as an Online Node (needed for Cold Wallet).</string>
        </property>
        <property name="statusTip">
-        <string>Run as a Online Node (needed for Cold Wallet).</string>
+        <string>Run as an Online Node (needed for Cold Wallet).</string>
        </property>
        <property name="styleSheet">
-        <string notr="true">#runOnlineNodeButton{ border-radius: 10px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
+        <string notr="true">#runOnlineNodeButton{ border-radius: 10px; background: transparent; font-size: 13px;} control--MwcToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
        </property>
        <property name="text">
         <string>     Cold Wallet Node</string>
@@ -340,7 +340,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="helpButton">
+      <widget class="control::MwcToolButton" name="helpButton">
        <property name="minimumSize">
         <size>
          <width>100</width>
@@ -357,13 +357,13 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Click to see the help for this page</string>
+        <string>Open help for this page.</string>
        </property>
        <property name="statusTip">
-        <string>Click to see the help for this page</string>
+        <string>Open help for this page.</string>
        </property>
        <property name="styleSheet">
-        <string notr="true">#helpButton{ border-radius: 10px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
+        <string notr="true">#helpButton{ border-radius: 10px; background: transparent; font-size: 13px;} control--MwcToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
        </property>
        <property name="text">
         <string>    Help</string>
@@ -420,6 +420,23 @@
   <tabstop>runOnlineNodeButton</tabstop>
   <tabstop>helpButton</tabstop>
  </tabstops>
+  <customwidgets>
+  <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcToolButton</class>
+   <extends>QToolButton</extends>
+   <header>control_desktop/MwcToolButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources_desktop.qrc"/>
  </resources>

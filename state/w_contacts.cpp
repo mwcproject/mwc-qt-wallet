@@ -17,6 +17,7 @@
 #include "../state/statemachine.h"
 #include "../core/global.h"
 #include "../core/WndManager.h"
+#include "../util/Log.h"
 
 namespace state {
 
@@ -38,18 +39,22 @@ NextStateRespond Contacts::execute() {
 }
 
 QVector<core::ContactRecord> Contacts::getContacts() {
+    logger::logInfo(logger::STATE, "Call Contacts::getContacts");
     return context->appContext->getContacts();
 }
 
 QPair<bool, QString> Contacts::addContact( const core::ContactRecord & contact ) {
+    logger::logInfo(logger::STATE, "Call Contacts::addContact with name=" + contact.name);
     return context->appContext->addContact(contact);
 }
 
 QPair<bool, QString> Contacts::deleteContact( const core::ContactRecord & contact ) {
+    logger::logInfo(logger::STATE, "Call Contacts::deleteContact with name=" + contact.name);
     return context->appContext->deleteContact(contact);
 }
 
 QPair<bool, QString> Contacts::updateContact( const core::ContactRecord & prevValue, const core::ContactRecord & newValue ) {
+    logger::logInfo(logger::STATE, "Call Contacts::updateContact with prevName=" + prevValue.name);
     return context->appContext->updateContact( prevValue, newValue );
 }
 

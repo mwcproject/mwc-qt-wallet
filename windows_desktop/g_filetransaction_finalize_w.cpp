@@ -43,18 +43,23 @@ FileTransactionFinalize::FileTransactionFinalize(QWidget *parent,
 
     QObject::connect( finalize, &bridge::Finalize::sgnHideProgress,
                       this, &FileTransactionFinalize::onSgnHideProgress, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnTransactionById,
-                      this, &FileTransactionFinalize::sgnTransactionById, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
     if (transInfo.amount_fee_not_defined) {
-        ui->mwcLabel->setText("-");
         // Requesting transaction info form the wallet.
         // It is a normal case, compact slate doesn;t have all info
         // Note, account can be any account, looking for send transaction type
-        wallet->requestTransactionById( "", transInfo.transactionId );
-        ui->progress->show();
+        QJsonObject txJson = wallet->getTransactionByUUID( transInfo.transactionId );
+        wallet::WalletTransaction tx = wallet::WalletTransaction::fromJson(txJson);
+
+        ui->mwcLabel->setText( util::nano2one( std::abs(tx.coinNano) ) + " MWC" );
+        if (tx.messages.length()>0) { // my message need to read form the saved transaction data
+            QString senderMsg = tx.messages[0].message;
+            if (senderMsg.isEmpty())
+                senderMsg = "None";
+            ui->senderMessage->setText(senderMsg);
+        }
     }
     else {
         ui->mwcLabel->setText(util::nano2one(transInfo.amount) + " MWC");
@@ -98,29 +103,6 @@ FileTransactionFinalize::~FileTransactionFinalize() {
     delete ui;
 }
 
-void FileTransactionFinalize::sgnTransactionById( bool success, QString account, QString height, QString transaction,
-                         QVector<QString> outputs, QVector<QString> messages ) {
-
-    Q_UNUSED(account)
-    Q_UNUSED(height)
-    Q_UNUSED(outputs)
-
-    ui->progress->hide();
-
-    if (!success)
-        return;
-
-    wallet::WalletTransaction txDetails = wallet::WalletTransaction::fromJson(transaction);
-
-    ui->mwcLabel->setText( util::nano2one( std::abs(txDetails.coinNano) ) + " MWC" );
-    if (messages.length()>0) { // my message need to read form the saved transaction data
-        QString senderMsg = messages[0];
-        if (senderMsg.isEmpty())
-            senderMsg = "None";
-        ui->senderMessage->setText(senderMsg);
-    }
-}
-
 
 void FileTransactionFinalize::on_cancelButton_clicked() {
     finalize->cancelFileFinalization();
@@ -154,8 +136,7 @@ void FileTransactionFinalize::on_processButton_clicked()
             return;
         }
     }
-    QString walletPasswordHash = wallet->getPasswordHash();
-    if (!walletPasswordHash.isEmpty()) {
+    if ( !wallet->checkPassword("") ) {
         QString amount = ui->mwcLabel->text();
         QString message;
         if (amount!="-")
@@ -165,19 +146,13 @@ void FileTransactionFinalize::on_processButton_clicked()
 
         dlg::FinalizeConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
                                             message,
-                                            1.0, walletPasswordHash );
+                                            1.0 );
         if (confirmDlg.exec() != QDialog::Accepted)
             return;
     }
     ui->progress->show();
 
-    if (fileNameOrSlatepack.startsWith("BEGINSLATE")) {
-        finalize->finalizeSlatepack( fileNameOrSlatepack, txUuid, resTxFN, config->isFluffSet() );
-    }
-    else
-    { // file
-        finalize->finalizeFile( fileNameOrSlatepack, resTxFN, config->isFluffSet() );
-    }
+    finalize->finalizeSlatepack( fileNameOrSlatepack, txUuid, resTxFN, config->isFluffSet(), -1 );
 }
 
 void FileTransactionFinalize::onSgnHideProgress() {

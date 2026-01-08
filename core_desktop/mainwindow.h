@@ -15,6 +15,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "../features.h"
 #include <QMainWindow>
 #include <QTimer>
 #include "../state/state.h"
@@ -33,6 +34,8 @@ namespace bridge {
     class Swap;
     class SwapMarketplace;
     class WalletConfig;
+    class Notification;
+    class HeartBeat;
 }
 
 class QPushButton;
@@ -67,15 +70,12 @@ private slots:
     void onSgnUpdateActionStates(int actionState); // state::STATE
     void onSgnNewNotificationMessage(int level, QString message); // level: bridge::MESSAGE_LEVEL
     void onSgnConfigUpdate();
-    void onSgnLoginResult(bool ok);
+    void onSgnLogin();
     void onApplicationStateChange(Qt::ApplicationState state);
 
     // keybaseOnline is absolete
     void onSgnUpdateListenerStatus(bool mwcOnline, bool tor);
-    void onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-    void onSgnStartingCommand(QString command);
-
-    void onSgnUpdateSyncProgress(double progressPercent);
+    void onSgnUpdateNodeStatus( QString embeddedNodeStatus, bool internalNode, bool online,  int nodeHeight, int peerHeight, QString totalDifficulty2show, int connection );
 
     void onSgnWalletFeaturesChanged();
 
@@ -130,8 +130,14 @@ private:
     bridge::Wallet * wallet = nullptr;
     bridge::StateMachine * stateMachine = nullptr;
     bridge::Util * util = nullptr;
+    bridge::Notification * notification = nullptr;
+    bridge::HeartBeat * heartBeat = nullptr;
+#ifdef FEATURE_SWAP
     bridge::Swap * swap = nullptr;
+#endif
+#ifdef FEATURE_MKTPLACE
     bridge::SwapMarketplace * swapMarketplace = nullptr;
+#endif
     bool leftBarShown = true;
     core::StatusWndMgr* statusMgr = nullptr;
 

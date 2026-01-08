@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NewSeedTest</class>
- <widget class="QWidget" name="NewSeedTest">
+ <widget class="control::MwcWidget" name="NewSeedTest">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -31,7 +31,7 @@
     <widget class="control::MwcLabelNormal" name="label_3">
      <property name="text">
       <string>Your passphrase is important! If you lose your passphrase, your money will be permanently lost.
-To make sure that you have properly saved your passphrase, please retype here:</string>
+To make sure that you have properly saved your passphrase, please retype it here:</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -84,10 +84,10 @@ To make sure that you have properly saved your passphrase, please retype here:</
         </size>
        </property>
        <property name="toolTip">
-        <string>You should backup your mnemonic phrase. Type mneminic word here and press Enter</string>
+        <string>You should back up your mnemonic phrase. Type a mnemonic word here and press Enter.</string>
        </property>
        <property name="statusTip">
-        <string>You should backup your mnemonic phrase. Type mneminic word here and press Enter</string>
+        <string>You should back up your mnemonic phrase. Type a mnemonic word here and press Enter.</string>
        </property>
        <property name="maxLength">
         <number>64</number>
@@ -213,6 +213,11 @@ To make sure that you have properly saved your passphrase, please retype here:</
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

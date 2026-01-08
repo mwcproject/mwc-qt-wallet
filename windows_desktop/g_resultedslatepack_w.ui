@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ResultedSlatepack</class>
- <widget class="QWidget" name="ResultedSlatepack">
+ <widget class="control::MwcWidget" name="ResultedSlatepack">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,7 +30,7 @@
     <number>30</number>
    </property>
    <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="control::MwcTabWidget" name="tabWidget">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -52,10 +52,10 @@
       <enum>Qt::StrongFocus</enum>
      </property>
      <property name="toolTip">
-      <string>Return back to starting point</string>
+      <string>Return to the starting point</string>
      </property>
      <property name="statusTip">
-      <string>Return back to starting point</string>
+      <string>Return to the starting point</string>
      </property>
      <property name="styleSheet">
       <string notr="true"/>
@@ -63,7 +63,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_string">
+     <widget class="control::MwcWidget" name="tab_string">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -80,7 +80,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0">
        <item>
-        <widget class="QTextEdit" name="slatepackContent">
+        <widget class="control::MwcTextEdit" name="slatepackContent">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -100,10 +100,10 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Resulting slatepack. Please copy this string and send it to your recipient</string>
+          <string>Resulting Slatepack. Copy this string and send it to your recipient.</string>
          </property>
          <property name="statusTip">
-          <string>Resulting slatepack. Please copy this string and send it to your recipient</string>
+          <string>Resulting Slatepack. Copy this string and send it to your recipient.</string>
          </property>
          <property name="styleSheet">
           <string notr="true">#slatepackContent{font-family: &quot;Courier&quot;}</string>
@@ -161,10 +161,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Copy slatepack into the clipboard</string>
+            <string>Copy the Slatepack to the clipboard</string>
            </property>
            <property name="statusTip">
-            <string>Copy slatepack into the clipboard</string>
+            <string>Copy the Slatepack to the clipboard</string>
            </property>
            <property name="text">
             <string>Copy to Clipboard</string>
@@ -208,10 +208,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Save the latepack in the file for your records</string>
+            <string>Save the Slatepack to a file for your records</string>
            </property>
            <property name="statusTip">
-            <string>Save the latepack in the file for your records</string>
+            <string>Save the Slatepack to a file for your records</string>
            </property>
            <property name="text">
             <string>Save Slatepack</string>
@@ -234,7 +234,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QTextEdit" name="finalizeSlatepack">
+        <widget class="control::MwcTextEdit" name="finalizeSlatepack">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -272,7 +272,7 @@
           <bool>false</bool>
          </property>
          <property name="placeholderText">
-          <string>Paste reply slatepack here to finalize transaction.  Also you can allways finalize it at &quot;Finalize&quot; page.</string>
+          <string>Paste the reply Slatepack here to finalize the transaction. You can also finalize it later from the &quot;Finalize&quot; page.</string>
          </property>
         </widget>
        </item>
@@ -312,10 +312,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Return back to starting point</string>
+            <string>Return to the starting point</string>
            </property>
            <property name="statusTip">
-            <string>Return back to starting point</string>
+            <string>Return to the starting point</string>
            </property>
            <property name="text">
             <string>Back</string>
@@ -386,7 +386,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_qrcode">
+     <widget class="control::MwcWidget" name="tab_qrcode">
       <attribute name="title">
        <string>QR Code</string>
       </attribute>
@@ -492,10 +492,10 @@
               <enum>Qt::StrongFocus</enum>
              </property>
              <property name="toolTip">
-              <string>Copy QR code into the clipboard.</string>
+              <string>Copy the QR code to the clipboard</string>
              </property>
              <property name="statusTip">
-              <string>Copy QR code into the clipboard.</string>
+              <string>Copy the QR code to the clipboard</string>
              </property>
              <property name="text">
               <string>Copy to Clipboard</string>
@@ -523,10 +523,10 @@
               <enum>Qt::StrongFocus</enum>
              </property>
              <property name="toolTip">
-              <string>Save QR code image as png file</string>
+              <string>Save the QR code image as a PNG file</string>
              </property>
              <property name="statusTip">
-              <string>Save QR code image as png file</string>
+              <string>Save the QR code image as a PNG file</string>
              </property>
              <property name="text">
               <string>Save QR image</string>
@@ -601,9 +601,26 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::QrCodeWidget</class>
    <extends>QWidget</extends>
    <header>control_desktop/QrCodeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>control_desktop/MwcTabWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

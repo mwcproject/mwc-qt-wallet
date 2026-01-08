@@ -39,10 +39,6 @@ Accounts::Accounts(QWidget *parent) :
 
     QObject::connect( wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
                       this, &Accounts::onSgnWalletBalanceUpdated, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnAccountCreated,
-                      this, &Accounts::onSgnAccountCreated, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnAccountRenamed,
-                      this, &Accounts::onSgnAccountRenamed, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
@@ -73,7 +69,7 @@ Accounts::~Accounts()
 void Accounts::updateButtons() {
     int idx = ui->accountList->getSelectedRow();
     ui->renameButton->setEnabled( idx>0 ); // 0 is default and default we can't rename
-    ui->deleteButton->setEnabled(idx>0 && idx<accounts.size() &&  accState->canDeleteAccount(accounts[idx]) ); // default cant delete as well
+    ui->deleteButton->setEnabled(idx>0 && idx<accounts.size() &&  accState->canDeleteAccount(accounts[idx].first) ); // default cant delete as well
 }
 
 void Accounts::initTableHeaders() {
@@ -93,55 +89,30 @@ void Accounts::saveTableHeaders() {
     config->updateColumnsWidhts("AccountTblColWidth", width);
 }
 
-
-void Accounts::startWaiting() {
-    ui->accountList->clearData();
-    ui->progress->show();
-}
-
-
 void Accounts::onSgnWalletBalanceUpdated()
 {
-    ui->progress->hide();
-
-    accounts = wallet->getWalletBalance(true,false,false);
-
     QVector<QString> data2show = accState->getAccountsBalancesToShow();
+    accounts.clear();
 
     // update the list with accounts
     ui->accountList->clearData();
-    int rowSz = 5;
+    int rowSz = 6;
 
     for (int r=0; r<data2show.size()-rowSz+1; r+=rowSz) {
         QVector<QString> data;
-        for (int w=0; w<rowSz; w++) {
+        for (int w=0; w<rowSz-1; w++) {
             data.push_back( data2show[r+w] );
         }
         ui->accountList->appendRow( data, 1.0, false );
+        accounts.push_back( QPair<QString, QString>(data2show[r], data2show[r+5]) );
     }
 
-    ui->transferButton->setEnabled( accounts.size()>1 );
+    ui->transferButton->setEnabled( data2show.size()>rowSz );
 }
-
-void Accounts::onSgnAccountRenamed(bool success, QString errorMessage) {
-    util::TimeoutLockObject to( "Accounts" );
-
-    wallet->requestWalletBalanceUpdate();
-    if (!success) {
-        control::MessageBox::messageText(this, "Account rename failure", "Your account wasn't renamed.\n" + errorMessage);
-    }
-}
-
-void Accounts::onSgnAccountCreated( QString newAccountName) {
-    Q_UNUSED(newAccountName)
-    onSgnWalletBalanceUpdated();
-}
-
 
 void Accounts::on_refreshButton_clicked()
 {
-    wallet->requestWalletBalanceUpdate();
-    startWaiting();
+    onSgnWalletBalanceUpdated();
 }
 
 
@@ -166,8 +137,8 @@ void Accounts::on_addButton_clicked()
         return;
     }
 
-    startWaiting();
     wallet->createAccount(accountName);
+    onSgnWalletBalanceUpdated();
 }
 
 void Accounts::on_deleteButton_clicked()
@@ -177,15 +148,15 @@ void Accounts::on_deleteButton_clicked()
     util::TimeoutLockObject to("Accounts" );
 
     int idx = ui->accountList->getSelectedRow();
-    if (idx>=0 && idx<accounts.size() && accState->canDeleteAccount(accounts[idx])) {
+    if (idx>=0 && idx<accounts.size() && accState->canDeleteAccount(accounts[idx].first)) {
         core::WndManager::RETURN_CODE res = MessageBox::questionText( this, "Delete account", "Are you sure that you want to delete this account?",
                 "Yes", "No",
                 "Continue and delete this account",
                 "Cancel, I want to keep this account",
                 false, true );
         if (res == core::WndManager::RETURN_CODE::BTN1 ) {
-            accState->deleteAccount( accounts[idx] );
-            startWaiting();
+            accState->deleteAccount( accounts[idx].first );
+            onSgnWalletBalanceUpdated();
         }
     }
 
@@ -200,13 +171,16 @@ void Accounts::renameAccount(int idx) {
     if (idx<0 || idx>=accounts.size())
         return;
 
+    if (accounts[idx].first == "default")
+        return; // we can't rename default
+
     util::TimeoutLockObject to( "Accounts" );
 
     bool ok = false;
     QString name = control::InputDialog::getText(this, "Rename MWC Account",
-                                        QString("Input a new name for your account '") + accounts[idx] + "'", "",
-                                        accounts[idx], 32, &ok);
-    if (!ok || name.isEmpty() || name==accounts[idx] )
+                                        QString("Input a new name for your account '") + accounts[idx].first + "'", "",
+                                        accounts[idx].first, 32, &ok);
+    if (!ok || name.isEmpty() || name==accounts[idx].first )
         return;
 
     QString err = accState->validateNewAccountName(name);
@@ -215,8 +189,8 @@ void Accounts::renameAccount(int idx) {
         return;
     }
 
-    wallet->renameAccount( accounts[idx], name );
-    startWaiting();
+    wallet->renameAccountById( accounts[idx].second, name );
+    onSgnWalletBalanceUpdated();
 }
 
 void Accounts::on_accountList_itemSelectionChanged()

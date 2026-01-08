@@ -31,9 +31,6 @@ void notificationStateSet(NOTIFICATION_STATES state);
 void notificationStateClean(NOTIFICATION_STATES state);
 bool notificationStateCheck(NOTIFICATION_STATES state);
 
-void addFalseMessage(const QString & msg);
-void remeoveFalseMessage(const QString & msg);
-
 struct NotificationMessage {
     bridge::MESSAGE_LEVEL level = bridge::MESSAGE_LEVEL::DEBUG;
     QString message;

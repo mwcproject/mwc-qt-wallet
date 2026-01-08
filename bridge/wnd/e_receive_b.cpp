@@ -18,6 +18,7 @@
 #include "../../state/state.h"
 #include <QDebug>
 #include "../../util/Files.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
@@ -37,14 +38,9 @@ void Receive::hideProgress() {
     emit sgnHideProgress();
 }
 
-// Sign file transaction
-void Receive::signTransaction(QString uriFileName) {
-    // Let's try to read the file...
-    getState()->signTransaction( uriFileName );
-}
-
 // Sign slatepack transaction. The primary data is slatepack.  slateJson can be calculated, passed becuase we already have after verification
 void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress) {
+    logger::logInfo(logger::BRIDGE, "Call Receive::signSlatepackTransaction with <slatepack> <slateJson> slateSenderAddress=" + slateSenderAddress);
     getState()->signSlatepackTransaction(slatepack, slateJson, slateSenderAddress);
 }
 
@@ -53,16 +49,13 @@ void Receive::onTransactionActionIsFinished( bool success, QString message ) {
 }
 
 void Receive::cancelReceive() {
+    logger::logInfo(logger::BRIDGE, "Call Receive::cancelReceive");
     getState()->ftBack();
-}
-
-// Files transaction page, continue with a file
-void Receive::receiveFile(QString uriFileName, QString description ) {
-    getState()->receiveFile(uriFileName, description);
 }
 
 // Files transaction page, continue with a Slatepack
 void Receive::receiveSlatepack(QString slatepack, QString description) {
+    logger::logInfo(logger::BRIDGE, "Call Receive::receiveSlatepack with slatepack=<hidden> description=" + description);
     getState()->receiveSlatepack(slatepack, description);
 }
 

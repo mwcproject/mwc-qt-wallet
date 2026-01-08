@@ -40,7 +40,7 @@ struct ProofInfo {
     QString slate;
 
     // Parse the data and fill the structure.
-    bool parseProofText(const QString & proof);
+    void parseProofRes(const QString & proof);
 };
 
 class ShowProofDlg : public control::MwcDialog {

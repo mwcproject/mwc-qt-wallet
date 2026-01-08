@@ -15,6 +15,10 @@
 #ifndef S_MRKTSWAPNEW_W_H
 #define S_MRKTSWAPNEW_W_H
 
+#include "../features.h"
+
+#ifdef FEATURE_SWAP
+
 #include "../core_desktop/navwnd.h"
 #include "../state/s_mktswap.h"
 
@@ -82,5 +86,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif // S_MRKTSWAPNEW_W_H

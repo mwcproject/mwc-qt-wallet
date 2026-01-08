@@ -15,7 +15,7 @@
 #ifndef MWC_QT_WALLET_IWALLETWNDMANANGER_H
 #define MWC_QT_WALLET_IWALLETWNDMANANGER_H
 
-#include <QString>
+#include "../features.h"
 #include "../util/Json.h"
 #include "../wallet/wallet.h"
 
@@ -52,12 +52,8 @@ public:
     virtual QString getOpenFileName(const QString &caption, const QString &dir, const QString &filter) = 0;
 
     // Ask for confirmation
-    virtual bool sendConfirmationSlatepackDlg( QString title, QString messageBody, double widthScale, int inputsNum, int * ttl, QString passwordHash ) = 0;
-    virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, int inputsNum, QString passwordHash ) = 0;
-
-    // Stopping wallet message
-    virtual void showWalletStoppingMessage(int taskTimeout) = 0;
-    virtual void hideWalletStoppingMessage() = 0;
+    virtual bool sendConfirmationSlatepackDlg( QString title, QString messageBody, double widthScale, int inputsNum, int * ttl ) = 0;
+    virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, int inputsNum ) = 0;
 
     //---------------- Pages ------------------------
     virtual void pageInitFirstTime() = 0;
@@ -79,12 +75,12 @@ public:
     virtual void pageListening() = 0;
     virtual void pageFinalize() = 0;
     virtual void pageSendStarting() = 0;
-    virtual void pageSendOnline( QString selectedAccount, int64_t amount ) = 0;
-    virtual void pageSendSlatepack( QString selectedAccount, int64_t amount ) = 0;
+    virtual void pageSendOnline( QString selectedAccountName, QString selectedAccountPath, int64_t amount ) = 0;
+    virtual void pageSendSlatepack( QString selectedAccountName, QString selectedAccountPath, int64_t amount ) = 0;
     virtual void pageTransactions() = 0;
     // slatepack - slatepack string value to show.
     // backStateId - state ID of the caller. On 'back' will switch to this state Id
-    virtual void pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) = 0;
+    virtual void pageShowSlatepack(QString slatepack, QString tx_uuid, int backStateId, QString txExtension, bool enableFinalize) = 0;
 
     virtual void pageAccounts() = 0;
     virtual void pageAccountTransfer() = 0;
@@ -101,6 +97,7 @@ public:
     virtual void pageWalletSettings() = 0;
     virtual void pageAccountOptions() = 0;
 
+#ifdef FEATURE_SWAP
     // Swap pages
     virtual void pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) = 0;
     virtual void pageSwapNew1() = 0;
@@ -108,18 +105,19 @@ public:
     virtual void pageSwapNew3() = 0;
     virtual void pageSwapEdit(QString swapId, QString stateCmd) = 0;
     virtual void pageSwapTradeDetails(QString swapId) = 0;
+#endif
 
+#ifdef FEATURE_MKTPLACE
     // Swap marketplace, if selectMyOffers==true,  my offers will be selected.
     // Otherwise last known tab
     virtual void pageMarketplace(bool selectMyOffers, bool selectFee) = 0;
     // new offer of myMsgId is empty. Otherwise it is running offer update
     virtual void pageNewUpdateOffer(QString myMsgId) = 0;
-
     // Show dialog that enforce setup of backup directory
     virtual void showSwapBackupDlg() = 0;
-
     // Show transaction for integrity fee page
     virtual void pageTransactionFee() = 0;
+#endif
 
     // Show Keys view page, show my key, input Viewing key
     virtual void pageViewHash() = 0;
@@ -127,9 +125,10 @@ public:
     virtual void pageViewAccounts() = 0;
 
     virtual void pageGenerateOwnershipInput() = 0;
-    virtual void pageGenerateOwnershipResult() = 0;
+    virtual void pageGenerateOwnershipResult(const QString & proof) = 0;
     virtual void pageValidateOwnershipInput() = 0;
-    virtual void pageValidateOwnershipResult() = 0;
+    virtual void pageValidateOwnershipResult(const QString & network, const QString & message, const QString & viewingKey,
+                        const QString & torAddress, const QString & mqsAddress) = 0;
 };
 
 void setWndManager(WndManager * mgr);

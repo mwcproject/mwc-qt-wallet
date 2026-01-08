@@ -31,17 +31,12 @@ public:
     virtual ~Migration() override;
 
 private slots:
-    void onLoginResult(bool ok);
-    void onRootPublicKey(bool success, QString errMsg, QString rootPubKey, QString message, QString signature);
-    void onTransactions(QString account, int64_t height, QVector<wallet::WalletTransaction> transactions);
-
+    void onLogin();
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override {return false;}
 
 private:
-    bool migratingNotes = false;
-    QString walletId = "";
 };
 
 }

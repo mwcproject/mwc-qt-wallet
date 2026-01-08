@@ -42,17 +42,12 @@ protected:
 
 private slots:
     void on_slatepackEdit_textChanged();
-
-    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
-
     void on_closeButton_clicked();
 
 private:
     Ui::DecodeSlatepackDlg *ui;
     bridge::Wallet  *wallet = nullptr;
     bridge::Util    *util = nullptr;
-
-    QString spInProgress;
 };
 
 }

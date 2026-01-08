@@ -88,6 +88,7 @@ void ValidateOwnershipProofInput::on_load_from_file_clicked()
 void ValidateOwnershipProofInput::on_validate_clicked()
 {
     QString proof = ui->proof_text->toPlainText();
+    proof = proof.trimmed().replace("\n", "");
 
     auto valRes = util::validateMwc713Str(proof, true);
     if (!valRes.first) {

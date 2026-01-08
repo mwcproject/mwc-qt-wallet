@@ -13,6 +13,10 @@
 // limitations under the License.
 
 #include "swapmkt_b.h"
+#include "../../util/Log.h"
+
+#ifdef FEATURE_MKTPLACE
+
 #include "../../wallet/wallet.h"
 #include "../../state/state.h"
 #include "../../state/s_mktswap.h"
@@ -50,6 +54,11 @@ QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
                                     bool sell, double  mwcAmount, double  secAmount,
                                     QString secondaryCurrency,  int mwcLockBlocks, int secLockBlocks,
                                     QString secAddress, double  secFee, QString note ) {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::createNewOffer with offerId=" + offerId +
+        " account=" + account + " sell=" + QString::number(sell) + " mwcAmount=" + QString::number(mwcAmount) +
+        " secAmount=" + QString::number(secAmount) + " secondaryCurrency=" + secondaryCurrency +
+        " mwcLockBlocks=" + QString::number(mwcLockBlocks) + " secLockBlocks=" + QString::number(secLockBlocks) +
+        " secAddress=" + secAddress + " secFee=" + QString::number(secFee) + " note=" + note);
     return getSwapMkt()->createNewOffer(offerId, account, sell, mwcAmount, secAmount,
             secondaryCurrency, mwcLockBlocks, secLockBlocks,
             secAddress, secFee, note);
@@ -57,11 +66,13 @@ QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
 
 // triggers sgnMyOffersChanged  event
 void SwapMarketplace::withdrawMyOffer(QString offerId) {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::withdrawMyOffer with offerId=" + offerId);
     getSwapMkt()->withdrawMyOffer(offerId);
 }
 
 // Json string with MySwap Offers info
 QVector<QString> SwapMarketplace::getMyOffers() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getMyOffers");
     QVector<state::MySwapOffer> offers = getSwapMkt()->getMyOffers();
     QVector<QString> res;
     for (const auto & o : offers) {
@@ -74,6 +85,8 @@ QVector<QString> SwapMarketplace::getMyOffers() {
 // selling: 0 - buy, 1-sell, 2 - all
 // currency: empty value for all
 QVector<QString> SwapMarketplace::getMarketOffers(double minFeeLevel, int selling, QString currency) {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getMarketOffers with minFeeLevel=" + QString::number(minFeeLevel) +
+                " selling=" + QString::number(selling) + " currency=" + currency);
     QVector<state::MktSwapOffer> offers = getSwapMkt()->getMarketOffers(minFeeLevel, selling, currency);
     QVector<QString> res;
     for (const auto & o : offers) {
@@ -84,6 +97,7 @@ QVector<QString> SwapMarketplace::getMarketOffers(double minFeeLevel, int sellin
 
 // return JSon strings with MktSwapOffer value. Empty string if such offer is not found
 QString SwapMarketplace::getMarketOffer(QString offerId, QString walletAddress) {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getMarketOffer with offerId=" + offerId + " walletAddress=" + walletAddress);
     state::MktSwapOffer offer = getSwapMkt()->getMarketOffer(offerId, walletAddress);
     if (offer.isValid())
         return offer.toJsonStr();
@@ -112,6 +126,7 @@ static QString getEstimatedNumber(int n) {
 }
 
 QVector<QString> SwapMarketplace::getTotalOffers() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getTotalOffers");
     QVector<QString> res;
 
     for (auto of : getSwapMkt()->getTotalOffers()) {
@@ -125,77 +140,95 @@ QVector<QString> SwapMarketplace::getTotalOffers() {
 
 // Response at: sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
 void SwapMarketplace::requestIntegrityFees() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::requestIntegrityFees");
     getSwapMkt()->requestIntegrityFees();
 }
 
 double SwapMarketplace::getFeeLevel() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getFeeLevel");
     return getSwapMkt()->getFeeLevel();
 }
 QString SwapMarketplace::getFeeDepositAccount() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getFeeDepositAccount");
     return getSwapMkt()->getFeeDepositAccount();
 }
 double SwapMarketplace::getFeeReservedAmount() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getFeeReservedAmount");
     return getSwapMkt()->getFeeReservedAmount();
 }
 
 void SwapMarketplace::setIntegritySettings(const double & feeLevel, QString feeDepositAccount, const double & feeReservedAmount) {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::setIntegritySettings with feeLevel=" + QString::number(feeLevel) +
+        " feeDepositAccount=" + feeDepositAccount + " feeReservedAmount=" + QString::number(feeReservedAmount));
     getSwapMkt()->setIntegritySettings(feeLevel, feeDepositAccount, feeReservedAmount);
 }
 
 // Response at: sgnWithdrawIntegrityFees(QString error, double mwc, QString account);
 void SwapMarketplace::withdrawIntegrityFees() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::withdrawIntegrityFees");
     getSwapMkt()->withdrawIntegrityFees();
 }
 
 // Return the listening status
 QString SwapMarketplace::getOffersListeningStatus() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getOffersListeningStatus");
     return getSwapMkt()->getOffersListeningStatus();
 }
 
 // Switch to create a new offer page. For new offer myMsgId must be empty string.
 // Otherwise - exist offer id
 void SwapMarketplace::pageCreateNewOffer(QString myMsgId) {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::pageCreateNewOffer with myMsgId=" + myMsgId);
     getSwapMkt()->pageCreateUpdateOffer(myMsgId);
 }
 
 // Show marketplace page
 void SwapMarketplace::pageMktList() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::pageMktList");
     getSwapMkt()->pageMktList(false, false);
 }
 
 // Show my offers at marketplace page
 void SwapMarketplace::pageMktMyOffers() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::pageMktMyOffers");
     getSwapMkt()->pageMktList(true, false);
 }
 
 void SwapMarketplace::pageFee() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::pageFee");
     return getSwapMkt()->pageMktList(false, true);
 }
 
 // Show integrity fee  transactions
 void SwapMarketplace::pageTransactionFee() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::pageTransactionFee");
     getSwapMkt()->pageFeeTransactions();
 }
 
 void SwapMarketplace::requestMktSwapOffers() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::requestMktSwapOffers");
     getSwapMkt()->requestMktSwapOffers();
 }
 
 // Accept the offer from marketplace
 bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::acceptMarketplaceOffer with offerId=" + offerId + " walletAddress=" + walletAddress);
     return getSwapMkt()->acceptMarketplaceOffer(offerId, walletAddress);
 }
 
 // Request number of running MyOffers
 int SwapMarketplace::getMyOffersNum() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getMyOffersNum");
     return getSwapMkt()->getMyOffersNum();
 }
 
 void SwapMarketplace::stashMyOffers() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::stashMyOffers");
     getSwapMkt()->stashMyOffers();
 }
 
 int SwapMarketplace::getLastNodeHeight() {
+    logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::getLastNodeHeight");
     return getSwapMkt()->getLastNodeHeight();
 }
 
@@ -226,4 +259,4 @@ void SwapMarketplace::onMessagingStatusChanged() {
 
 }
 
-
+#endif

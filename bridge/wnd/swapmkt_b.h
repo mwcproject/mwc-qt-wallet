@@ -15,6 +15,9 @@
 #ifndef MWC_QT_WALLET_SWAPMKT_B_H
 #define MWC_QT_WALLET_SWAPMKT_B_H
 
+#include "../../features.h"
+
+#ifdef FEATURE_MKTPLACE
 
 #include <QObject>
 #include "../../wallet/wallet.h"
@@ -111,5 +114,7 @@ private slots:
 };
 
 }
+
+#endif
 
 #endif //MWC_QT_WALLET_SWAPMKT_B_H

@@ -47,19 +47,18 @@ void NavMenuAccount::on_seedButton_clicked()
 
     if (stateMachine->canSwitchState(state::STATE::SHOW_SEED)) {
 
-        QString passwordHash = wallet->getPasswordHash();
-
-        if ( !passwordHash.isEmpty() ) {
+        QString password;
+        if ( !wallet->checkPassword("") ) {
             if (WndManager::RETURN_CODE::BTN2 !=
                 control::MessageBox::questionText(this, "Wallet Password",
                                                   "You are going to view wallet mnemonic passphrase.", "Cancel", "Confirm",
                                                   "Cancel operation", "Verify password and show mnemonic passphrase",
                                                   false, true, 1.0,
-                                                  passwordHash, WndManager::RETURN_CODE::BTN2))
+                                                  &password, WndManager::RETURN_CODE::BTN2))
                 return;
         }
         // passwordHash should contain raw password value form the messgage box
-        stateMachine->activateShowSeed(passwordHash);
+        stateMachine->activateShowSeed(password);
     }
     close();
 }

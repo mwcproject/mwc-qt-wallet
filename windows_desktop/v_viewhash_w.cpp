@@ -30,9 +30,6 @@ ViewHash::ViewHash(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     viewAcounts = new bridge::ViewOutputs(this);
 
-    QObject::connect( wallet, &bridge::Wallet::sgnGetViewingKey,
-                      this, &ViewHash::onSgnGetViewingKey, Qt::QueuedConnection);
-
     ui->walletViewingKeyLable->hide();
     ui->walletViewingKey->hide();
     ui->showWalletKeyButton->show();
@@ -49,21 +46,14 @@ ViewHash::~ViewHash()
 
 void ViewHash::on_showWalletKeyButton_clicked()
 {
-    wallet->getViewingKey();
-    ui->walletViewingKeyLable->show();
-    ui->walletViewingKey->show();
-    ui->walletViewingKey->setText("Retrieving Viewing Key, please wait...");
-    ui->showWalletKeyButton->hide();
-}
+    QString viewingKey = wallet->viewRewindHash();
 
-void ViewHash::onSgnGetViewingKey(QString viewingKey, QString error) {
     if (viewingKey.isEmpty()) {
         // Error,
         ui->walletViewingKeyLable->hide();
         ui->walletViewingKey->hide();
         ui->showWalletKeyButton->show();
-
-        control::MessageBox::messageText( this, "Error", "Unable to retrieve the wallet viewing key.\n\n" + error);
+        control::MessageBox::messageText( this, "Error", "Unable to retrieve the wallet viewing key.");
     }
     else {
         ui->walletViewingKeyLable->show();
@@ -71,6 +61,7 @@ void ViewHash::onSgnGetViewingKey(QString viewingKey, QString error) {
         ui->showWalletKeyButton->hide();
         ui->walletViewingKey->setText(viewingKey);
     }
+
 }
 
 static bool validateHashKey(const QString & hash) {

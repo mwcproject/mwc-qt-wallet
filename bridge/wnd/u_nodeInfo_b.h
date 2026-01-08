@@ -26,38 +26,24 @@ public:
     explicit NodeInfo(QObject * parent = nullptr);
     ~NodeInfo();
 
-    void setNodeStatus( const QString & localNodeStatus, const state::NodeStatus & status );
-    void updateEmbeddedMwcNodeStatus( const QString & status );
     void hideProgress();
 
-    // request wallet::MwcNodeConnection as a Json
-    Q_INVOKABLE QString getNodeConnection();
-
-    // mwc Node status string
-    Q_INVOKABLE QString getMwcNodeStatus();
+    // Requst the node status, will be sent through sgnSetNodeStatus
+    Q_INVOKABLE void requestMwcNodeStatus();
 
     // Request wallet full resync
     Q_INVOKABLE void requestWalletResync();
-
-    // Update node connection data for the wallet. Might require relogin
-    Q_INVOKABLE void updateNodeConnection(QString mwcNodeConnectionJson);
 
     // Export blockchain data to the archive
     Q_INVOKABLE void exportBlockchainData(QString fileName);
     // Import blockchain data from the archive
     Q_INVOKABLE void importBlockchainData(QString fileName);
     // publish transaction from the file
-    Q_INVOKABLE void publishTransaction(QString fileName);
+    Q_INVOKABLE void publishTransaction(QString fileName, bool fluff);
 
     // Reset embedded node data
     Q_INVOKABLE void resetEmbeddedNodeData();
 signals:
-    void sgnSetNodeStatus( QString localNodeStatus,
-                             bool online,  QString errMsg, int nodeHeight, int peerHeight,
-                            QString totalDifficulty2show, int connections);
-
-    void sgnUpdateEmbeddedMwcNodeStatus( QString status );
-
     void sgnHideProgress();
 };
 

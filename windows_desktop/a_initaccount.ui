@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>InitAccount</class>
- <widget class="QWidget" name="InitAccount">
+ <widget class="control::MwcWidget" name="InitAccount">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -43,7 +43,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="control::MwcLabel" name="label_2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -120,7 +120,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="passwordWndHolder" native="true">
+      <widget class="control::MwcWidget" name="passwordWndHolder" native="true">
        <property name="minimumSize">
         <size>
          <width>402</width>
@@ -144,7 +144,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QWidget" name="passwordFrame" native="true">
+         <widget class="control::MwcWidget" name="passwordFrame" native="true">
           <property name="minimumSize">
            <size>
             <width>400</width>
@@ -282,7 +282,7 @@
             <string>Name your instance</string>
            </property>
           </widget>
-          <widget class="QLabel" name="label">
+          <widget class="control::MwcLabel" name="label">
            <property name="geometry">
             <rect>
              <x>45</x>
@@ -337,10 +337,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Choose alternative location for your wallet data. You might keep the wallet data on USB drive.</string>
+            <string>Choose an alternative location for your wallet data. You can keep the wallet data on a USB drive.</string>
            </property>
            <property name="statusTip">
-            <string>Choose alternative location for your wallet data. You might keep the wallet data on USB drive.</string>
+            <string>Choose an alternative location for your wallet data. You can keep the wallet data on a USB drive.</string>
            </property>
            <property name="layoutDirection">
             <enum>Qt::LeftToRight</enum>
@@ -352,7 +352,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="straighHolder" native="true">
+         <widget class="control::MwcWidget" name="straighHolder" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <property name="spacing">
             <number>0</number>
@@ -483,7 +483,7 @@
             <string>Confirm password</string>
            </property>
           </widget>
-          <widget class="QLabel" name="confirmPassLable">
+          <widget class="control::MwcLabel" name="confirmPassLable">
            <property name="geometry">
             <rect>
              <x>363</x>
@@ -747,6 +747,16 @@
    <class>control::MwcRadioButton</class>
    <extends>QRadioButton</extends>
    <header>control_desktop/MwcRadioButton.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

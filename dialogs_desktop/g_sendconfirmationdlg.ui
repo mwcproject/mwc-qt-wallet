@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SendConfirmationDlg</class>
- <widget class="QDialog" name="SendConfirmationDlg">
+ <widget class="control::MwcDialog" name="SendConfirmationDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Send</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -67,7 +67,7 @@
       </font>
      </property>
      <property name="text">
-      <string>WARNING</string>
+      <string>Warning</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -143,9 +143,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QCheckBox" name="fluffCheckBox">
+      <widget class="control::MwcCheckBox" name="fluffCheckBox">
        <property name="toolTip">
-        <string>Skip Dandelion relay protocol to speed up the transaction delivery to mining nodes</string>
+        <string>Skip the Dandelion relay protocol to speed up delivery to mining nodes.</string>
        </property>
        <property name="text">
         <string>Fluff the transaction
@@ -243,7 +243,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
          </font>
         </property>
         <property name="text">
-         <string>Input your password to continue:</string>
+         <string>Enter your password to continue:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -279,7 +279,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
          </font>
         </property>
         <property name="toolTip">
-         <string>Number of change outputs for your send transactions. Use 1 if you are not sure what number to use.</string>
+         <string>Number of change outputs for your send transactions. Use 1 if you are unsure.</string>
         </property>
         <property name="inputMask">
          <string/>
@@ -357,7 +357,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
          </font>
         </property>
         <property name="toolTip">
-         <string>Input your wallet password to authorize transaction</string>
+         <string>Enter your wallet password to authorize the transaction.</string>
         </property>
         <property name="inputMask">
          <string/>
@@ -521,6 +521,16 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
    <class>control::MwcTextEditDlg</class>
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcPlainEditLogs.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -19,6 +19,7 @@
 #include "../core/Config.h"
 #include "../state/statemachine.h"
 #include "../util/crypto.h"
+#include "util/Log.h"
 
 namespace state {
 
@@ -30,9 +31,7 @@ Migration::Migration( StateContext * _context) :
     State (_context, STATE::MIGRATION) {
     // only need to wait for signals if there is something to migrate
     if (context->appContext->hasTxnNotesToMigrate()) {
-        QObject::connect( context->wallet, &wallet::Wallet::onLoginResult, this, &Migration::onLoginResult, Qt::QueuedConnection );
-        QObject::connect( context->wallet, &wallet::Wallet::onRootPublicKey, this, &Migration::onRootPublicKey, Qt::QueuedConnection );
-        QObject::connect( context->wallet, &wallet::Wallet::onTransactions, this, &Migration::onTransactions, Qt::QueuedConnection);
+        QObject::connect( context->wallet, &wallet::Wallet::onLogin, this, &Migration::onLogin, Qt::QueuedConnection );
     }
 }
 
@@ -43,61 +42,49 @@ NextStateRespond Migration::execute() {
     return NextStateRespond( NextStateRespond::RESULT::DONE );
 }
 
-void Migration::onLoginResult(bool ok) {
-    Q_UNUSED(ok);
-    qDebug() << endl << "\t*****Migration onLoginResult" << endl;
-
+void Migration::onLogin() {
     if (context->appContext->hasTxnNotesToMigrate() &&
             (config::isOnlineWallet() || config::isColdWallet())) {
-        migratingNotes = true;
-        walletId = "";
-        context->wallet->getRootPublicKey("");
-    }
-}
 
-void Migration::onRootPublicKey(bool success, QString errMsg, QString rootPubKey, QString message, QString signature) {
-    Q_UNUSED(errMsg)
-    Q_UNUSED(message)
-    Q_UNUSED(signature)
-    qDebug() << endl << "\t*****Migration onRootPublicKey" << endl;
+        logger::logInfo(logger::MWC_WALLET, "Migrating transaction notes");
 
-    if (success && migratingNotes && walletId.isEmpty()) {
-        walletId = crypto::calcHSA256Hash(rootPubKey);
-        // now we wait for someone to request the transactions for each
-        // account in each wallet instance until there a no more notes
-        // to migrate
-    }
-}
+        QJsonObject public_key_resp = context->wallet->generateOwnershipProof("", true, false, false);
+        // rewind hash is a public key
+        QString rootPubKey = public_key_resp["wallet_root"].toObject()["public_key"].toString();
+        if (!rootPubKey.isEmpty()) {
+            QString walletId = crypto::calcHSA256Hash(rootPubKey);
 
-void Migration::onTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> transactions) {
-    Q_UNUSED(height)
+            QVector<wallet::Account> accounts = context->wallet->listAccounts();
+            for (const wallet::Account & acc : accounts) {
+                QStringList txIdxList = context->appContext->getTxnNotesToMigrate(walletId, acc.path);
+                if (txIdxList.size() > 0) {
+                    logger::logInfo(logger::MWC_WALLET, "Migrating for account " + acc.path);
 
-    if (migratingNotes && context->appContext->hasTxnNotesToMigrate())
-    {
-        QStringList txIdxList = context->appContext->getTxnNotesToMigrate(walletId, account);
-        if (txIdxList.size() > 0) {
-            bool notesLoaded = false;
-            for (wallet::WalletTransaction txn : transactions) {
-                QString txIdxStr = QString::number(txn.txIdx);
-                if (txIdxList.contains(txIdxStr)) {
-                    if (!notesLoaded) {
-                        // getting a note will ensure the notes are loaded
-                        context->appContext->getNote("tx_" + txn.txid);
-                        notesLoaded = true;
+                    bool notesLoaded = false;
+                    QVector<wallet::WalletTransaction> transactions = context->wallet->getTransactions( acc.path );
+
+                    for (wallet::WalletTransaction txn : transactions) {
+                        QString txIdxStr = QString::number(txn.txIdx);
+                        if (txIdxList.contains(txIdxStr)) {
+                            if (!notesLoaded) {
+                                // getting a note will ensure the notes are loaded
+                                context->appContext->getNote("tx_" + txn.txid);
+                                notesLoaded = true;
+                            }
+                            context->appContext->migrateTxnNote(walletId, acc.path,
+                                txIdxStr, txn.txid);
+                            int index = txIdxList.indexOf(txIdxStr);
+                            if (index >= 0) {
+                                txIdxList.removeAt(index);
+                            }
+                        }
                     }
-                    context->appContext->migrateTxnNote(walletId, account, txIdxStr, txn.txid);
-                    int index = txIdxList.indexOf(txIdxStr);
-                    if (index >= 0) {
-                        txIdxList.removeAt(index);
-                    }
+
                 }
+
             }
         }
-        if (context->appContext->hasTxnNotesToMigrate() == false)
-        {
-            migratingNotes = false;
-            walletId = "";
-        }
+
     }
 }
 

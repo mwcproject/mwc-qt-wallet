@@ -15,7 +15,7 @@
 #ifndef MWC_QT_WALLET_PANELBASEWND_H
 #define MWC_QT_WALLET_PANELBASEWND_H
 
-#include <QWidget>
+#include "../control_desktop/MwcWidget.h"
 
 #ifdef Q_OS_DARWIN
 namespace Cocoa
@@ -29,7 +29,7 @@ namespace core {
 // Base calss for all panels. those classes cover:
 // Title update for MacOS. Need to be done because of QT bugs
 // Activity monitoring
-class PanelBaseWnd : public QWidget {
+class PanelBaseWnd : public control::MwcWidget {
     Q_OBJECT
 public:
     PanelBaseWnd(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());

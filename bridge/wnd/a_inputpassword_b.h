@@ -26,7 +26,8 @@ public:
     ~InputPassword();
 
     // Try to login into the wallet with this password.
-    Q_INVOKABLE void submitPassword(QString password);
+    // return success. Error will be shown by internals
+    Q_INVOKABLE bool submitPassword(QString password, QString selectedPath);
 private:
 };
 

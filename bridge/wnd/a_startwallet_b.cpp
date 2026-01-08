@@ -16,6 +16,7 @@
 #include "../../state/a_StartWallet.h"
 #include "../../state/state.h"
 #include "../../state/statemachine.h"
+#include "../../util/Log.h"
 
 namespace bridge {
 
@@ -28,11 +29,13 @@ StartWallet::~StartWallet() {}
 // path - wallet data location or empty for the next available_path (new wallet case only)
 // restoreWallet - true if the next new wallet will be restore from the seed.
 void StartWallet::createNewWalletInstance(QString path, bool restoreWallet) {
+    logger::logInfo(logger::BRIDGE, "Call StartWallet::createNewWalletInstance with path=" + path + " restoreWallet=" + QString(restoreWallet ? "true" : "false"));
     ((state::StartWallet *) state::getState(state::STATE::START_WALLET)) -> createNewWalletInstance(path, restoreWallet);
 }
 
 // Cancel this workflow and return back
 void StartWallet::cancel() {
+    logger::logInfo(logger::BRIDGE, "Call StartWallet::cancel");
     ((state::StartWallet *) state::getState(state::STATE::START_WALLET)) -> cancel();
 }
 

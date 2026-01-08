@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ShowProofDlg</class>
- <widget class="QDialog" name="ShowProofDlg">
+ <widget class="control::MwcDialog" name="ShowProofDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Proof</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_7">
    <property name="spacing">
@@ -72,7 +72,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Path to the proof file - upload it at https://explorer.mwc.mw/ to verify.</string>
+        <string>Path to the proof file. Upload it at https://explorer.mwc.mw/ to verify.</string>
        </property>
        <property name="readOnly">
         <bool>true</bool>
@@ -82,7 +82,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTextEdit" name="textEdit">
+    <widget class="control::MwcTextEdit" name="textEdit">
      <property name="readOnly">
       <bool>true</bool>
      </property>
@@ -132,7 +132,7 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>This transaction outputs.</string>
+          <string>Transaction outputs.</string>
          </property>
         </widget>
        </item>
@@ -174,7 +174,7 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Open output details with MWC block explorer</string>
+          <string>Open output details in the MWC block explorer</string>
          </property>
          <property name="text">
           <string>View</string>
@@ -217,7 +217,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>This trasaction kernel</string>
+          <string>Transaction kernel.</string>
          </property>
          <property name="text">
           <string/>
@@ -265,7 +265,7 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Open kernel details with MWC block explorer</string>
+          <string>Open kernel details in the MWC block explorer</string>
          </property>
          <property name="text">
           <string>View</string>
@@ -295,7 +295,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextEdit" name="slate">
+      <widget class="control::MwcTextEdit" name="slate">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -309,7 +309,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Transaction Slate for detailed review.</string>
+        <string>Transaction slate for detailed review.</string>
        </property>
        <property name="readOnly">
         <bool>true</bool>
@@ -425,6 +425,16 @@ this proof should only be considered valid if the kernel is actually on-chain wi
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

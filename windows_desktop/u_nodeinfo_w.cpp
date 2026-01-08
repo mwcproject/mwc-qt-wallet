@@ -15,15 +15,13 @@
 #include "u_nodeinfo_w.h"
 #include "ui_u_nodeinfo_w.h"
 #include "../control_desktop/messagebox.h"
-#include "../dialogs_desktop/u_changenode.h"
-#include <QScrollBar>
 #include "../util_desktop/timeoutlock.h"
-#include "../dialogs_desktop/u_mwcnodelogs.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/u_nodeInfo_b.h"
 #include "../core/global.h"
 #include "../bridge/util_b.h"
+#include "../bridge/heartbeat_b.h"
 
 namespace wnd {
 
@@ -45,22 +43,15 @@ NodeInfo::NodeInfo(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     nodeInfo = new bridge::NodeInfo(this);
     util = new bridge::Util(this);
+    heartBeat = new bridge::HeartBeat(this);
 
     // Need simulate post message. Using events for that
-    connect(nodeInfo, &bridge::NodeInfo::sgnSetNodeStatus, this, &NodeInfo::onSgnSetNodeStatus, Qt::QueuedConnection );
-    connect(nodeInfo, &bridge::NodeInfo::sgnUpdateEmbeddedMwcNodeStatus, this, &NodeInfo::onSgnUpdateEmbeddedMwcNodeStatus, Qt::QueuedConnection );
+    connect(heartBeat, &bridge::HeartBeat::sgnSetNodeStatus, this, &NodeInfo::onSgnSetNodeStatus, Qt::QueuedConnection );
     connect(nodeInfo, &bridge::NodeInfo::sgnHideProgress, this, &NodeInfo::onSgnHideProgress, Qt::QueuedConnection );
 
     ui->warningLine->hide();
 
     ui->progress->initLoader(false);
-
-    connectionType = wallet::MwcNodeConnection::fromJson(nodeInfo->getNodeConnection()).connectionType;
-
-    if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
-        ui->statusInfo->setText( toBoldAndYellow( nodeInfo->getMwcNodeStatus() ) );
-
-    ui->showLogsButton->setEnabled( connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
 
     if ( !config->isOnlineWallet() )
         ui->onlineWalletBtns->hide();
@@ -78,12 +69,6 @@ NodeInfo::NodeInfo(QWidget *parent) :
 
 NodeInfo::~NodeInfo() {
     delete ui;
-}
-
-// logs to show, multi like output
-void NodeInfo::onSgnUpdateEmbeddedMwcNodeStatus( QString status ) {
-    if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
-        ui->statusInfo->setText( toBoldAndYellow(status) );
 }
 
 // Empty string to hide warning...
@@ -105,49 +90,55 @@ void NodeInfo::showWarning(QString warning) {
 }
 
 
-void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
-                                 bool online,  QString errMsg, int nodeHeight, int peerHeight,
-                                 QString totalDifficulty2show, int connections) {
-    Q_UNUSED(errMsg);
-    QString warning;
+void NodeInfo::onSgnSetNodeStatus( QString embeddedNodeStatus,
+                                bool internalNode,
+                                bool online,  int nodeHeight, int peerHeight,
+                                QString totalDifficulty2show, int connections) {
+    bool nodeIsReady = nodeHeight>0 && (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT > peerHeight);
 
-    bool nodeIsReady = false;
+    if (internalNode) {
+        ui->statusLabel->setText( "Embedded" );
+    }
+    else {
+        ui->statusLabel->setText( "Public" );
+    }
 
     if (!online) {
         QString statusStr = "Offline";
-
-        if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL && localNodeStatus!="Ready") {
-            statusStr = localNodeStatus;
+        if (config->isOnlineNode()) {
+            ui->statusInfo->setText( embeddedNodeStatus );
         }
-
-        ui->statusInfo->setText( toBoldAndYellow(statusStr) );
+        else {
+            ui->statusInfo->setText( toBoldAndYellow("Offline") );
+        }
         ui->connectionsInfo->setText("-");
         ui->heightInfo->setText("-");
         ui->difficultyInfo->setText("-");
     }
     else {
-        if ( nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight ) {
-            if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
-                ui->statusInfo->setText(toBoldAndYellow("Syncing") );
+        if (!config->isOnlineNode()) {
+            if (internalNode) {
+                ui->statusInfo->setText(embeddedNodeStatus);
+                showWarning("");
+            }
+            else {
+                if ( nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight ) {
+                    ui->statusInfo->setText(toBoldAndYellow("Syncing") );
+                }
+                else {
+                    ui->statusInfo->setText("Online");
+                }
+
+                showWarning("Embedded node status: " + embeddedNodeStatus);
+            }
         }
         else {
-            if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
-                ui->statusInfo->setText("Online");
-
-            nodeIsReady = true;
+            ui->statusInfo->setText(embeddedNodeStatus);
+            showWarning("");
         }
 
         if (connections <= 0) {
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
-
-            if (!config->isColdWallet()) {
-                if (! (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD ||
-                        (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL && !config->getNoTorForEmbeddedNode() )))
-                {
-                    warning = toBoldAndYellow(
-                            "Please note. You can't run two MWC Nodes with same public IP.<br>That might be a reason why node unable to find any peers.");
-                }
-            }
         }
         else {
             ui->connectionsInfo->setText( QString::number(connections) );
@@ -157,12 +148,13 @@ void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
         ui->difficultyInfo->setText( totalDifficulty2show );
     }
 
+    ui->refreshButton->setEnabled( online );
+    ui->publishTransaction->setEnabled(online);
+
     if (peerHeight==0 || connections==0)
         nodeIsReady = false;
 
     updateNodeReadyButtons(nodeIsReady);
-
-    showWarning(warning);
 }
 
 void NodeInfo::on_refreshButton_clicked() {
@@ -173,32 +165,6 @@ void NodeInfo::on_refreshButton_clicked() {
             "Continue with resync, I will wait for a while",
             true, false) == core::WndManager::RETURN_CODE::BTN2 ) {
         nodeInfo->requestWalletResync();
-    }
-}
-
-void NodeInfo::showNodeLogs() {
-    util::TimeoutLockObject to("NodeInfo");
-
-    dlg::MwcNodeLogs logsDlg(this);
-    logsDlg.exec();
-}
-
-void NodeInfo::on_showLogsButton_clicked() { showNodeLogs(); }
-void NodeInfo::on_showLogsButton_5_clicked() { showNodeLogs(); }
-void NodeInfo::on_showLogsButton_9_clicked() { showNodeLogs(); }
-
-void NodeInfo::on_changeNodeButton_clicked()
-{
-    util::TimeoutLockObject to("NodeInfo");
-
-    // call dialog the allow to change the
-    wallet::MwcNodeConnection nodeConn = wallet::MwcNodeConnection::fromJson(nodeInfo->getNodeConnection());
-
-    dlg::ChangeNode changeNodeDlg(this, nodeConn, config->getNetwork() );
-
-    if ( changeNodeDlg.exec() == QDialog::Accepted ) {
-        ui->progress->show(); // We are restarting, might take a while. Let's show the progress
-        nodeInfo->updateNodeConnection( changeNodeDlg.getNodeConnectionConfig().toJson() );
     }
 }
 
@@ -220,7 +186,7 @@ void NodeInfo::on_saveBlockchianData_clicked()
     nodeInfo->exportBlockchainData(fileName);
 }
 
-void NodeInfo::on_loadBlockchainData_2_clicked()
+void NodeInfo::on_loadBlockchainData_clicked()
 {
     QString fileName = util->getOpenFileName("Load Blockchain Data",
                                                     "BlockchainData",
@@ -243,13 +209,11 @@ void NodeInfo::on_publishTransaction_clicked()
           return;
 
     ui->progress->show();
-    nodeInfo->publishTransaction(fileName);
+    nodeInfo->publishTransaction(fileName, false);
 }
 
 void NodeInfo::updateNodeReadyButtons(bool nodeIsReady) {
-    ui->publishTransaction->setEnabled(nodeIsReady);
     ui->saveBlockchianData->setEnabled(nodeIsReady);
-    ui->refreshButton->setEnabled(nodeIsReady);
 }
 
 void NodeInfo::on_resyncNodeData_clicked()
@@ -262,7 +226,7 @@ void NodeInfo::on_resyncNodeData_clicked()
         return;
 
     // User choose to clean up.
-    ui->progress->show();
+    //ui->progress->show();
     nodeInfo->resetEmbeddedNodeData();
 }
 

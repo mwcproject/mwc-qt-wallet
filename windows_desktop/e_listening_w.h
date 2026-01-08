@@ -25,6 +25,7 @@ namespace bridge {
 class Wallet;
 class Config;
 class WalletConfig;
+class HeartBeat;
 }
 
 namespace wnd {
@@ -40,24 +41,20 @@ public:
 private slots:
     // keybaseOnline is absolete, keeping for compatibility
     void onSgnUpdateListenerStatus(bool mwcOnline, bool tor);
-    void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
-    void onSgnListenerStartStop(bool mqs, bool tor); // _keybase is absolete
-    void onSgnFileProofAddress(QString proofAddress); // tor address
 
     void on_mwcMqNextAddress_clicked();
     void on_mwcMqToIndex_clicked();
 
-    void on_torBridgeConection_textEdited(const QString &arg1);
-
-    void on_torClientOptions_textEdited(const QString &arg1);
-
 private:
     void updateStatuses();
+
+    void setMwcTorAddressWithIndex(QString mwcAddress, QString torAddress, int idx);
 private:
     Ui::Listening *ui;
     bridge::Wallet * wallet = nullptr;
     bridge::Config * config = nullptr;
     bridge::WalletConfig * walletConfig = nullptr;
+    bridge::HeartBeat * heartBeat = nullptr;
 };
 
 }

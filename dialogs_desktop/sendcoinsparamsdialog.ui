@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SendCoinsParamsDialog</class>
- <widget class="QDialog" name="SendCoinsParamsDialog">
+ <widget class="control::MwcDialog" name="SendCoinsParamsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Send Parameters</string>
   </property>
   <widget class="control::MwcLabelSmall" name="label_6">
    <property name="geometry">
@@ -212,6 +212,11 @@
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

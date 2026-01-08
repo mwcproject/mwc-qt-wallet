@@ -17,11 +17,11 @@
 namespace control {
 
 MwcStatusLine::MwcStatusLine(QWidget *parent) :
-    QPushButton(parent)
+    MwcPushButton(parent)
 {}
 
 MwcStatusLine::MwcStatusLine(const QString & t, QWidget *parent ) :
-        QPushButton(t, parent)
+        MwcPushButton(t, parent)
 {}
 
 MwcStatusLine::~MwcStatusLine()

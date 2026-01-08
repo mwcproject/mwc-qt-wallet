@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DecodeSlatepackDlg</class>
- <widget class="QDialog" name="DecodeSlatepackDlg">
+ <widget class="control::MwcDialog" name="DecodeSlatepackDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Decode Slatepack</string>
   </property>
   <widget class="control::MwcPushButtonNormal" name="closeButton">
    <property name="geometry">
@@ -44,7 +44,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QTextEdit" name="slatepackEdit">
+  <widget class="control::MwcTextEdit" name="slatepackEdit">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -78,7 +78,7 @@
     <bool>false</bool>
    </property>
    <property name="placeholderText">
-    <string>Please paste the slatepack content below</string>
+    <string>Please paste the Slatepack content below.</string>
    </property>
   </widget>
   <widget class="control::MwcLabelLarge" name="title">
@@ -114,7 +114,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QTextEdit" name="slateJsonEdit">
+  <widget class="control::MwcTextEdit" name="slateJsonEdit">
    <property name="geometry">
     <rect>
      <x>460</x>
@@ -189,6 +189,16 @@
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+   <customwidget>
+   <class>control::MwcDialog</class>
+   <extends>QDialog</extends>
+   <header>control_desktop/mwcdialog.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>control_desktop/MwcTextEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
