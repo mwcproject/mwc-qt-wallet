@@ -3,7 +3,7 @@
 QT       += core gui widgets network svg concurrent
 requires(qtConfig(completer))
 
-greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 6): QT += widgets
 
 TARGET = mwc-qt-wallet
 TEMPLATE = app

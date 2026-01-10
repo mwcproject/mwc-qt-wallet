@@ -253,6 +253,9 @@ void logDebug(Who who, QString message) {
 #ifndef QT_NO_DEBUG
     Q_ASSERT(logClient); // call initLogger first
     logClient->log(true, who2str(who), "DEBUG " + message );
+#else
+    Q_UNUSED(who)
+    Q_UNUSED(message)
 #endif
 }
 

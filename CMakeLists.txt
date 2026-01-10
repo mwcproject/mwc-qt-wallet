@@ -9,9 +9,7 @@ project(mwc-qt-wallet)
 # Qt configuration
 # Please specify here path to your Qt installation
 #
-set (Qt5_DIR "~/Qt/6.2.4/macos/lib/cmake/Qt6")
-#set (Qt5_DIR "/usr/local/opt/qt/lib/cmake/Qt5")
-#set (Qt5_DIR "C:/Qt/5.9.8/msvc2015_64/lib/cmake/Qt5")
+set (Qt5_DIR "~/Qt/6.8.3/macos/lib/cmake/Qt6")
 
 #find_package(Qt5 COMPONENTS Core Gui Widgets Network Svg REQUIRED)
 find_package(Qt6 COMPONENTS Core Gui Widgets Network Svg Concurrent REQUIRED)

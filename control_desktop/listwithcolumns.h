@@ -36,7 +36,7 @@ public:
     int getNumberOfVisibleRows() const;
     static int getNumberOfVisibleRows(int height);
 
-    void setTextAlignment(int alignment) { textAlignment = alignment; }
+    void setTextAlignment(Qt::Alignment alignment) { textAlignment = alignment; }
     void setHightlightColors(QColor low, QColor hi) {selectedLow=low; selectedHi=hi;}
     // Alpha delta for row stripe coloring. Range 0-255
     void setStripeAlfaDelta( int alpha ) { bkColor2.setAlpha(alpha); }
@@ -61,7 +61,7 @@ protected:
     void setListLook();
 
 protected:
-    int textAlignment = Qt::AlignCenter;
+    Qt::Alignment textAlignment = Qt::AlignCenter;
 
     // Two background color
     QColor bkColor1 = QColor(255,255,255,0);
