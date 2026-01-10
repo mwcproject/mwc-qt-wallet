@@ -100,8 +100,8 @@ Item {
     }
 
     function updateStatus() {      
-        image_mwcmqs.source = wallet.getMqsListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
-        image_tor.source = wallet.getTorListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_mwcmqs.source = wallet.getMqsListenerStatus() ? "../img/CircGreen.svg" : "../img/CircRed.svg"
+        image_tor.source = wallet.getTorListenerStatus() ? "../img/CircGreen.svg" : "../img/CircRed.svg"
     }
 
     function slatepackCallback(ok, slatepack, slateJson, sender) {

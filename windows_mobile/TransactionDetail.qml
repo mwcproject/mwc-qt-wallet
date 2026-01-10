@@ -152,19 +152,19 @@ Item {
 
     function getTxTypeIcon(transactionType, confirmed) {
         if ( transactionType & type_TRANSACTION_CANCELLED )
-            return "../img/Transactions_Cancelled_Blue@2x.svg"
+            return "../img/Transactions_Cancelled_Blue.svg"
 
         if ( !confirmed )
-            return "../img/Transactions_Unconfirmed_Blue@2x.svg"
+            return "../img/Transactions_Unconfirmed_Blue.svg"
 
         if ( transactionType & type_TRANSACTION_SEND )
-            return "../img/Transactions_Sent_Blue@2x.svg"
+            return "../img/Transactions_Sent_Blue.svg"
 
         if ( transactionType & type_TRANSACTION_RECEIVE )
-            return "../img/Transactions_Received_Blue@2x.svg"
+            return "../img/Transactions_Received_Blue.svg"
 
         if ( transactionType & type_TRANSACTION_COIN_BASE )
-            return "../img/Transactions_CoinBase_Blue@2x.svg"
+            return "../img/Transactions_CoinBase_Blue.svg"
     }
 
     function getTypeAsStr(transactionType) {
@@ -290,7 +290,7 @@ Item {
                     anchors.verticalCenter: text_txtype_amount.verticalCenter
                     anchors.right: text_txtype_amount.left
                     anchors.rightMargin: dp(5)
-                    source: "../img/Transactions_Sent_Blue@2x.svg"
+                    source: "../img/Transactions_Sent_Blue.svg"
                     fillMode: Image.PreserveAspectFit
                 }
 
@@ -323,7 +323,7 @@ Item {
                     anchors.topMargin: dp(25)
                     anchors.right: parent.right
                     anchors.rightMargin: dp(25)
-                    source: "../img/MessageBox_Close@2x.svg"
+                    source: "../img/MessageBox_Close.svg"
                     fillMode: Image.PreserveAspectFit
 
                     MouseArea {

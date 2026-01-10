@@ -185,7 +185,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             width: dp(20)
             height: dp(20)
-            source: isMainNet ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
+            source: isMainNet ? "../img/StatusOk.svg" : "../img/StatusEmpty.svg"
         }
 
         MouseArea {
@@ -217,7 +217,7 @@ Item {
             anchors.leftMargin: dp(15)
             width: dp(20)
             height: dp(20)
-            source: isMainNet ? "../img/StatusEmpty@2x.svg" : "../img/StatusOk@2x.svg"
+            source: isMainNet ? "../img/StatusEmpty.svg" : "../img/StatusOk.svg"
         }
 
         MouseArea {

@@ -106,7 +106,7 @@ Item {
                     height: dp(20)
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
-                    source: checkbox_fluff.checked ? "../img/purpleCheckOn@2x.svg" : "../img/purpleCheckOff@2x.svg"
+                    source: checkbox_fluff.checked ? "../img/purpleCheckOn.svg" : "../img/purpleCheckOff.svg"
                 }
             }
 

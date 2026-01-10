@@ -19,7 +19,7 @@ Item {
         width: dp(200)
         height: dp(30)
         fillMode: Image.PreserveAspectFit
-        source: "../img/BigLogo@2x.svg"
+        source: "../img/BigLogo.svg"
         anchors.top: parent.top
         anchors.topMargin: dp(100)
         anchors.horizontalCenter: parent.horizontalCenter
@@ -33,7 +33,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         fillMode: Image.PreserveAspectFit
-        source: "../img/NewInstanceBtn_big@2x.svg"
+        source: "../img/NewInstanceBtn_big.svg"
     }
 
     Text {
@@ -64,7 +64,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         fillMode: Image.PreserveAspectFit
-        source: "../img/RestoreBtn_big@2x.svg"
+        source: "../img/RestoreBtn_big.svg"
     }
 
     Text {
@@ -104,7 +104,7 @@ Item {
 //        anchors.horizontalCenterOffset: dp(-40)
 //        anchors.bottomMargin: dp(90)
 //        fillMode: Image.PreserveAspectFit
-//        source: "../img/HelpBtn@2x.svg"
+//        source: "../img/HelpBtn.svg"
 //        anchors.bottom: parent.bottom
 //        anchors.horizontalCenter: parent.horizontalCenter
 //    }

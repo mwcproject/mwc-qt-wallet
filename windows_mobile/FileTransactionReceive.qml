@@ -59,7 +59,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(70)
         fillMode: Image.PreserveAspectFit
-        source: "../img/FinalizeL@2x.svg"
+        source: "../img/FinalizeL.svg"
     }
 
     Text {

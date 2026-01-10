@@ -150,7 +150,7 @@
              </property>
              <property name="icon">
               <iconset resource="../resources_desktop.qrc">
-               <normaloff>:/img/HelpBtn@2x.svg</normaloff>:/img/HelpBtn@2x.svg</iconset>
+               <normaloff>:/img/HelpBtn.svg</normaloff>:/img/HelpBtn.svg</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -213,7 +213,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normalon>:/img/CircYellow@2x.svg</normalon>
+               <normalon>:/img/CircYellow.svg</normalon>
               </iconset>
              </property>
              <property name="iconSize">
@@ -258,7 +258,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normalon>:/img/CircYellow@2x.svg</normalon>
+               <normalon>:/img/CircYellow.svg</normalon>
               </iconset>
              </property>
              <property name="iconSize">

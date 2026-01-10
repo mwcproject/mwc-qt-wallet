@@ -123,16 +123,16 @@ Item {
     function getOutputTypeIcon(outputStatus, coinbase) {
         switch (outputStatus) {
             case "Unconfirmed":
-                return "../img/Transactions_Unconfirmed@2x.svg"
+                return "../img/Transactions_Unconfirmed.svg"
             case "Unspent":
                 if (coinbase) {
-                    return "../img/Transactions_CoinBase@2x.svg"
+                    return "../img/Transactions_CoinBase.svg"
                 }
-                return "../img/Outputs_Unspent@2x.svg"
+                return "../img/Outputs_Unspent.svg"
             case "Locked":
-                return "../img/iconLock@2x.svg"
+                return "../img/iconLock.svg"
             case "Spent":
-                return "../img/Outputs_Spent@2x.svg"
+                return "../img/Outputs_Spent.svg"
         }
     }
 
@@ -475,7 +475,7 @@ Item {
             width: dp(35)
             height: dp(35)
             fillMode: Image.PreserveAspectFit
-            source: "../img/Refresh@2x.svg"
+            source: "../img/Refresh.svg"
 
             MouseArea {
                 anchors.fill: parent

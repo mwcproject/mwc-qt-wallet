@@ -180,7 +180,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources_desktop.qrc">
-             <normaloff>:/img/Edit@2x.svg</normaloff>:/img/Edit@2x.svg</iconset>
+             <normaloff>:/img/Edit.svg</normaloff>:/img/Edit.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -230,7 +230,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources_desktop.qrc">
-             <normaloff>:/img/Transfer@2x.svg</normaloff>:/img/Transfer@2x.svg</iconset>
+             <normaloff>:/img/Transfer.svg</normaloff>:/img/Transfer.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -296,7 +296,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources_desktop.qrc">
-             <normaloff>:/img/Refresh@2x.svg</normaloff>:/img/Refresh@2x.svg</iconset>
+             <normaloff>:/img/Refresh.svg</normaloff>:/img/Refresh.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -396,7 +396,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources_desktop.qrc">
-             <normaloff>:/img/Delete@2x.svg</normaloff>:/img/Delete@2x.svg</iconset>
+             <normaloff>:/img/Delete.svg</normaloff>:/img/Delete.svg</iconset>
            </property>
            <property name="iconSize">
             <size>

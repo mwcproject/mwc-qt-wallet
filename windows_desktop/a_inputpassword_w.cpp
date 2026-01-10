@@ -162,13 +162,13 @@ void InputPassword::on_submitButton_clicked() {
 
 
 void InputPassword::updateMwcMqState(bool online) {
-    ui->mwcMqStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+    ui->mwcMqStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk.svg" : ":/img/StatusEmpty.svg"));
     ui->mwcMqStatusImg->setToolTip(online ? "Listener connected to MWCMQS" : "Listener disconnected from MWCMQS");
     ui->mwcMqStatusTxt->setText(online ? "Online" : "Offline");
 }
 
 void InputPassword::updateTorState(bool online) {
-    ui->torStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+    ui->torStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk.svg" : ":/img/StatusEmpty.svg"));
     ui->torStatusImg->setToolTip(online ? "Listener connected to Tor" : "Listener disconnected from Tor");
     ui->torStatusTxt->setText(online ? "Online" : "Offline");
 }

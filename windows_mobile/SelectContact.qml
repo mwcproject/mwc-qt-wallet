@@ -205,7 +205,7 @@ Item {
                         width: dp(35)
                         height: dp(35)
                         fillMode: Image.PreserveAspectFit
-                        source: "../img/Edit@2x.svg"
+                        source: "../img/Edit.svg"
 
                         MouseArea {
                             anchors.fill: parent
@@ -227,7 +227,7 @@ Item {
                         width: dp(35)
                         height: dp(35)
                         fillMode: Image.PreserveAspectFit
-                        source: "../img/Delete@2x.svg"
+                        source: "../img/Delete.svg"
 
                         MouseArea {
                             anchors.fill: parent
@@ -307,7 +307,7 @@ Item {
                 width: dp(45)
                 height: dp(45)
                 fillMode: Image.PreserveAspectFit
-                source: "../img/Add@2x.svg"
+                source: "../img/Add.svg"
 
                 MouseArea {
                     anchors.fill: parent

@@ -69,7 +69,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../resources_desktop.qrc">:/img/BigLogo@2x.svg</pixmap>
+        <pixmap resource="../resources_desktop.qrc">:/img/BigLogo.svg</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -162,7 +162,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources_desktop.qrc">
-          <normaloff>:/img/AddLarge@2x.svg</normaloff>:/img/AddLarge@2x.svg</iconset>
+          <normaloff>:/img/AddLarge.svg</normaloff>:/img/AddLarge.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -197,7 +197,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources_desktop.qrc">
-          <normaloff>:/img/RestoreBtn_big@2x.svg</normaloff>:/img/RestoreBtn_big@2x.svg</iconset>
+          <normaloff>:/img/RestoreBtn_big.svg</normaloff>:/img/RestoreBtn_big.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -235,7 +235,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources_desktop.qrc">
-          <normaloff>:/img/OpenFile@2x.svg</normaloff>:/img/OpenFile@2x.svg</iconset>
+          <normaloff>:/img/OpenFile.svg</normaloff>:/img/OpenFile.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -326,7 +326,7 @@
        </property>
        <property name="icon">
         <iconset resource="../resources_desktop.qrc">
-         <normaloff>:/img/Node@2x.svg</normaloff>:/img/Node@2x.svg</iconset>
+         <normaloff>:/img/Node.svg</normaloff>:/img/Node.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -370,7 +370,7 @@
        </property>
        <property name="icon">
         <iconset resource="../resources_desktop.qrc">
-         <normaloff>:/img/HelpBtn@2x.svg</normaloff>:/img/HelpBtn@2x.svg</iconset>
+         <normaloff>:/img/HelpBtn.svg</normaloff>:/img/HelpBtn.svg</iconset>
        </property>
        <property name="iconSize">
         <size>

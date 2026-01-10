@@ -117,7 +117,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources_desktop.qrc">:/img/SendOnline@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/SendOnline.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -428,7 +428,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources_desktop.qrc">:/img/File@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/File.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>

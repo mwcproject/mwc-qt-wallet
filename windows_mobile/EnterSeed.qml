@@ -22,7 +22,7 @@ Item {
 
     Image {
         id: image_phrase
-        source: "../img/RecoveryPhrase@2x.svg"
+        source: "../img/RecoveryPhrase.svg"
         width: dp(20)
         height: dp(20)
         anchors.left: parent.left

@@ -46,7 +46,7 @@ Item {
         const torStarted = wallet.isTorListenerStarted()
 
         // MWC MQ
-        image_mqs_status.source = mqsStatus ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
+        image_mqs_status.source = mqsStatus ? "../img/StatusOk.svg" : "../img/StatusEmpty.svg"
         text_mqs_status.text = mqsStatus ? "Online" : "Offline"
 
         if (mqsStarted) {
@@ -62,7 +62,7 @@ Item {
         button_to_index.enabled = !mqsStarted && !torStarted
 
         // TOR
-        image_tor_status.source = torStatus ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
+        image_tor_status.source = torStatus ? "../img/StatusOk.svg" : "../img/StatusEmpty.svg"
         text_tor_status.text = torStatus ? "Online" : "Offline"
 
         if (torStarted) {
@@ -157,7 +157,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(15)
             fillMode: Image.PreserveAspectFit
-            source: "../img/StatusOk@2x.svg"
+            source: "../img/StatusOk.svg"
         }
     }
 
@@ -275,7 +275,7 @@ Item {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             fillMode: Image.PreserveAspectFit
-            source: "../img/StatusOk@2x.svg"
+            source: "../img/StatusOk.svg"
         }
     }
 

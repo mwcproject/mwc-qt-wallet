@@ -114,10 +114,10 @@ void Receive::updateListenerStatus() {
 }
 
 void Receive::updateListenerStatusWith(bool mqsOnline, bool torOnline) {
-    ui->mwcmqStatusImg->setPixmap( QPixmap(mqsOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
+    ui->mwcmqStatusImg->setPixmap( QPixmap(mqsOnline ? ":/img/StatusOk.svg" : ":/img/StatusEmpty.svg") );
     ui->mwcmqStatusLabel->setText( mqsOnline ? "Online" : "Offline" );
 
-    ui->torStatusImg->setPixmap( QPixmap(torOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
+    ui->torStatusImg->setPixmap( QPixmap(torOnline ? ":/img/StatusOk.svg" : ":/img/StatusEmpty.svg") );
     ui->torStatusLabel->setText( torOnline ? "Online" : "Offline" );
 }
 

@@ -900,7 +900,7 @@
                 </property>
                 <property name="icon">
                  <iconset resource="../resources_desktop.qrc">
-                  <normaloff>:/img/A1@2x.svg</normaloff>:/img/A1@2x.svg</iconset>
+                  <normaloff>:/img/A1.svg</normaloff>:/img/A1.svg</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -941,7 +941,7 @@
                 </property>
                 <property name="icon">
                  <iconset resource="../resources_desktop.qrc">
-                  <normaloff>:/img/A1@2x.svg</normaloff>:/img/A1@2x.svg</iconset>
+                  <normaloff>:/img/A1.svg</normaloff>:/img/A1.svg</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -982,7 +982,7 @@
                 </property>
                 <property name="icon">
                  <iconset resource="../resources_desktop.qrc">
-                  <normaloff>:/img/A1@2x.svg</normaloff>:/img/A1@2x.svg</iconset>
+                  <normaloff>:/img/A1.svg</normaloff>:/img/A1.svg</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1023,7 +1023,7 @@
                 </property>
                 <property name="icon">
                  <iconset resource="../resources_desktop.qrc">
-                  <normaloff>:/img/A1@2x.svg</normaloff>:/img/A1@2x.svg</iconset>
+                  <normaloff>:/img/A1.svg</normaloff>:/img/A1.svg</iconset>
                 </property>
                 <property name="iconSize">
                  <size>

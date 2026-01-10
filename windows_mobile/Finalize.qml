@@ -38,7 +38,7 @@ Item {
         anchors.bottomMargin: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
         fillMode: Image.PreserveAspectFit
-        source: "../img/FinalizeL@2x.svg"
+        source: "../img/FinalizeL.svg"
     }
 
     Text {

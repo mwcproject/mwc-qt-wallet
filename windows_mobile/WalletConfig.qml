@@ -126,7 +126,7 @@ Item {
                     height: dp(20)
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
-                    source: checkbox_mqs.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
+                    source: checkbox_mqs.checked ? "../img/CheckOn.svg" : "../img/CheckOff.svg"
                 }
             }
 
@@ -163,7 +163,7 @@ Item {
                     height: dp(20)
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
-                    source: checkbox_tor.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
+                    source: checkbox_tor.checked ? "../img/CheckOn.svg" : "../img/CheckOff.svg"
                 }
             }
 

@@ -114,16 +114,16 @@ void Outputs::updateShownData(bool resetScrollData) {
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
             // Adding Icon and a text
             if (out.status == "Unconfirmed") {
-                itm->addWidget(control::createIcon(itm, ":/img/iconUnconfirmed@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                itm->addWidget(control::createIcon(itm, ":/img/iconUnconfirmed.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
             } else if (out.status == "Unspent") {
                 if (out.coinbase)
-                    itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                    itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
                 else
-                    itm->addWidget(control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                    itm->addWidget(control::createIcon(itm, ":/img/iconReceived.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
             } else if (out.status == "Locked") {
-                itm->addWidget( control::createIcon(itm, ":/img/iconLock@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                itm->addWidget( control::createIcon(itm, ":/img/iconLock.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
             } else if (out.status == "Spent") {
-                itm->addWidget( control::createIcon(itm, ":/img/iconSent@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                itm->addWidget( control::createIcon(itm, ":/img/iconSent.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
             } else {
                 Q_ASSERT(false);
             }
@@ -154,7 +154,7 @@ void Outputs::updateShownData(bool resetScrollData) {
         { // Line with amount
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
-            itm->addWidget(control::createIcon(itm, ":/img/iconLock@2x", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            itm->addWidget(control::createIcon(itm, ":/img/iconLock", control::ROW_HEIGHT, control::ROW_HEIGHT));
             lockL = (QLabel*)itm->getCurrentWidget();
 
             if (lockState != "YES") {

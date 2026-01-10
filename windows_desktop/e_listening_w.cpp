@@ -87,13 +87,13 @@ void Listening::updateStatuses() {
     bool torStatus = statuses[3];
 
     // MWC MQ
-    ui->mwcMqStatusImg->setPixmap(QPixmap(mqsStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+    ui->mwcMqStatusImg->setPixmap(QPixmap(mqsStatus ? ":/img/StatusOk.svg" : ":/img/StatusEmpty.svg"));
     ui->mwcMqStatusImg->setToolTip(
             mqsStatus ? "Listener connected to MWCMQS" : "Listener disconnected from MWCMQS");
     ui->mwcMqStatusTxt->setText(mqsStatus ? "Online" : "Offline");
 
     ui->torStatusImg->setPixmap(
-            QPixmap(torStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+            QPixmap(torStatus ? ":/img/StatusOk.svg" : ":/img/StatusEmpty.svg"));
     ui->torStatusImg->setToolTip(
             torStatus ? "Listener connected to Tor" : "Listener disconnected from Tor");
     ui->torStatusTxt->setText(torStatus ? "Online" : "Offline");

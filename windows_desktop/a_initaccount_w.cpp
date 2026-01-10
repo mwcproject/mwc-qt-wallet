@@ -148,7 +148,7 @@ void InitAccount::updatePassState() {
         ui->confirmPassLable->hide();
     } else {
         ui->confirmPassLable->show();
-        ui->confirmPassLable->setPixmap(QPixmap(pswd1 == pswd2 ? ":/img/PassOK@2x.svg" : ":/img/PassNotMatch@2x.svg"));
+        ui->confirmPassLable->setPixmap(QPixmap(pswd1 == pswd2 ? ":/img/PassOK.svg" : ":/img/PassNotMatch.svg"));
     }
 }
 

@@ -144,11 +144,11 @@ control--MwcRadioButton {
 }
 
 control--MwcRadioButton::indicator:unchecked {
-    image: url(:/img/purpRadioOff@2x.svg);
+    image: url(:/img/purpRadioOff.svg);
 }
 
 control--MwcRadioButton::indicator:checked {
-    image: url(:/img/purpRadioOn@2x.svg);
+    image: url(:/img/purpRadioOn.svg);
 }
 
 
@@ -340,10 +340,14 @@ control--MwcComboBox::drop-down {
 
     background: transparent;
     border: transparent;
-    image: url(:/img/ComboBoxArrowDlg@2x.svg);
 
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
+}
+
+control--MwcComboBox::down-arrow {
+    image: url(:/img/ComboBoxArrowDlg.svg);
+    border: transparent;
 }
 
 control--MwcListView {
@@ -381,19 +385,19 @@ control--MwcCheckBox::disabled {
 }
 
 control--MwcCheckBox::indicator:unchecked {
-    image: url(:/img/purpleCheckOff@2x.svg);
+    image: url(:/img/purpleCheckOff.svg);
 }
 
 control--MwcCheckBox::indicator:checked {
-    image: url(:/img/purpleCheckOn@2x.svg);
+    image: url(:/img/purpleCheckOn.svg);
 }
 
 control--MwcCheckBox::indicator:disabled:unchecked {
-    image: url(:/img/disabledCheckOff@2x.svg);
+    image: url(:/img/disabledCheckOff.svg);
 }
 
 control--MwcCheckBox::indicator:disabled:checked {
-    image: url(:/img/disabledCheckOn@2x.svg);
+    image: url(:/img/disabledCheckOn.svg);
 }
 
 /* popup for completer. NOTE. completer doesn't pick it up, for completer it is setup manually */

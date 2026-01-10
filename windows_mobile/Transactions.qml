@@ -239,19 +239,19 @@ Item {
 
     function getTxTypeIcon(txType) {
         if (txType === "Cancelled")
-            return "../img/Transactions_Cancelled@2x.svg"
+            return "../img/Transactions_Cancelled.svg"
 
         if (txType === "Unconfirmed")
-            return "../img/Transactions_Unconfirmed@2x.svg"
+            return "../img/Transactions_Unconfirmed.svg"
 
         if (txType === "Sent")
-            return "../img/Transactions_Sent@2x.svg"
+            return "../img/Transactions_Sent.svg"
 
         if (txType === "Received")
-            return "../img/Transactions_Received@2x.svg"
+            return "../img/Transactions_Received.svg"
 
         if (txType === "CoinBase")
-            return "../img/Transactions_CoinBase@2x.svg"
+            return "../img/Transactions_CoinBase.svg"
     }
 
     function isTxValid(tx) {
@@ -596,7 +596,7 @@ Item {
                 width: dp(40)
                 height: dp(40)
                 fillMode: Image.PreserveAspectFit
-                source: "../img/Validate@2x.svg"
+                source: "../img/Validate.svg"
 
                 MouseArea {
                     anchors.fill: parent
@@ -617,7 +617,7 @@ Item {
 //                width: dp(40)
 //                height: dp(40)
 //                fillMode: Image.PreserveAspectFit
-//                source: "../img/Validate1@2x.svg"
+//                source: "../img/Validate1.svg"
 
 //                MouseArea {
 //                    anchors.fill: parent
@@ -652,7 +652,7 @@ Item {
                 width: dp(40)
                 height: dp(40)
                 fillMode: Image.PreserveAspectFit
-                source: "../img/Refresh@2x.svg"
+                source: "../img/Refresh.svg"
 
                 MouseArea {
                     anchors.fill: parent

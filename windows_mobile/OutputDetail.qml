@@ -32,16 +32,16 @@ Item {
     function getOutputTypeIcon(outputStatus, coinbase) {
         switch (outputStatus) {
             case "Unconfirmed":
-                return "../img/Transactions_Unconfirmed_Blue@2x.svg"
+                return "../img/Transactions_Unconfirmed_Blue.svg"
             case "Unspent":
                 if (coinbase) {
-                    return "../img/Transactions_CoinBase_Blue@2x.svg"
+                    return "../img/Transactions_CoinBase_Blue.svg"
                 }
-                return "../img/Outputs_Unspent_Blue@2x.svg"
+                return "../img/Outputs_Unspent_Blue.svg"
             case "Locked":
-                return "../img/iconLock_Blue@2x.svg"
+                return "../img/iconLock_Blue.svg"
             case "Spent":
-                return "../img/Outputs_Spent_Blue@2x.svg"
+                return "../img/Outputs_Spent_Blue.svg"
         }
     }
 
@@ -96,7 +96,7 @@ Item {
                     anchors.verticalCenter: text_status.verticalCenter
                     anchors.right: text_status.left
                     anchors.rightMargin: dp(5)
-                    source: "../img/Outputs_Unspent@2x.svg"
+                    source: "../img/Outputs_Unspent.svg"
                     fillMode: Image.PreserveAspectFit
                 }
 
@@ -129,7 +129,7 @@ Item {
                     anchors.topMargin: dp(25)
                     anchors.right: parent.right
                     anchors.rightMargin: dp(25)
-                    source: "../img/MessageBox_Close@2x.svg"
+                    source: "../img/MessageBox_Close.svg"
                     fillMode: Image.PreserveAspectFit
 
                     MouseArea {

@@ -107,7 +107,7 @@ Item {
                 anchors.topMargin: dp(25)
                 anchors.right: parent.right
                 anchors.rightMargin: dp(25)
-                source: "../img/MessageBox_Close@2x.svg"
+                source: "../img/MessageBox_Close.svg"
                 fillMode: Image.PreserveAspectFit
 
                 MouseArea {

@@ -15,7 +15,7 @@ Item {
         anchors.bottomMargin: dp(80)
         anchors.horizontalCenterOffset: dp(-90)
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../img/Send_big@2x.svg"
+        source: "../img/Send_big.svg"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
@@ -43,7 +43,7 @@ Item {
         anchors.verticalCenter: image_send.verticalCenter
         anchors.horizontalCenterOffset: dp(90)
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../img/Receive_big@2x.svg"
+        source: "../img/Receive_big.svg"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
@@ -72,7 +72,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenterOffset: dp(-35)
         anchors.verticalCenter: parent.verticalCenter
-        source: "../img/FinalizeL@2x.svg"
+        source: "../img/FinalizeL.svg"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
@@ -100,7 +100,7 @@ Item {
         anchors.horizontalCenterOffset: dp(90)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: image_finalize.verticalCenter
-        source: "../img/Transactions_big@2x.svg"
+        source: "../img/Transactions_big.svg"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
@@ -129,7 +129,7 @@ Item {
         anchors.topMargin: dp(55)
         anchors.horizontalCenterOffset: dp(-90)
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../img/Output_big@2x.svg"
+        source: "../img/Output_big.svg"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
@@ -157,7 +157,7 @@ Item {
         anchors.verticalCenter: image_outputs.verticalCenter
         anchors.horizontalCenterOffset: dp(90)
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../img/Account_big@2x.svg"
+        source: "../img/Account_big.svg"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {

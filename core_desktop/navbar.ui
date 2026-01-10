@@ -36,7 +36,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources_desktop.qrc">
-     <normaloff>:/img/NavNotificationNormal@2x.svg</normaloff>:/img/NavNotificationNormal@2x.svg</iconset>
+     <normaloff>:/img/NavNotificationNormal.svg</normaloff>:/img/NavNotificationNormal.svg</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -77,7 +77,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources_desktop.qrc">
-     <normaloff>:/img/NavSettings@2x.svg</normaloff>:/img/NavSettings@2x.svg</iconset>
+     <normaloff>:/img/NavSettings.svg</normaloff>:/img/NavSettings.svg</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -118,7 +118,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources_desktop.qrc">
-     <normaloff>:/img/NavAccount@2x.svg</normaloff>:/img/NavAccount@2x.svg</iconset>
+     <normaloff>:/img/NavAccount.svg</normaloff>:/img/NavAccount.svg</iconset>
    </property>
    <property name="iconSize">
     <size>

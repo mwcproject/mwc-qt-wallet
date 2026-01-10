@@ -218,7 +218,7 @@ Item {
                     width: dp(35)
                     height: dp(35)
                     fillMode: Image.PreserveAspectFit
-                    source: "../img/Edit@2x.svg"
+                    source: "../img/Edit.svg"
                     visible: index > 0
 
                     MouseArea {
@@ -239,7 +239,7 @@ Item {
                     width: dp(35)
                     height: dp(35)
                     fillMode: Image.PreserveAspectFit
-                    source: "../img/Delete@2x.svg"
+                    source: "../img/Delete.svg"
                     visible: index > 0 && index < accountsModel.count && accState.canDeleteAccount(account)
 
                     MouseArea {
@@ -288,7 +288,7 @@ Item {
                 width: dp(40)
                 height: dp(40)
                 fillMode: Image.PreserveAspectFit
-                source: "../img/Transfer@2x.svg"
+                source: "../img/Transfer.svg"
 
                 MouseArea {
                     anchors.fill: parent
@@ -305,7 +305,7 @@ Item {
                 width: dp(40)
                 height: dp(40)
                 fillMode: Image.PreserveAspectFit
-                source: "../img/Add@2x.svg"
+                source: "../img/Add.svg"
 
                 MouseArea {
                     anchors.fill: parent
@@ -322,7 +322,7 @@ Item {
                 width: dp(40)
                 height: dp(40)
                 fillMode: Image.PreserveAspectFit
-                source: "../img/Refresh@2x.svg"
+                source: "../img/Refresh.svg"
 
                 MouseArea {
                     anchors.fill: parent

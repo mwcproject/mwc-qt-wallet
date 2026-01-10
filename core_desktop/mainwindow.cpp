@@ -451,13 +451,13 @@ void MainWindow::updateNetworkName() {
 void MainWindow::setStatusButtonState(  QPushButton * btn, STATUS status, QString text ) {
     switch (status) {
         case STATUS::GREEN:
-            btn->setIcon( QIcon( QPixmap( ":/img/CircGreen@2x.svg" )));
+            btn->setIcon( QIcon( QPixmap( ":/img/CircGreen.svg" )));
             break;
         case STATUS::RED:
-            btn->setIcon( QIcon( QPixmap( ":/img/CircRed@2x.svg" )));
+            btn->setIcon( QIcon( QPixmap( ":/img/CircRed.svg" )));
             break;
         case STATUS::YELLOW:
-            btn->setIcon( QIcon( QPixmap( ":/img/CircYellow@2x.svg" )));
+            btn->setIcon( QIcon( QPixmap( ":/img/CircYellow.svg" )));
             break;
         default: // Ingnore suppose to be here
             break;

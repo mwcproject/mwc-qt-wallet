@@ -359,7 +359,7 @@ void SwapList::updateTradeListData() {
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
             itm->addWidget(
-                        control::createIcon(itm, sw.isSeller ? ":/img/iconSent@2x.svg" : ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                        control::createIcon(itm, sw.isSeller ? ":/img/iconSent.svg" : ":/img/iconReceived.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
             itm->addWidget(control::createLabel(itm, false, false,
                                                 (sw.isSeller ? "Sell " : "Buy ") + sw.mwcAmount + " MWC for " +
                                                 sw.secondaryAmount + " " +  sw.secondaryCurrency +

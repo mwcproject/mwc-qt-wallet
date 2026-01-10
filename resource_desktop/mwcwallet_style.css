@@ -539,10 +539,14 @@ control--MwcComboBox::drop-down {
 
     background: transparent;
     border: transparent;
-    image: url(:/img/ComboBoxArrow@2x.svg);
 
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
+}
+
+control--MwcComboBox::down-arrow {
+    image: url(:/img/ComboBoxArrow.svg);
+    border: transparent;
 }
 
 /*  By default selected item has yellow color */
@@ -580,11 +584,11 @@ control--MwcRadioButton::indicator {
 }
 
 control--MwcRadioButton::indicator:unchecked {
-    image: url(:/img/RadioOff@2x.svg);
+    image: url(:/img/RadioOff.svg);
 }
 
 control--MwcRadioButton::indicator:checked {
-    image: url(:/img/RadioOn@2x.svg);
+    image: url(:/img/RadioOn.svg);
 }
 
 
@@ -724,19 +728,19 @@ control--MwcCheckBox::indicator {
 }
 
 control--MwcCheckBox::indicator:unchecked {
-    image: url(:/img/CheckOff@2x.svg);
+    image: url(:/img/CheckOff.svg);
 }
 
 control--MwcCheckBox::indicator:checked {
-    image: url(:/img/CheckOn@2x.svg);
+    image: url(:/img/CheckOn.svg);
 }
 
 control--MwcCheckBox::indicator:disabled:unchecked {
-    image: url(:/img/disabledCheckOff@2x.svg);
+    image: url(:/img/disabledCheckOff.svg);
 }
 
 control--MwcCheckBox::indicator:disabled:checked {
-    image: url(:/img/disabledCheckOn@2x.svg);
+    image: url(:/img/disabledCheckOn.svg);
 }
 
 control--MwcTabWidget::tab-bar {

@@ -89,9 +89,9 @@ void ViewOutputs::updateShownData(bool resetScrollData) {
         {
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
             if (out.coinbase)
-                itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
             else
-                itm->addWidget(control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                itm->addWidget(control::createIcon(itm, ":/img/iconReceived.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
 
             itm->addWidget(control::createLabel(itm, false, false, out.status));
             itm->addHSpacer();

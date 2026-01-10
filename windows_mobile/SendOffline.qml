@@ -73,7 +73,7 @@ Item {
         anchors.bottomMargin: dp(50)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
-        source: "../img/File@2x.svg"
+        source: "../img/File.svg"
         fillMode: Image.PreserveAspectFit
     }
 
@@ -173,7 +173,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         fillMode: Image.PreserveAspectFit
-        source: "../img/Contact@2x.svg"
+        source: "../img/Contact.svg"
 
         MouseArea {
             anchors.fill: parent

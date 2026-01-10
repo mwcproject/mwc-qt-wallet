@@ -111,23 +111,23 @@ control::RichItem * TransactionRecord::buildRecordContent() {
         itm->addWidget( control::createLabel(itm, false, false, "#" + QString::number(trans.txIdx + 1)) ).addFixedHSpacer(10);
 
         if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::CANCELLED) {
-            itm->addWidget(control::createIcon(itm, ":/img/iconClose@2x.svg", control::ROW_HEIGHT,
+            itm->addWidget(control::createIcon(itm, ":/img/iconClose.svg", control::ROW_HEIGHT,
                                                control::ROW_HEIGHT))
                     .addWidget(control::createLabel(itm, false, false, "Cancelled"));
         } else if (!trans.confirmed) {
-            itm->addWidget(control::createIcon(itm, ":/img/iconUnconfirmed@2x.svg", control::ROW_HEIGHT,
+            itm->addWidget(control::createIcon(itm, ":/img/iconUnconfirmed.svg", control::ROW_HEIGHT,
                                                control::ROW_HEIGHT))
                     .addWidget(control::createLabel(itm, false, false, "Unconfirmed"));
         } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::SEND) {
-            itm->addWidget(control::createIcon(itm, ":/img/iconSent@2x.svg", control::ROW_HEIGHT,
+            itm->addWidget(control::createIcon(itm, ":/img/iconSent.svg", control::ROW_HEIGHT,
                                                control::ROW_HEIGHT))
                     .addWidget(control::createLabel(itm, false, false, "Sent"));
         } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::RECEIVE) {
-            itm->addWidget(control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
+            itm->addWidget(control::createIcon(itm, ":/img/iconReceived.svg", control::ROW_HEIGHT,
                                                control::ROW_HEIGHT))
                     .addWidget(control::createLabel(itm, false, false, "Received"));
         } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::COIN_BASE) {
-            itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase@2x.svg", control::ROW_HEIGHT,
+            itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase.svg", control::ROW_HEIGHT,
                                                control::ROW_HEIGHT))
                     .addWidget(control::createLabel(itm, false, false, "CoinBase"));
         } else {

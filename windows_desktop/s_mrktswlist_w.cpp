@@ -251,7 +251,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
 
             // Line 1
             itm->addWidget(
-                        control::createIcon(itm, offer.offer.sell ? ":/img/iconSent@2x.svg" : ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                        control::createIcon(itm, offer.offer.sell ? ":/img/iconSent.svg" : ":/img/iconReceived.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
             itm->addWidget(control::createLabel(itm, false, false,
                                                     (offer.offer.sell ? "Sell " : "Buy ") + QString::number(offer.offer.mwcAmount) + " MWC for " +
                                                     QString::number(offer.offer.secAmount) + " " + offer.offer.secondaryCurrency +
@@ -363,7 +363,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
 
             // Line 1
             itm->addWidget(
-                    control::createIcon(itm, offer.sell ? ":/img/iconSent@2x.svg" : ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                    control::createIcon(itm, offer.sell ? ":/img/iconSent.svg" : ":/img/iconReceived.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
             itm->addWidget(control::createLabel(itm, false, false,
                                                 (offer.sell ? "Sell " : "Buy ") + QString::number(offer.mwcAmount) + " MWC for " +
                                                 QString::number(offer.secAmount) + " " + offer.secondaryCurrency +

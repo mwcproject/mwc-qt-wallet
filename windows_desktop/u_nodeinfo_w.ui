@@ -113,7 +113,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources_desktop.qrc">:/img/Connections@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/Connections.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -196,7 +196,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources_desktop.qrc">:/img/Ready@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/Ready.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -282,7 +282,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources_desktop.qrc">:/img/Difficulty@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/Difficulty.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -365,7 +365,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources_desktop.qrc">:/img/Blockchain@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/Blockchain.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>

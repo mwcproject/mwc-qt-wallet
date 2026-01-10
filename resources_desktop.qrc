@@ -2,41 +2,41 @@
     <qresource prefix="/">
         <file>txt/bip39_words.txt</file>
         <file>resource_desktop/mwcwallet_style.css</file>
-        <file>img/Receive@2x.svg</file>
-        <file>img/Send@2x.svg</file>
-        <file>img/Transactions@2x.svg</file>
-        <file>img/TBLogo@2x.svg</file>
-        <file>img/StatusFail@2x.svg</file>
-        <file>img/StatusOk@2x.svg</file>
-        <file>img/HelpBtn@2x.svg</file>
+        <file>img/Receive.svg</file>
+        <file>img/Send.svg</file>
+        <file>img/Transactions.svg</file>
+        <file>img/TBLogo.svg</file>
+        <file>img/StatusFail.svg</file>
+        <file>img/StatusOk.svg</file>
+        <file>img/HelpBtn.svg</file>
         <file>resource_desktop/dialogs_style.css</file>
         <file>img/loading.gif</file>
         <file>resource_desktop/mwc-gui-wallet.conf</file>
-        <file>img/StatusEmpty@2x.svg</file>
-        <file>img/SendOnline@2x.svg</file>
-        <file>img/ComboBoxArrow@2x.svg</file>
-        <file>img/ComboBoxArrowDlg@2x.svg</file>
-        <file>img/File@2x.svg</file>
-        <file>img/RadioOff@2x.svg</file>
-        <file>img/RadioOn@2x.svg</file>
-        <file>img/Refresh@2x.svg</file>
-        <file>img/Delete@2x.svg</file>
-        <file>img/NavAccount@2x.svg</file>
-        <file>img/NavNotificationActive@2x.svg</file>
-        <file>img/NavNotificationNormal@2x.svg</file>
-        <file>img/NavSettings@2x.svg</file>
-        <file>img/Add@2x.svg</file>
-        <file>img/Transfer@2x.svg</file>
-        <file>img/Left@2x.svg</file>
-        <file>img/Right@2x.svg</file>
-        <file>img/Edit@2x.svg</file>
-        <file>img/BigLogo@2x.svg</file>
-        <file>img/Ready@2x.svg</file>
-        <file>img/Connections@2x.svg</file>
-        <file>img/Blockchain@2x.svg</file>
-        <file>img/Difficulty@2x.svg</file>
-        <file>img/purpLeft@2x.svg</file>
-        <file>img/purpRight@2x.svg</file>
+        <file>img/StatusEmpty.svg</file>
+        <file>img/SendOnline.svg</file>
+        <file>img/ComboBoxArrow.svg</file>
+        <file>img/ComboBoxArrowDlg.svg</file>
+        <file>img/File.svg</file>
+        <file>img/RadioOff.svg</file>
+        <file>img/RadioOn.svg</file>
+        <file>img/Refresh.svg</file>
+        <file>img/Delete.svg</file>
+        <file>img/NavAccount.svg</file>
+        <file>img/NavNotificationActive.svg</file>
+        <file>img/NavNotificationNormal.svg</file>
+        <file>img/NavSettings.svg</file>
+        <file>img/Add.svg</file>
+        <file>img/Transfer.svg</file>
+        <file>img/Left.svg</file>
+        <file>img/Right.svg</file>
+        <file>img/Edit.svg</file>
+        <file>img/BigLogo.svg</file>
+        <file>img/Ready.svg</file>
+        <file>img/Connections.svg</file>
+        <file>img/Blockchain.svg</file>
+        <file>img/Difficulty.svg</file>
+        <file>img/purpLeft.svg</file>
+        <file>img/purpRight.svg</file>
         <file>help/accounts.html</file>
         <file>help/contacts.html</file>
         <file>help/event_log.html</file>
@@ -53,45 +53,45 @@
         <file>help/default.html</file>
         <file>help/transactions.html</file>
         <file>help/select_mode.html</file>
-        <file>img/purpRadioOff@2x.svg</file>
-        <file>img/purpRadioOn@2x.svg</file>
-        <file>img/Finalize@2x.svg</file>
-        <file>img/FinalizeL@2x.svg</file>
-        <file>img/CircGreen@2x.svg</file>
-        <file>img/CircRed@2x.svg</file>
-        <file>img/CircYellow@2x.svg</file>
-        <file>img/A1@2x.svg</file>
-        <file>img/PassNotMatch@2x.svg</file>
-        <file>img/PassOK@2x.svg</file>
+        <file>img/purpRadioOff.svg</file>
+        <file>img/purpRadioOn.svg</file>
+        <file>img/Finalize.svg</file>
+        <file>img/FinalizeL.svg</file>
+        <file>img/CircGreen.svg</file>
+        <file>img/CircRed.svg</file>
+        <file>img/CircYellow.svg</file>
+        <file>img/A1.svg</file>
+        <file>img/PassNotMatch.svg</file>
+        <file>img/PassOK.svg</file>
         <file>resource/passwords-1k.dat</file>
         <file>resource/passwords-1M.dat</file>
         <file>resource/passwords-10k.dat</file>
         <file>resource/passwords-100k.dat</file>
-        <file>img/AddDlg@2x.svg</file>
-        <file>img/DeleteDlg@2x.svg</file>
-        <file>img/EditDlg@2x.svg</file>
-        <file>img/CheckOff@2x.svg</file>
-        <file>img/CheckOn@2x.svg</file>
-        <file>img/purpleCheckOff@2x.svg</file>
-        <file>img/purpleCheckOn@2x.svg</file>
-        <file>img/disabledCheckOff@2x.svg</file>
-        <file>img/disabledCheckOn@2x.svg</file>
-        <file>img/AddLarge@2x.svg</file>
-        <file>img/RestoreBtn_big@2x.svg</file>
-        <file>img/RestoreBtn@2x.svg</file>
-        <file>img/OpenFile@2x.svg</file>
-        <file>img/Node@2x.svg</file>
-        <file>img/WarningTriangle@2x.svg</file>
-        <file>img/iconUnlock@2x.svg</file>
-        <file>img/iconLock@2x.svg</file>
-        <file>img/iconReceived@2x.svg</file>
-        <file>img/iconSent@2x.svg</file>
-        <file>img/iconUnconfirmed@2x.svg</file>
-        <file>img/iconCoinbase@2x.svg</file>
-        <file>img/iconClose@2x.svg</file>
-        <file>img/swap@2x.svg</file>
+        <file>img/AddDlg.svg</file>
+        <file>img/DeleteDlg.svg</file>
+        <file>img/EditDlg.svg</file>
+        <file>img/CheckOff.svg</file>
+        <file>img/CheckOn.svg</file>
+        <file>img/purpleCheckOff.svg</file>
+        <file>img/purpleCheckOn.svg</file>
+        <file>img/disabledCheckOff.svg</file>
+        <file>img/disabledCheckOn.svg</file>
+        <file>img/AddLarge.svg</file>
+        <file>img/RestoreBtn_big.svg</file>
+        <file>img/RestoreBtn.svg</file>
+        <file>img/OpenFile.svg</file>
+        <file>img/Node.svg</file>
+        <file>img/WarningTriangle.svg</file>
+        <file>img/iconUnlock.svg</file>
+        <file>img/iconLock.svg</file>
+        <file>img/iconReceived.svg</file>
+        <file>img/iconSent.svg</file>
+        <file>img/iconUnconfirmed.svg</file>
+        <file>img/iconCoinbase.svg</file>
+        <file>img/iconClose.svg</file>
+        <file>img/swap.svg</file>
         <file>resource/messsage_mappers.txt</file>
-        <file>img/swap_yellow@2x.svg</file>
+        <file>img/swap_yellow.svg</file>
         <file>help/finalize.html</file>
         <file>help/swap.html</file>
         <file>help/viewing_key_gen_in.html</file>
@@ -99,7 +99,7 @@
         <file>help/viewing_key_outputs.html</file>
         <file>help/viewing_key_start.html</file>
         <file>help/viewing_key_val.html</file>
-        <file>img/Transactions_Unconfirmed_Yellow@2x.svg</file>
-        <file>img/marketplace@2x.png</file>
+        <file>img/Transactions_Unconfirmed_Yellow.svg</file>
+        <file>img/marketplace.png</file>
     </qresource>
 </RCC>

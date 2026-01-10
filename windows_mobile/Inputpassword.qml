@@ -120,7 +120,7 @@ Item {
         width: dp(200)
         height: dp(30)
         fillMode: Image.PreserveAspectFit
-        source: "../img/BigLogo@2x.svg"
+        source: "../img/BigLogo.svg"
         anchors.top: parent.top
         anchors.topMargin: dp(100)
         anchors.horizontalCenter: parent.horizontalCenter
@@ -337,7 +337,7 @@ Item {
         anchors.top: button_login.bottom
         anchors.topMargin: dp(80)
         fillMode: Image.PreserveAspectFit
-        source: "../img/RestoreBtn@2x.svg"
+        source: "../img/RestoreBtn.svg"
     }
 
     Text {
@@ -370,7 +370,7 @@ Item {
         anchors.top: image_restore.bottom
         anchors.topMargin: dp(30)
         fillMode: Image.PreserveAspectFit
-        source: "../img/NewInstanceBtn@2x.svg"
+        source: "../img/NewInstanceBtn.svg"
     }
 
     Text {
@@ -425,7 +425,7 @@ Item {
 //        anchors.horizontalCenterOffset: dp(-40)
 //        anchors.bottomMargin: dp(90)
 //        fillMode: Image.PreserveAspectFit
-//        source: "../img/HelpBtn@2x.svg"
+//        source: "../img/HelpBtn.svg"
 //        anchors.bottom: parent.bottom
 //        anchors.horizontalCenter: parent.horizontalCenter
 //    }

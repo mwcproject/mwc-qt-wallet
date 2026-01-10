@@ -200,10 +200,10 @@ void MwcToolbar::timerEvent(QTimerEvent *event)
 
     Q_UNUSED(event);
     if (mwc::hasSwapErrors(30000)) {
-        ui->swapToolButton->setIcon( QIcon( QPixmap( (counter++ % 2)==0 ? ":/img/swap@2x.svg" : ":/img/swap_yellow@2x.svg" )));
+        ui->swapToolButton->setIcon( QIcon( QPixmap( (counter++ % 2)==0 ? ":/img/swap.svg" : ":/img/swap_yellow.svg" )));
     }
     else {
-        ui->swapToolButton->setIcon( QIcon( QPixmap( ":/img/swap@2x.svg" )));
+        ui->swapToolButton->setIcon( QIcon( QPixmap( ":/img/swap.svg" )));
     }
 
     if (mwc::hasNoGasError()) {

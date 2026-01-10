@@ -80,7 +80,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
-            source: "../img/Ready@2x.svg"
+            source: "../img/Ready.svg"
             fillMode: Image.PreserveAspectFit
         }
 
@@ -134,7 +134,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
-            source: "../img/Connections@2x.svg"
+            source: "../img/Connections.svg"
             fillMode: Image.PreserveAspectFit
         }
 
@@ -188,7 +188,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
-            source: "../img/Blockchain@2x.svg"
+            source: "../img/Blockchain.svg"
             fillMode: Image.PreserveAspectFit
         }
 
@@ -241,7 +241,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
-            source: "../img/Difficulty@2x.svg"
+            source: "../img/Difficulty.svg"
             fillMode: Image.PreserveAspectFit
         }
 

@@ -58,7 +58,7 @@ Item {
 
         Image {
             id: image_phrase
-            source: "../img/RecoveryPhrase@2x.svg"
+            source: "../img/RecoveryPhrase.svg"
             width: dp(20)
             height: dp(20)
             anchors.left: parent.left
@@ -80,7 +80,7 @@ Item {
 
         Image {
             id: image_copy
-            source: "../img/iconCopy@2x.svg"
+            source: "../img/iconCopy.svg"
             width: dp(20)
             height: dp(20)
             anchors.verticalCenter: image_phrase.verticalCenter

@@ -156,13 +156,13 @@ Item {
         if (isNetwork) {
             switch (status) {
                 case status_green:
-                    image_network.source = "../img/CircGreen@2x.svg"
+                    image_network.source = "../img/CircGreen.svg"
                     break;
                 case status_red:
-                    image_network.source = "../img/CircRed@2x.svg"
+                    image_network.source = "../img/CircRed.svg"
                     break;
                 case status_yellow:
-                    image_network.source = "../img/CircYellow@2x.svg"
+                    image_network.source = "../img/CircYellow.svg"
                     break;
                 default: // Ingnore suppose to be here
                     break;
@@ -173,13 +173,13 @@ Item {
         } else {
             switch (status) {
                 case status_green:
-                    image_listener.source = "../img/CircGreen@2x.svg"
+                    image_listener.source = "../img/CircGreen.svg"
                     break;
                 case status_red:
-                    image_listener.source = "../img/CircRed@2x.svg"
+                    image_listener.source = "../img/CircRed.svg"
                     break;
                 case status_yellow:
-                    image_listener.source = "../img/CircYellow@2x.svg"
+                    image_listener.source = "../img/CircYellow.svg"
                     break;
                 default: // Ingnore suppose to be here
                     break;
@@ -315,7 +315,7 @@ Item {
                 height: dp(29)
                 anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
-                source: "../img/TBLogo@2x.svg"
+                source: "../img/TBLogo.svg"
             }
 
             Text {
@@ -360,7 +360,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: dp(28)
             fillMode: Image.PreserveAspectFit
-            source: "../img/NavNotificationNormal@2x.svg"
+            source: "../img/NavNotificationNormal.svg"
 
             MouseArea {
                 anchors.fill: parent
@@ -378,7 +378,7 @@ Item {
             anchors.leftMargin: dp(17)
             anchors.verticalCenter: image_notifications.verticalCenter
             fillMode: Image.PreserveAspectFit
-            source: "../img/HelpBtn@2x.svg"
+            source: "../img/HelpBtn.svg"
 
             MouseArea {
                 anchors.fill: parent
@@ -417,7 +417,7 @@ Item {
                 anchors.leftMargin: dp(10)
                 anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
-                source: "../img/CircGreen@2x.svg"
+                source: "../img/CircGreen.svg"
             }
 
             Text {
@@ -458,7 +458,7 @@ Item {
                 anchors.leftMargin: dp(10)
                 anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
-                source: "../img/CircGreen@2x.svg"
+                source: "../img/CircGreen.svg"
             }
 
             Text {
@@ -508,7 +508,7 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: dp(70)
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: "../img/TBLogo@2x.svg"
+                source: "../img/TBLogo.svg"
                 fillMode: Image.PreserveAspectFit
             }
 
@@ -732,15 +732,15 @@ Item {
         id: navModel
         ListElement {
             pageName: "Wallet"
-            imagePath: "../img/NavWallet@2x.svg"
+            imagePath: "../img/NavWallet.svg"
         }
         ListElement {
             pageName: "Account Options"
-            imagePath: "../img/NavAccount@2x.svg"
+            imagePath: "../img/NavAccount.svg"
         }
         ListElement {
             pageName: "Settings"
-            imagePath: "../img/NavSettings@2x.svg"
+            imagePath: "../img/NavSettings.svg"
         }
     }
 }

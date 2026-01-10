@@ -122,7 +122,7 @@ Item {
             anchors.topMargin: dp(10)
             anchors.horizontalCenter: parent.horizontalCenter
             fillMode: Image.PreserveAspectFit
-            source: "../img/SendOnline@2x.svg"
+            source: "../img/SendOnline.svg"
         }
 
         Text {
@@ -194,7 +194,7 @@ Item {
             height: dp(60)
             anchors.topMargin: dp(10)
             fillMode: Image.PreserveAspectFit
-            source: "../img/File@2x.svg"
+            source: "../img/File.svg"
             anchors.top: text_file_selected.bottom
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -269,7 +269,7 @@ Item {
             height: dp(60)
             anchors.topMargin: dp(10)
             fillMode: Image.PreserveAspectFit
-            source: "../img/File@2x.svg"
+            source: "../img/File.svg"
             anchors.top: text_slatepack_selected.bottom
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -446,7 +446,7 @@ Item {
                 height: dp(20)
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source: checkbox_tx_proof.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
+                source: checkbox_tx_proof.checked ? "../img/CheckOn.svg" : "../img/CheckOff.svg"
             }
         }
 
