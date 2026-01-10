@@ -6,19 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>717</width>
-    <height>751</height>
+    <width>851</width>
+    <height>886</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,3">
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,3">
    <property name="spacing">
     <number>0</number>
-   </property>
-   <property name="leftMargin">
-    <number>12</number>
    </property>
    <property name="topMargin">
     <number>90</number>
@@ -27,24 +24,24 @@
     <number>1</number>
    </property>
    <item>
-    <spacer name="verticalSpacer">
+    <spacer name="verticalSpacer_7">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Orientation::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>34</height>
+       <height>60</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,7,1">
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_2">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -70,441 +67,605 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>600</width>
+         <width>1200</width>
          <height>540</height>
         </size>
        </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
-       <widget class="control::MwcCheckedFrame" name="onlineChecked">
-        <property name="geometry">
-         <rect>
-          <x>124</x>
-          <y>0</y>
-          <width>150</width>
-          <height>208</height>
-         </rect>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>1</number>
         </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-        <property name="toolTip">
-         <string>Send MWC online with MWCMQS or Tor</string>
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="statusTip">
-         <string>Send MWC online with MWCMQS or Tor</string>
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
+        <property name="bottomMargin">
+         <number>0</number>
         </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <widget class="control::MwcLabel" name="label">
-         <property name="geometry">
-          <rect>
-           <x>39</x>
-           <y>42</y>
-           <width>79</width>
-           <height>70</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="../resources_desktop.qrc">:/img/SendOnline.svg</pixmap>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="control::MwcLabelLarge" name="label_2">
-         <property name="geometry">
-          <rect>
-           <x>27</x>
-           <y>132</y>
-           <width>103</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Address</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-        <widget class="control::MwcLine" name="frame_2">
-         <property name="geometry">
-          <rect>
-           <x>33</x>
-           <y>165</y>
-           <width>91</width>
-           <height>2</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-        </widget>
-        <widget class="control::MwcLabelNormal" name="label_3">
-         <property name="geometry">
-          <rect>
-           <x>4</x>
-           <y>168</y>
-           <width>139</width>
-           <height>28</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Confirmed Online</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-        <widget class="control::MwcLabelSmall" name="onlineLabel">
-         <property name="geometry">
-          <rect>
-           <x>15</x>
-           <y>12</y>
-           <width>124</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>SELECTED</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </widget>
-       <widget class="control::MwcComboBox" name="accountComboBox">
-        <property name="geometry">
-         <rect>
-          <x>105</x>
-          <y>339</y>
-          <width>390</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Choose the account to send MWC from</string>
-        </property>
-        <property name="statusTip">
-         <string>Choose the account to send MWC from</string>
-        </property>
-       </widget>
-       <widget class="control::MwcLineEditNormal" name="amountEdit">
-        <property name="geometry">
-         <rect>
-          <x>105</x>
-          <y>399</y>
-          <width>274</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Amount of MWC to send</string>
-        </property>
-        <property name="statusTip">
-         <string>Amount of MWC to send</string>
-        </property>
-        <property name="maxLength">
-         <number>32</number>
-        </property>
-        <property name="placeholderText">
-         <string>Amount</string>
-        </property>
-       </widget>
-       <widget class="control::MwcPushButtonNormal" name="allAmountButton">
-        <property name="geometry">
-         <rect>
-          <x>390</x>
-          <y>399</y>
-          <width>103</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Send entire MWC balance from this account</string>
-        </property>
-        <property name="statusTip">
-         <string>Send entire MWC balance from this account</string>
-        </property>
-        <property name="text">
-         <string>All</string>
-        </property>
-       </widget>
-       <widget class="control::MwcPushButtonNormal" name="nextButton">
-        <property name="geometry">
-         <rect>
-          <x>225</x>
-          <y>500</y>
-          <width>148</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Send MWC and continue to the next step.</string>
-        </property>
-        <property name="statusTip">
-         <string>Send MWC and continue to the next step.</string>
-        </property>
-        <property name="text">
-         <string>Next</string>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelSmall" name="label_4">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>231</y>
-          <width>598</width>
-          <height>91</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>- Transaction won't be sent if the destination wallet is offline and isn't listening for the chosen address.
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame">
+            <property name="minimumSize">
+             <size>
+              <width>600</width>
+              <height>300</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>600</width>
+              <height>300</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::NoFocus</enum>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Shape::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Plain</enum>
+            </property>
+            <widget class="control::MwcCheckedFrame" name="slatepackChecked">
+             <property name="geometry">
+              <rect>
+               <x>320</x>
+               <y>2</y>
+               <width>150</width>
+               <height>208</height>
+              </rect>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::FocusPolicy::StrongFocus</enum>
+             </property>
+             <property name="toolTip">
+              <string>Send MWC via Slatepack</string>
+             </property>
+             <property name="statusTip">
+              <string>Send MWC via Slatepack</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Shape::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Shadow::Raised</enum>
+             </property>
+             <widget class="control::MwcLabel" name="label_16">
+              <property name="geometry">
+               <rect>
+                <x>48</x>
+                <y>42</y>
+                <width>58</width>
+                <height>73</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap resource="../resources_desktop.qrc">:/img/File.svg</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="control::MwcLabelLarge" name="label_17">
+              <property name="geometry">
+               <rect>
+                <x>27</x>
+                <y>132</y>
+                <width>103</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Slatepack</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+             <widget class="control::MwcLine" name="frame_11">
+              <property name="geometry">
+               <rect>
+                <x>33</x>
+                <y>165</y>
+                <width>91</width>
+                <height>2</height>
+               </rect>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Shadow::Raised</enum>
+              </property>
+             </widget>
+             <widget class="control::MwcLabelNormal" name="label_18">
+              <property name="geometry">
+               <rect>
+                <x>7</x>
+                <y>171</y>
+                <width>136</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Manual Process</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+             <widget class="control::MwcLabelSmall" name="slatepackLabel">
+              <property name="geometry">
+               <rect>
+                <x>13</x>
+                <y>12</y>
+                <width>124</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>SELECTED</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </widget>
+            <widget class="control::MwcLabelSmall" name="label_4">
+             <property name="geometry">
+              <rect>
+               <x>4</x>
+               <y>218</y>
+               <width>589</width>
+               <height>77</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>- Transaction won't be sent if the destination wallet is offline and isn't listening for the chosen address.
 - Your funds remain locked until the transaction is fully confirmed on-chain.
 - You can cancel any unconfirmed transaction to unlock your funds at 'Transactions'.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcCheckBox" name="generatePoof">
-        <property name="geometry">
-         <rect>
-          <x>105</x>
-          <y>460</y>
-          <width>391</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
-        </property>
-        <property name="statusTip">
-         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
-        </property>
-        <property name="text">
-         <string>Generate Transaction Proof</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcCheckedFrame" name="slatepackChecked">
-        <property name="geometry">
-         <rect>
-          <x>322</x>
-          <y>0</y>
-          <width>150</width>
-          <height>208</height>
-         </rect>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Send MWC via Slatepack</string>
-        </property>
-        <property name="statusTip">
-         <string>Send MWC via Slatepack</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <widget class="control::MwcLabel" name="label_16">
-         <property name="geometry">
-          <rect>
-           <x>48</x>
-           <y>42</y>
-           <width>58</width>
-           <height>73</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="../resources_desktop.qrc">:/img/File.svg</pixmap>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="control::MwcLabelLarge" name="label_17">
-         <property name="geometry">
-          <rect>
-           <x>27</x>
-           <y>132</y>
-           <width>103</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Slatepack</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-        <widget class="control::MwcLine" name="frame_11">
-         <property name="geometry">
-          <rect>
-           <x>33</x>
-           <y>165</y>
-           <width>91</width>
-           <height>2</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-        </widget>
-        <widget class="control::MwcLabelNormal" name="label_18">
-         <property name="geometry">
-          <rect>
-           <x>7</x>
-           <y>171</y>
-           <width>136</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Manual Process</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-        <widget class="control::MwcLabelSmall" name="slatepackLabel">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>12</y>
-           <width>124</width>
-           <height>22</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>SELECTED</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </widget>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+            <widget class="control::MwcCheckedFrame" name="onlineChecked">
+             <property name="geometry">
+              <rect>
+               <x>122</x>
+               <y>2</y>
+               <width>150</width>
+               <height>208</height>
+              </rect>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::FocusPolicy::StrongFocus</enum>
+             </property>
+             <property name="toolTip">
+              <string>Send MWC online with MWCMQS or Tor</string>
+             </property>
+             <property name="statusTip">
+              <string>Send MWC online with MWCMQS or Tor</string>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Shape::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Shadow::Raised</enum>
+             </property>
+             <widget class="control::MwcLabel" name="label">
+              <property name="geometry">
+               <rect>
+                <x>39</x>
+                <y>42</y>
+                <width>79</width>
+                <height>70</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap resource="../resources_desktop.qrc">:/img/SendOnline.svg</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="control::MwcLabelLarge" name="label_2">
+              <property name="geometry">
+               <rect>
+                <x>27</x>
+                <y>132</y>
+                <width>103</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Address</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+             <widget class="control::MwcLine" name="frame_2">
+              <property name="geometry">
+               <rect>
+                <x>33</x>
+                <y>165</y>
+                <width>91</width>
+                <height>2</height>
+               </rect>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Shadow::Raised</enum>
+              </property>
+             </widget>
+             <widget class="control::MwcLabelNormal" name="label_3">
+              <property name="geometry">
+               <rect>
+                <x>4</x>
+                <y>168</y>
+                <width>139</width>
+                <height>28</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Confirmed Online</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+             <widget class="control::MwcLabelSmall" name="onlineLabel">
+              <property name="geometry">
+               <rect>
+                <x>15</x>
+                <y>12</y>
+                <width>124</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>SELECTED</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="control::MwcComboBox" name="accountComboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::FocusPolicy::StrongFocus</enum>
+          </property>
+          <property name="toolTip">
+           <string>Choose the account to send MWC from</string>
+          </property>
+          <property name="statusTip">
+           <string>Choose the account to send MWC from</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
+          <property name="spacing">
+           <number>25</number>
+          </property>
+          <item>
+           <widget class="control::MwcLineEditNormal" name="amountEdit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Amount of MWC to send</string>
+            </property>
+            <property name="statusTip">
+             <string>Amount of MWC to send</string>
+            </property>
+            <property name="maxLength">
+             <number>32</number>
+            </property>
+            <property name="placeholderText">
+             <string>Amount</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="control::MwcPushButtonNormal" name="allAmountButton">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::StrongFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Send entire MWC balance from this account</string>
+            </property>
+            <property name="statusTip">
+             <string>Send entire MWC balance from this account</string>
+            </property>
+            <property name="text">
+             <string>All</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <spacer name="horizontalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="control::MwcCheckBox" name="generatePoof">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::StrongFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
+            </property>
+            <property name="statusTip">
+             <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
+            </property>
+            <property name="text">
+             <string>Generate Transaction Proof</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="control::MwcPushButtonNormal" name="nextButton">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::StrongFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Send MWC and continue to the next step.</string>
+            </property>
+            <property name="statusTip">
+             <string>Send MWC and continue to the next step.</string>
+            </property>
+            <property name="text">
+             <string>Next</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -521,7 +682,7 @@
      <item>
       <spacer name="verticalSpacer_3">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -539,10 +700,10 @@
        <item>
         <spacer name="horizontalSpacer_3">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Minimum</enum>
+          <enum>QSizePolicy::Policy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -596,10 +757,10 @@
        <item>
         <spacer name="horizontalSpacer_4">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Minimum</enum>
+          <enum>QSizePolicy::Policy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -614,7 +775,7 @@
      <item>
       <spacer name="verticalSpacer_4">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -629,6 +790,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
@@ -655,7 +822,7 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabel</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
@@ -670,6 +837,11 @@
    <header>control_desktop/MwcCheckBox.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLine</class>
    <extends>QFrame</extends>
    <header>control_desktop/MwcFrameWithBorder.h</header>
@@ -681,16 +853,6 @@
    <header>control_desktop/MwcCheckedFrame.h</header>
    <container>1</container>
   </customwidget>
-   <customwidget>
-   <class>control::MwcLabel</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>onlineChecked</tabstop>
@@ -700,6 +862,7 @@
   <tabstop>allAmountButton</tabstop>
   <tabstop>generatePoof</tabstop>
   <tabstop>nextButton</tabstop>
+  <tabstop>frame</tabstop>
  </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>

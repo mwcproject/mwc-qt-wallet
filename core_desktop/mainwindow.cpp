@@ -43,6 +43,7 @@
 #include "../core_desktop/statuswndmgr.h"
 #include <QSettings>
 #include "../core_desktop/DesktopWndManager.h"
+#include "../control_desktop/MwcScrollBar.h"
 
 namespace core {
 
@@ -94,6 +95,8 @@ MainWindow::MainWindow(QWidget *parent) :
     updateNetworkName();
     updateMenu();
 
+    ui->scrollArea->setVerticalScrollBar(new control::MwcScrollBar(Qt::Vertical, this));
+    ui->scrollArea->setHorizontalScrollBar(new control::MwcScrollBar(Qt::Horizontal, this));
 
     ui->leftTb->hide();
 

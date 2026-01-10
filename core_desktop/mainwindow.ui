@@ -48,10 +48,10 @@
     <item>
      <widget class="QScrollArea" name="scrollArea">
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustToContents</enum>
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
@@ -114,10 +114,10 @@
               <bool>true</bool>
              </property>
              <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
+              <enum>QFrame::Shape::NoFrame</enum>
              </property>
              <property name="frameShadow">
-              <enum>QFrame::Sunken</enum>
+              <enum>QFrame::Shadow::Sunken</enum>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout"/>
             </widget>
@@ -134,7 +134,7 @@
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
+              <enum>Qt::FocusPolicy::NoFocus</enum>
              </property>
              <property name="toolTip">
               <string>Open help</string>
@@ -200,7 +200,7 @@
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
+              <enum>Qt::FocusPolicy::NoFocus</enum>
              </property>
              <property name="toolTip">
               <string>View MWC node status</string>
@@ -245,7 +245,7 @@
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
+              <enum>Qt::FocusPolicy::NoFocus</enum>
              </property>
              <property name="toolTip">
               <string>View listener settings and status</string>
@@ -513,6 +513,17 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>control::MwcWidget</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/MwcWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabel</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>core::MwcToolbar</class>
    <extends>QWidget</extends>
    <header>core_desktop/mwctoolbar.h</header>
@@ -528,11 +539,6 @@
    <extends>QFrame</extends>
    <header>control_desktop/MwcMainWndContainer.h</header>
    <container>1</container>
-  </customwidget>
-   <customwidget>
-   <class>control::MwcLabel</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcMenu</class>
@@ -553,11 +559,6 @@
    <class>control::MwcStatusBar</class>
    <extends>QStatusBar</extends>
    <header>control_desktop/MwcStatusBar.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>
