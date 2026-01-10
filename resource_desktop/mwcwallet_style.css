@@ -463,7 +463,7 @@ control--MwcScrollBar::up-arrow:vertical, control--MwcScrollBar::down-arrow:vert
     background: none;
 }
 
-/*control--MwcTextEdit::corner,
+control--MwcTextEdit::corner,
 control--MwcPlainTextEdit::corner,
 control--MwcTextBrowser::corner,
 control--MwcListView::corner {
@@ -502,6 +502,7 @@ control--MwcComboBox
    border: transparent;
    border-radius: 6px;
    padding: 0px 1px 0px 20px;
+   combobox-popup: 0;
 
     background-color: rgba(255, 255, 255, 0.2);
     selection-background-color: rgba(255, 255, 255, 0.3);
@@ -538,6 +539,7 @@ control--MwcComboBox::drop-down {
 
     background: transparent;
     border: transparent;
+    image: url(:/img/ComboBoxArrow@2x.svg);
 
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -547,11 +549,6 @@ control--MwcComboBox::drop-down {
 control--MwcComboBox:item:selected
 {
     color: white;
-}
-
-control--MwcComboBox::down-arrow {
-    image: url(:/img/ComboBoxArrow.svg);
-    border: transparent;
 }
 
 control--MwcComboBox::disabled {
@@ -583,11 +580,11 @@ control--MwcRadioButton::indicator {
 }
 
 control--MwcRadioButton::indicator:unchecked {
-    image: url(:/img/RadioOff.svg);
+    image: url(:/img/RadioOff@2x.svg);
 }
 
 control--MwcRadioButton::indicator:checked {
-    image: url(:/img/RadioOn.svg);
+    image: url(:/img/RadioOn@2x.svg);
 }
 
 
@@ -727,19 +724,19 @@ control--MwcCheckBox::indicator {
 }
 
 control--MwcCheckBox::indicator:unchecked {
-    image: url(:/img/CheckOff.svg);
+    image: url(:/img/CheckOff@2x.svg);
 }
 
 control--MwcCheckBox::indicator:checked {
-    image: url(:/img/CheckOn.svg);
+    image: url(:/img/CheckOn@2x.svg);
 }
 
 control--MwcCheckBox::indicator:disabled:unchecked {
-    image: url(:/img/disabledCheckOff.svg);
+    image: url(:/img/disabledCheckOff@2x.svg);
 }
 
 control--MwcCheckBox::indicator:disabled:checked {
-    image: url(:/img/disabledCheckOn.svg);
+    image: url(:/img/disabledCheckOn@2x.svg);
 }
 
 control--MwcTabWidget::tab-bar {
