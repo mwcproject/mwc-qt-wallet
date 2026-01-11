@@ -32,7 +32,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget1" native="true">
+  <widget class="QWidget" name="layoutWidget1" native="true">
    <property name="geometry">
     <rect>
      <x>459</x>
@@ -106,7 +106,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget2" native="true">
+  <widget class="QWidget" name="layoutWidget2" native="true">
    <property name="geometry">
     <rect>
      <x>370</x>
@@ -180,7 +180,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget3" native="true">
+  <widget class="QWidget" name="layoutWidget3" native="true">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -275,7 +275,7 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget4" native="true">
+  <widget class="QWidget" name="layoutWidget4" native="true">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -417,7 +417,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget_2" native="true">
+  <widget class="QWidget" name="layoutWidget_2" native="true">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -491,7 +491,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget_3" native="true">
+  <widget class="QWidget" name="layoutWidget_3" native="true">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -565,7 +565,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget_4" native="true">
+  <widget class="QWidget" name="layoutWidget_4" native="true">
    <property name="geometry">
     <rect>
      <x>177</x>
@@ -639,7 +639,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget_5" native="true">
+  <widget class="QWidget" name="layoutWidget_5" native="true">
    <property name="geometry">
     <rect>
      <x>510</x>
@@ -713,7 +713,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget_6" native="true">
+  <widget class="QWidget" name="layoutWidget_6" native="true">
    <property name="geometry">
     <rect>
      <x>690</x>
@@ -787,7 +787,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget_8" native="true">
+  <widget class="QWidget" name="layoutWidget_8" native="true">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -861,7 +861,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget5" native="true">
+  <widget class="QWidget" name="layoutWidget5" native="true">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -935,7 +935,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget6" native="true">
+  <widget class="QWidget" name="layoutWidget6" native="true">
    <property name="geometry">
     <rect>
      <x>37</x>
@@ -1009,7 +1009,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget7" native="true">
+  <widget class="QWidget" name="layoutWidget7" native="true">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -1083,7 +1083,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget8" native="true">
+  <widget class="QWidget" name="layoutWidget8" native="true">
    <property name="geometry">
     <rect>
      <x>500</x>
@@ -1157,7 +1157,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget9" native="true">
+  <widget class="QWidget" name="layoutWidget9" native="true">
    <property name="geometry">
     <rect>
      <x>730</x>
@@ -1231,7 +1231,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget10" native="true">
+  <widget class="QWidget" name="layoutWidget10" native="true">
    <property name="geometry">
     <rect>
      <x>620</x>
@@ -1336,7 +1336,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget11" native="true">
+  <widget class="QWidget" name="layoutWidget11" native="true">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -1410,7 +1410,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget_10" native="true">
+  <widget class="QWidget" name="layoutWidget_10" native="true">
    <property name="geometry">
     <rect>
      <x>37</x>
@@ -1494,7 +1494,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget12" native="true">
+  <widget class="QWidget" name="layoutWidget12" native="true">
    <property name="geometry">
     <rect>
      <x>38</x>
@@ -1580,7 +1580,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcWidget" name="layoutWidget13" native="true">
+  <widget class="QWidget" name="layoutWidget13" native="true">
    <property name="geometry">
     <rect>
      <x>38</x>
@@ -1731,13 +1731,7 @@
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
+<customwidget>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>

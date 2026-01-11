@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ValidateOwnershipProofResult</class>
- <widget class="control::MwcWidget" name="ValidateOwnershipProofResult">
+ <widget class="QWidget" name="ValidateOwnershipProofResult">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -430,13 +430,7 @@
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
+<customwidget>
    <class>control::MwcTextEdit</class>
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcTextEdit.h</header>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ViewHash</class>
- <widget class="control::MwcWidget" name="ViewHash">
+ <widget class="QWidget" name="ViewHash">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -421,12 +421,7 @@ Be cautious when sharing your viewing key - once it's shared,  your wallet loses
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
-   <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <tabstops>
   <tabstop>showWalletKeyButton</tabstop>
   <tabstop>generateOwnershipProof</tabstop>

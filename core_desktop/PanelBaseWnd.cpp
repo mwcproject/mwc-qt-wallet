@@ -18,7 +18,7 @@
 namespace core {
 
 PanelBaseWnd::PanelBaseWnd( QWidget *parent, Qt::WindowFlags f) :
-    control::MwcWidget(parent, f)
+    QWidget(parent, f)
 {
     updateAppTitle();
     QTimer::singleShot(0, this, SLOT(updateAppTitle()));

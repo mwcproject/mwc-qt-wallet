@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Accounts</class>
- <widget class="control::MwcWidget" name="Accounts">
+ <widget class="QWidget" name="Accounts">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -118,7 +118,7 @@
           </widget>
          </item>
          <item>
-          <widget class="control::MwcWidget" name="widget" native="true">
+          <widget class="QWidget" name="widget" native="true">
            <property name="minimumSize">
             <size>
              <width>1</width>
@@ -247,7 +247,7 @@
           </widget>
          </item>
          <item>
-          <widget class="control::MwcWidget" name="w20" native="true">
+          <widget class="QWidget" name="w20" native="true">
            <property name="minimumSize">
             <size>
              <width>20</width>
@@ -449,12 +449,7 @@
    <extends>QTableWidget</extends>
    <header>control_desktop/listwithcolumns.h</header>
   </customwidget>
-   <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <resources>
   <include location="../resources_desktop.qrc"/>
  </resources>

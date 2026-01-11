@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>AccountTransfer</class>
- <widget class="control::MwcWidget" name="AccountTransfer">
+ <widget class="QWidget" name="AccountTransfer">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -89,7 +89,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcWidget" name="h20" native="true">
+        <widget class="QWidget" name="h20" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -146,7 +146,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcWidget" name="h20_2" native="true">
+        <widget class="QWidget" name="h20_2" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -192,7 +192,7 @@
           </widget>
          </item>
          <item>
-          <widget class="control::MwcWidget" name="widget_2" native="true">
+          <widget class="QWidget" name="widget_2" native="true">
            <property name="minimumSize">
             <size>
              <width>20</width>
@@ -241,7 +241,7 @@
         </layout>
        </item>
        <item>
-        <widget class="control::MwcWidget" name="h20_3" native="true">
+        <widget class="QWidget" name="h20_3" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -412,7 +412,7 @@
       </widget>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="widget" native="true">
+      <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -483,12 +483,7 @@
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
-   <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <resources/>
  <connections/>
 </ui>

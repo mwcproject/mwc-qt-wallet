@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>FileTransactionReceive</class>
- <widget class="control::MwcWidget" name="FileTransactionReceive">
+ <widget class="QWidget" name="FileTransactionReceive">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -58,7 +58,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="primaryFrame" native="true">
+      <widget class="QWidget" name="primaryFrame" native="true">
        <property name="minimumSize">
         <size>
          <width>778</width>
@@ -494,7 +494,7 @@
          </widget>
         </item>
         <item>
-         <widget class="control::MwcWidget" name="widget_2" native="true">
+         <widget class="QWidget" name="widget_2" native="true">
           <property name="minimumSize">
            <size>
             <width>1</width>
@@ -573,12 +573,7 @@
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcTextEdit.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <tabstops>
   <tabstop>receiverMessage</tabstop>
   <tabstop>cancelButton</tabstop>

@@ -27,7 +27,7 @@ using namespace bridge;
 namespace core {
 
 NavBar::NavBar(QWidget *parent) :
-        control::MwcWidget(parent),
+        QWidget(parent),
         ui(new Ui::NavBar),
         prntWnd(parent)
 {

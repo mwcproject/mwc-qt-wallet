@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>StatusWnd</class>
- <widget class="control::MwcWidget" name="StatusWnd">
+ <widget class="QWidget" name="StatusWnd">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -95,12 +95,7 @@
    <extends>QPushButton</extends>
    <header>control_desktop/MwcStatusLine.h</header>
   </customwidget>
-   <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <resources/>
  <connections/>
 </ui>

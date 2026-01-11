@@ -1,7 +1,7 @@
 #ifndef A_SEEDLENGTH_H
 #define A_SEEDLENGTH_H
 
-#include "../control_desktop/MwcWidget.h"
+#include <QWidget>
 
 namespace Ui {
 class SeedLength;
@@ -14,7 +14,7 @@ class InitAccount;
 
 namespace wnd {
 
-class SeedLength : public control::MwcWidget {
+class SeedLength : public QWidget {
 Q_OBJECT
 
 public:

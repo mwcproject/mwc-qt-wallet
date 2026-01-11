@@ -21,7 +21,7 @@
 #include "../wallet/wallet.h"
 #include "../control_desktop/richbutton.h"
 #include "../control_desktop/richitem.h"
-#include "../control_desktop/MwcWidget.h"
+#include <QWidget>
 
 namespace Ui {
 class Transactions;
@@ -42,7 +42,7 @@ class QLabel;
 
 namespace wnd {
 
-class TransactionRecord : public control::MwcWidget {
+class TransactionRecord : public QWidget {
 public:
     // use 135 for unknown intialHeight value
     explicit TransactionRecord(QString id, control::RichVBox *parent, const wallet::WalletTransaction & trans,

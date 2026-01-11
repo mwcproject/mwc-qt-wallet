@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MwcToolbar</class>
- <widget class="control::MwcWidget" name="MwcToolbar">
+ <widget class="QWidget" name="MwcToolbar">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -193,7 +193,7 @@ color: #FFFFFF;}</string>
       </spacer>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="mwcUnconfFrame" native="true">
+      <widget class="QWidget" name="mwcUnconfFrame" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -330,7 +330,7 @@ color: #CCFF33;}</string>
       </spacer>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="widget" native="true">
+      <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -691,12 +691,7 @@ color: #CCFF33;}</string>
    <extends>QToolButton</extends>
    <header>control_desktop/MwcToolButton.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <resources>
   <include location="../resources_desktop.qrc"/>
  </resources>

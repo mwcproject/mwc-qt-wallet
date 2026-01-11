@@ -32,7 +32,7 @@ using namespace bridge;
 namespace core {
 
 MwcToolbar::MwcToolbar(QWidget *parent) :
-    control::MwcWidget(parent),
+    QWidget(parent),
     ui(new Ui::MwcToolbar) {
     ui->setupUi(this);
 

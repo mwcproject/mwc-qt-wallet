@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MrktSwapNew</class>
- <widget class="control::MwcWidget" name="MrktSwapNew">
+ <widget class="QWidget" name="MrktSwapNew">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -61,7 +61,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="widget" native="true">
+      <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>700</width>
@@ -111,7 +111,7 @@
          <string>Account to trade MWC from</string>
         </property>
        </widget>
-       <widget class="control::MwcWidget" name="layoutWidget1">
+       <widget class="QWidget" name="layoutWidget1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -227,7 +227,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="control::MwcWidget" name="layoutWidget2">
+       <widget class="QWidget" name="layoutWidget2">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -540,7 +540,7 @@
          <string>Account:</string>
         </property>
        </widget>
-       <widget class="control::MwcWidget" name="layoutWidget3">
+       <widget class="QWidget" name="layoutWidget3">
         <property name="geometry">
          <rect>
           <x>285</x>
@@ -595,7 +595,7 @@
           </widget>
          </item>
          <item>
-          <widget class="control::MwcWidget" name="widget_2" native="true">
+          <widget class="QWidget" name="widget_2" native="true">
            <property name="minimumSize">
             <size>
              <width>1</width>
@@ -640,7 +640,7 @@
         <property name="title">
          <string>Funds lock time</string>
         </property>
-        <widget class="control::MwcWidget" name="layoutWidget4">
+        <widget class="QWidget" name="layoutWidget4">
          <property name="geometry">
           <rect>
            <x>23</x>
@@ -684,7 +684,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="control::MwcWidget" name="layoutWidget5">
+        <widget class="QWidget" name="layoutWidget5">
          <property name="geometry">
           <rect>
            <x>23</x>
@@ -930,7 +930,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="control::MwcWidget" name="layoutWidget6">
+       <widget class="QWidget" name="layoutWidget6">
         <property name="geometry">
          <rect>
           <x>1</x>
@@ -1214,12 +1214,7 @@
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <tabstops>
   <tabstop>accountComboBox</tabstop>
   <tabstop>buySellCombo</tabstop>

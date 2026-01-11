@@ -40,7 +40,7 @@ TransactionRecord::TransactionRecord(QString _id, control::RichVBox *_parent, co
             control::RichButtonPressCallback * _btnCallBack,
             bridge::Config * _config, bridge::Wallet * _wallet,
             int intialHeight) :
-        control::MwcWidget(_parent),
+        QWidget(_parent),
         id(_id),
         parent(_parent),
         trans(trans),

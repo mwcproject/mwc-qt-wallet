@@ -15,7 +15,7 @@
 #ifndef MWCTOOLBAR_H
 #define MWCTOOLBAR_H
 
-#include "../control_desktop/MwcWidget.h"
+#include <QWidget>
 #include "../state/state.h"
 
 namespace Ui {
@@ -35,7 +35,7 @@ namespace core {
 
 class MainWindow;
 
-class MwcToolbar : public control::MwcWidget
+class MwcToolbar : public QWidget
 {
    Q_OBJECT
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MrktSwList</class>
- <widget class="control::MwcWidget" name="MrktSwList">
+ <widget class="QWidget" name="MrktSwList">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -191,7 +191,7 @@
     </layout>
    </item>
    <item>
-    <widget class="control::MwcWidget" name="feesHolder" native="true">
+    <widget class="QWidget" name="feesHolder" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -305,7 +305,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="control::MwcWidget" name="feeFixedHolder" native="true">
+         <widget class="QWidget" name="feeFixedHolder" native="true">
           <property name="minimumSize">
            <size>
             <width>800</width>
@@ -867,7 +867,7 @@
     </widget>
    </item>
    <item>
-    <widget class="control::MwcWidget" name="filterPlaceholder" native="true">
+    <widget class="QWidget" name="filterPlaceholder" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,1">
       <item>
        <widget class="control::MwcComboBox" name="buySellCombo">
@@ -1023,7 +1023,7 @@
     </layout>
    </item>
    <item>
-    <widget class="control::MwcWidget" name="refreshBtnsHolder" native="true">
+    <widget class="QWidget" name="refreshBtnsHolder" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -1169,7 +1169,7 @@
       </widget>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="widget" native="true">
+      <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -1263,12 +1263,7 @@
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcTextEdit.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <tabstops>
   <tabstop>marketOffers</tabstop>
   <tabstop>myOffers</tabstop>

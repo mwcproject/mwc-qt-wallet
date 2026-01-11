@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ResultedSlatepack</class>
- <widget class="control::MwcWidget" name="ResultedSlatepack">
+ <widget class="QWidget" name="ResultedSlatepack">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -63,7 +63,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="control::MwcWidget" name="tab_string">
+     <widget class="QWidget" name="tab_string">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -386,7 +386,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="control::MwcWidget" name="tab_qrcode">
+     <widget class="QWidget" name="tab_qrcode">
       <attribute name="title">
        <string>QR Code</string>
       </attribute>
@@ -600,13 +600,7 @@
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
+<customwidget>
    <class>control::MwcTextEdit</class>
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcTextEdit.h</header>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NewSwap1</class>
- <widget class="control::MwcWidget" name="NewSwap1">
+ <widget class="QWidget" name="NewSwap1">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -464,7 +464,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="control::MwcWidget" name="widget" native="true">
+          <widget class="QWidget" name="widget" native="true">
            <property name="minimumSize">
             <size>
              <width>500</width>
@@ -596,7 +596,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcWidget" name="widget_2" native="true">
+        <widget class="QWidget" name="widget_2" native="true">
          <property name="minimumSize">
           <size>
            <width>1</width>
@@ -810,12 +810,7 @@
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <tabstops>
   <tabstop>accountComboBox</tabstop>
   <tabstop>mwcAmountEdit</tabstop>

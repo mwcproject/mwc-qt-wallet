@@ -15,7 +15,7 @@
 #ifndef TOPRIGHTBUTTONS_H
 #define TOPRIGHTBUTTONS_H
 
-#include "../control_desktop/MwcWidget.h"
+#include <QWidget>
 
 namespace Ui {
 class NavBar;
@@ -31,7 +31,7 @@ namespace core {
 
 class NavMenu;
 
-class NavBar : public control::MwcWidget {
+class NavBar : public QWidget {
 Q_OBJECT
 
 public:

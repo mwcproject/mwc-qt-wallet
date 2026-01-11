@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SwapList</class>
- <widget class="control::MwcWidget" name="SwapList">
+ <widget class="QWidget" name="SwapList">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -282,7 +282,7 @@
     </layout>
    </item>
    <item>
-    <widget class="control::MwcWidget" name="restoreTradeHolder" native="true">
+    <widget class="QWidget" name="restoreTradeHolder" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -474,7 +474,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
     </widget>
    </item>
    <item>
-    <widget class="control::MwcWidget" name="ethWalletHolder" native="true">
+    <widget class="QWidget" name="ethWalletHolder" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -771,7 +771,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
     </widget>
    </item>
    <item>
-    <widget class="control::MwcWidget" name="refreshBtnsHolder" native="true">
+    <widget class="QWidget" name="refreshBtnsHolder" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -980,7 +980,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
       </widget>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="widget" native="true">
+      <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -1048,13 +1048,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
+<customwidget>
    <class>control::RichVBox</class>
    <extends>QWidget</extends>
    <header>control_desktop/richvbox.h</header>

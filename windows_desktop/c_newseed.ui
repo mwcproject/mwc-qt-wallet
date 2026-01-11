@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NewSeed</class>
- <widget class="control::MwcWidget" name="NewSeed">
+ <widget class="QWidget" name="NewSeed">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -265,7 +265,7 @@ WARNING:
       </widget>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="widget" native="true">
+      <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -331,12 +331,7 @@ WARNING:
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcTextEdit.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <resources/>
  <connections/>
 </ui>

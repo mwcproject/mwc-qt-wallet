@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>GenerateOwnershipProofResult</class>
- <widget class="control::MwcWidget" name="GenerateOwnershipProofResult">
+ <widget class="QWidget" name="GenerateOwnershipProofResult">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -244,12 +244,7 @@ However, be cautious when including your viewing key - once shared, your wallet'
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcTextEdit.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <tabstops>
   <tabstop>proof_text</tabstop>
   <tabstop>back</tabstop>

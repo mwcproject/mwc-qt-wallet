@@ -21,7 +21,7 @@
 namespace wnd {
 
 SeedLength::SeedLength(QWidget *parent) :
-        control::MwcWidget(parent),
+        QWidget(parent),
         ui(new Ui::SeedLength) {
     ui->setupUi(this);
 

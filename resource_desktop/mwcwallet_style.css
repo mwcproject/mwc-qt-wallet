@@ -32,11 +32,6 @@ core--StatusWnd {
     font-size: 13px;
 }
 
-/* Needed for Windows */
-control--MwcWidget {
-    border: none;
-}
-
 control--MwcStatusBar::item {
     border: none;
 }
@@ -751,12 +746,12 @@ control--MwcTabWidget::pane {
     border: none;
 }
 
-control--MwcWidget#tab_main {
+QWidget#tab_main {
     background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
                                   stop: 0 #9E00E7, stop: 0.9 #3600C9, stop: 1 #3600C9);
 }
 
-control--MwcWidget#tab_wallet {
+QWidget#tab_wallet {
     background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
                                   stop: 0 #9E00E7, stop: 0.9 #3600C9, stop: 1 #3600C9);
 }

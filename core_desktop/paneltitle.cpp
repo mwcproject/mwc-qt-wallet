@@ -17,7 +17,7 @@ void setCurrentTitle(const QString & title) {
 
 
 PanelTitle::PanelTitle(QWidget *parent) :
-        control::MwcWidget(parent),
+        QWidget(parent),
         ui(new Ui::PanelTitle) {
     ui->setupUi(this);
 

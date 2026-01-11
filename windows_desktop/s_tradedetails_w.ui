@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>TradeDetails</class>
- <widget class="control::MwcWidget" name="TradeDetails">
+ <widget class="QWidget" name="TradeDetails">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -147,7 +147,7 @@
       </widget>
      </item>
      <item>
-      <widget class="control::MwcWidget" name="widget" native="true">
+      <widget class="QWidget" name="widget" native="true">
        <property name="minimumSize">
         <size>
          <width>1</width>
@@ -306,12 +306,7 @@
    <header>control_desktop/richvbox.h</header>
    <container>1</container>
   </customwidget>
-   <customwidget>
-   <class>control::MwcWidget</class>
-   <extends>QWidget</extends>
-   <header>control_desktop/MwcWidget.h</header>
-  </customwidget>
- </customwidgets>
+</customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -16,7 +16,7 @@
 #define QRCODEWIDGET_H
 
 #include <QColor>
-#include "MwcWidget.h"
+#include <QWidget>
 #include <QByteArray>
 
 class QPaintEvent;
@@ -27,7 +27,7 @@ class Util;
 
 namespace control {
 
-class QrCodeWidget : public MwcWidget {
+class QrCodeWidget : public QWidget {
 Q_OBJECT
 public:
     explicit QrCodeWidget(QWidget *parent = nullptr);
