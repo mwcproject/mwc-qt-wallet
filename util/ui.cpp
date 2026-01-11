@@ -438,7 +438,7 @@ uint64_t getTxnFee2(const QString& accountPath, int64_t amount, wallet::Wallet* 
 }
 
 // Function to determine the number of significant digits
-int getSignificantDigits(double value) {
+/*int getSignificantDigits(double value) {
     if (value == 0.0) return 1; // Handle zero case
 
     int digits = 0;
@@ -450,15 +450,13 @@ int getSignificantDigits(double value) {
           break;
     }
     return digits;
-}
+}*/
 
 QString txnFeeToString(uint64_t nanoTxnFee) {
-    double dTxnFee = (double)nanoTxnFee / (double)mwc::NANO_MWC;
-    QString fee = QString::number(dTxnFee, 'f', getSignificantDigits(dTxnFee));
     if (nanoTxnFee < mwc::BASE_TRANSACTION_FEE) {
-        fee = "unknown";
+        return "unknown";
     }
-    return fee;
+    return nano2one(nanoTxnFee);
 }
 
 QString getAllSpendableAmount2(const QString& accountPath, wallet::Wallet* wallet, core::AppContext* appContext) {

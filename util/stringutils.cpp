@@ -53,7 +53,15 @@ QString nano2one( int64_t nano, bool firstcall ) {
     if (nano == 0)
         return "0";
 
-    if (nano<0) {
+    Q_UNUSED(firstcall);
+    QString mwcTotalFraction = QString::number( nano % int64_t(1000000000),10);
+    while (mwcTotalFraction.length()<9)
+        mwcTotalFraction = "0" + mwcTotalFraction;
+
+    QString mwcTotalWhole = QString::number( nano / int64_t(1000000000),10);
+    return mwcTotalWhole + "." + mwcTotalFraction;
+
+/*    if (nano<0) {
         if (-nano < 0 || !firstcall)
             return "ErrValue"; // it muct be a bug at mwc-wallet level, we can;t handle it here.
         return "-" + nano2one(-nano, false);
@@ -74,7 +82,7 @@ QString nano2one( int64_t nano, bool firstcall ) {
     if (nano<0)
         myNumber.push_front("-");
 
-    return myNumber;
+    return myNumber;*/
 }
 
 // 1.0100000 => 1.01   or 0001.0000000 => 1
