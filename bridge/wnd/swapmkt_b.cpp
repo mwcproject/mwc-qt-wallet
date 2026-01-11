@@ -138,7 +138,7 @@ QVector<QString> SwapMarketplace::getTotalOffers() {
     return res;
 }
 
-// Response at: sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
+// Response at: sgnRequestIntegrityFees(QString error, qint64 balance, QVector<QString> IntegrityFeesJsonStr);
 void SwapMarketplace::requestIntegrityFees() {
     logger::logInfo(logger::BRIDGE, "Call SwapMarketplace::requestIntegrityFees");
     getSwapMkt()->requestIntegrityFees();
@@ -232,7 +232,7 @@ int SwapMarketplace::getLastNodeHeight() {
     return getSwapMkt()->getLastNodeHeight();
 }
 
-void SwapMarketplace::onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees) {
+void SwapMarketplace::onRequestIntegrityFees(QString error, qint64 balance, QVector<wallet::IntegrityFees> fees) {
     QVector<QString> integrityFeesJsonStr;
     for (const auto & f : fees) {
         integrityFeesJsonStr.push_back(f.toJSonStr());

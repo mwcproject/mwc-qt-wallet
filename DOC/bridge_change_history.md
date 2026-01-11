@@ -218,9 +218,9 @@ DELETED    Q_INVOKABLE void ftContinueSlatepack(QString slatepack, QString txUui
 ##WndManager
 pageShowSlatepack  shows new ResultedSlatepack page.
 ```c++
-    // Removeed   virtual void pageSendOffline( QString selectedAccount, int64_t amount ) override;
-    virtual void pageSendFile( QString selectedAccount, int64_t amount ) override;
-    virtual void pageSendSlatepack( QString selectedAccount, int64_t amount ) override;
+    // Removeed   virtual void pageSendOffline( QString selectedAccount, qint64 amount ) override;
+    virtual void pageSendFile( QString selectedAccount, qint64 amount ) override;
+    virtual void pageSendSlatepack( QString selectedAccount, qint64 amount ) override;
 
 
     // Show open file dialog. Might not be needed for mobile

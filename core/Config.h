@@ -44,15 +44,15 @@ void setMwcGuiWalletConf( QString conf );
  * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
  */
 void setConfigData(WALLET_RUN_MODE runMode,
-                   int64_t logoutTimeMs,
+                   qint64 logoutTimeMs,
                    double timeoutMultiplier,
                    int sendTimeoutMs);
 
 // Note, workflow for config not enforced. Please don't abuse it
 const QString & getMwcGuiWalletConf();
 
-int64_t         getLogoutTimeMs();
-void            setLogoutTimeMs(int64_t timeMs);
+qint64         getLogoutTimeMs();
+void            setLogoutTimeMs(qint64 timeMs);
 
 double          getTimeoutMultiplier();
 void            increaseTimeoutMultiplier();

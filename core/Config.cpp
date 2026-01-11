@@ -19,7 +19,7 @@ namespace config {
 static WALLET_RUN_MODE runMode = WALLET_RUN_MODE::ONLINE_WALLET;
 static QString mwcGuiWalletConf;
 //static QString mwcPath;
-static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
+static qint64 logoutTimeMs = 1000*60*15; // 15 minutes is default
 static double  timeoutMultiplier = 1.0;
 static int     sendTimeoutMs = 60000; // 1 minute
 
@@ -54,7 +54,7 @@ void setMwcGuiWalletConf( QString conf ) {
  * @param sendTimeoutMs         - timeout for mwc mq send. Expected that 2nd party is online. Otherwise we will ask user if he want to stop waiting and cancel transaction.
  */
 void setConfigData(WALLET_RUN_MODE _runMode,
-                   int64_t  _logoutTimeMs,
+                   qint64  _logoutTimeMs,
                    double _timeoutMultiplier,
                    int _sendTimeoutMs) {
     runMode = _runMode;
@@ -69,8 +69,8 @@ void setConfigData(WALLET_RUN_MODE _runMode,
 // Note, workflow for config not enforced. Please don't abuse it
 const QString & getMwcGuiWalletConf() {return mwcGuiWalletConf;}
 
-int64_t         getLogoutTimeMs() {return logoutTimeMs;}
-void            setLogoutTimeMs(int64_t timeMs) {logoutTimeMs = timeMs;}
+qint64         getLogoutTimeMs() {return logoutTimeMs;}
+void            setLogoutTimeMs(qint64 timeMs) {logoutTimeMs = timeMs;}
 
 
 double          getTimeoutMultiplier() {return timeoutMultiplier;}

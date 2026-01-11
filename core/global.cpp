@@ -92,7 +92,7 @@ bool isWalletLocked() {
     return walletLocked;
 }
 
-static int64_t lastErrorEvent = 0;
+static qint64 lastErrorEvent = 0;
 bool last_no_gas_error = false;
 void reportSwapError(QString err, QString lastProcessError) {
     Q_UNUSED(err);

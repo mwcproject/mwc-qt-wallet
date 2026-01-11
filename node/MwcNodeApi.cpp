@@ -309,7 +309,7 @@ namespace node {
     }
 
     // Read some logs from the buffer
-    mwc_api::ApiResponse<QVector<mwc_api::LogBufferedEntry>> get_buffered_logs(uint64_t last_known_id, int result_size_limit) {
+    mwc_api::ApiResponse<QVector<mwc_api::LogBufferedEntry>> get_buffered_logs(quint64 last_known_id, int result_size_limit) {
         Q_ASSERT(result_size_limit>0);
 
         QJsonObject params;

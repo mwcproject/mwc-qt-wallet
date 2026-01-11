@@ -95,7 +95,7 @@ void IntegrityTransactions::updateData() {
         bool blocksPrinted = false;
         //if (trans.confirmed && nodeHeight > 0 && trans.height > 0) {
             // confirmations are 1 more than the difference between the node and transaction heights
-        //    int64_t confirmations = nodeHeight - trans.height + 1;
+        //    qint64 confirmations = nodeHeight - trans.height + 1;
         //}
 
         control::RichItem *itm = control::createMarkedItem(QString::number(idx), ui->transactionTable,

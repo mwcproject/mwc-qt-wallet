@@ -29,7 +29,7 @@
 namespace wnd {
 
 // Update current state and UI
-void SwapTradeInfo::updateData(QString _stateCmd, QString _status, QString _lastProcessError, int64_t _expirationTime, int swapTabSelection,
+void SwapTradeInfo::updateData(QString _stateCmd, QString _status, QString _lastProcessError, qint64 _expirationTime, int swapTabSelection,
                                bridge::Util * util, bridge::Config * config, bridge::Swap * swap) {
     if (!_stateCmd.isEmpty())
         stateCmd = _stateCmd;
@@ -51,7 +51,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
     if (initTimeLable == nullptr)
         return; // All null
 
-    int64_t timestampSec = QDateTime::currentSecsSinceEpoch();
+    qint64 timestampSec = QDateTime::currentSecsSinceEpoch();
 
     Q_ASSERT(initTimeLable);
     if (initiatedTime>0) {
@@ -569,7 +569,7 @@ void SwapList::sgnDeleteSwapTrade(QString swapId, QString error) {
 }
 
 void SwapList::sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
-                                         int64_t expirationTime,
+                                         qint64 expirationTime,
                                          QString lastProcessError,
                                          QVector<QString> executionPlan,
                                          QVector<QString> tradeJournal) {

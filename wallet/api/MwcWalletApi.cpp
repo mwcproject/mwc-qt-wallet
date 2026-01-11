@@ -32,7 +32,7 @@ namespace wallet {
         return mwc_api::ApiResponse<bool> (response.second.isEmpty(), response.second);
     }
 
-    static WalletTransaction toWalletTransaction(const QJsonObject & tx, int64_t height) {
+    static WalletTransaction toWalletTransaction(const QJsonObject & tx, qint64 height) {
         QString tx_type = tx["tx_type"].toString();
 
         bool confirmed = tx["confirmed"].toBool(false);
@@ -60,8 +60,8 @@ namespace wallet {
 
         QString ttl_cutoff_height = tx["ttl_cutoff_height"].toString();
 
-        int64_t credited = tx["amount_credited"].toString().toLongLong();
-        int64_t debited = tx["amount_debited"].toString().toLongLong();
+        qint64 credited = tx["amount_credited"].toString().toLongLong();
+        qint64 debited = tx["amount_debited"].toString().toLongLong();
 
         QVector<QString> inputs;
         auto inp = tx["input_commits"].toArray();
@@ -90,7 +90,7 @@ namespace wallet {
                   tx["address"].toString(""),
                   tx["creation_ts"].toString(), // Example: "2019-01-15T16:01:26Z"
                   confirmed,
-                  ttl_cutoff_height.isEmpty() ? -1 : int64_t (ttl_cutoff_height.toLongLong()),
+                  ttl_cutoff_height.isEmpty() ? -1 : qint64 (ttl_cutoff_height.toLongLong()),
                   tx["output_height"].toInteger(),
                   height,
                   tx["confirmation_ts"].toString(),
@@ -591,7 +591,7 @@ namespace wallet {
 
     mwc_api::ApiResponse<QString> send(
                 int context_id,
-                int64_t amount, //  -1  - mean All
+                qint64 amount, //  -1  - mean All
                 bool amount_includes_fee,
                 const QString & message, // can be empty, means None
                 int minimum_confirmations,
@@ -607,7 +607,7 @@ namespace wallet {
                 int minimum_confirmations_change_outputs,
                 QStringList outputs, // Outputs to use. If None, all outputs can be used
                 bool late_lock,
-                int64_t min_fee)
+                qint64 min_fee)
     {
         if (method=="mwcmqs") {
             if (http_proof_address.startsWith("mwcmqs://"))
@@ -1053,7 +1053,7 @@ namespace wallet {
         return mwc_api::ApiResponse<bool>( busy, response.second );
     }
 
-    mwc_api::ApiResponse<bool> faucet_request(int context_id, uint64_t amount) {
+    mwc_api::ApiResponse<bool> faucet_request(int context_id, quint64 amount) {
         Q_ASSERT(context_id>=0);
         QJsonObject params;
         params["context_id"] = context_id;

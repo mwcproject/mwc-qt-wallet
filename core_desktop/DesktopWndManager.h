@@ -75,8 +75,8 @@ public:
     virtual void pageListening() override;
     virtual void pageFinalize() override;
     virtual void pageSendStarting() override;
-    virtual void pageSendOnline( QString selectedAccountName, QString selectedAccountPath, int64_t amount ) override;
-    virtual void pageSendSlatepack( QString selectedAccountName, QString selectedAccountPath, int64_t amount ) override;
+    virtual void pageSendOnline( QString selectedAccountName, QString selectedAccountPath, qint64 amount ) override;
+    virtual void pageSendSlatepack( QString selectedAccountName, QString selectedAccountPath, qint64 amount ) override;
     virtual void pageTransactions() override;
     // slatepack - slatepack string value to show.
     // backStateId - state ID of the caller. On 'back' will switch to this state Id

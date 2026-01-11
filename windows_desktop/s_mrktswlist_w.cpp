@@ -665,7 +665,7 @@ void MrktSwList::updateList() {
     updateTradeListData(false);
 }
 
-void MrktSwList::sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> integrityFeesJsonStr) {
+void MrktSwList::sgnRequestIntegrityFees(QString error, qint64 balance, QVector<QString> integrityFeesJsonStr) {
     if (error.isEmpty()) {
         // get the data
         QString report = "Reserved " + util->nano2one(balance) + " MWC\n";

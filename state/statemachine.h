@@ -89,7 +89,7 @@ private:
     QMap< STATE, State* > states;
     STATE currentState = STATE::NONE;
 
-    int64_t logoutTime = 0; // 0 mean never logout...
+    qint64 logoutTime = 0; // 0 mean never logout...
     QVector<QString> blockLogoutStack;
 
     // Call history

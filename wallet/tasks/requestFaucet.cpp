@@ -22,7 +22,7 @@
 
 namespace wallet {
 
-QFuture<QPair<bool, QString>> requestMwcFromFlooFaucet(Wallet *wallet, int64_t amount) {
+QFuture<QPair<bool, QString>> requestMwcFromFlooFaucet(Wallet *wallet, qint64 amount) {
 
     QFuture<QPair<bool, QString>> sendF = QtConcurrent::run( [wallet, amount]() -> QPair<bool, QString>
     {

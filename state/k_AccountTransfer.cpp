@@ -66,7 +66,7 @@ bool AccountTransfer::transferFunds(const QString & from,
         return false;
     }
 
-    QPair<bool, int64_t> mwcAmount;
+    QPair<bool, qint64> mwcAmount;
     if (sendAmount != "All") {
         mwcAmount = util::one2nano(sendAmount);
         if (!mwcAmount.first || mwcAmount.second<=0) {
@@ -75,10 +75,10 @@ bool AccountTransfer::transferFunds(const QString & from,
         }
     }
     else { // All
-        mwcAmount = QPair<bool, int64_t>(true, -1);
+        mwcAmount = QPair<bool, qint64>(true, -1);
     }
 
-    int64_t nanoCoins = mwcAmount.second;
+    qint64 nanoCoins = mwcAmount.second;
 
     wallet::AccountInfo accFrom;
     // For self send, let's allow to send all coins, no confirmations
@@ -113,7 +113,7 @@ bool AccountTransfer::transferFunds(const QString & from,
     }
 
     QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
-    uint64_t txnFee = 0; // not used here yet
+    quint64 txnFee = 0; // not used here yet
     // nanoCoins < 0  - All
     util::getOutputsToSend2( accFrom.accountPath, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
 
@@ -183,7 +183,7 @@ void AccountTransfer::goBack() {
     context->stateMachine->setActionWindow( STATE::ACCOUNTS );
 }
 
-void AccountTransfer::onSend(  bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag ) {
+void AccountTransfer::onSend(  bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag ) {
     Q_UNUSED(amount);
     Q_UNUSED(method);
     Q_UNUSED(dest);

@@ -40,8 +40,8 @@ enum class FileTransactionType { RECEIVE = 1, FINALIZE = 2 };
 struct FileTransactionInfo {
     QString fileName;
     QString transactionId;
-    int64_t amount; // nanos
-    int64_t fee;    // nanos
+    qint64 amount; // nanos
+    qint64 fee;    // nanos
     bool amount_fee_not_defined = false; // Slatepack finalize doesn't have this info
     QString fromAddress;
     QString senderMessage;

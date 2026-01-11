@@ -44,7 +44,7 @@ struct MktSwapOffer {
 
     double mktFee = 0.0;
     QString walletAddress;
-    int64_t timestamp = 0;
+    qint64 timestamp = 0;
 
     MktSwapOffer() = default;
     MktSwapOffer(const MktSwapOffer & itm) = default;
@@ -170,7 +170,7 @@ public:
     // All marketplace offers that are published buy currency. Sorted by largest number
     QVector<QPair<QString,int>> getTotalOffers();
 
-    // Response at: onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
+    // Response at: onRequestIntegrityFees(QString error, qint64 balance, QVector<wallet::IntegrityFees> fees);
     void requestIntegrityFees();
 
     double getFeeLevel() const;
@@ -232,13 +232,13 @@ signals:
     void onMarketPlaceOffersChanged();
     void onMyOffersChanged();
     void onMessagingStatusChanged();
-    void onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
+    void onRequestIntegrityFees(QString error, qint64 balance, QVector<wallet::IntegrityFees> fees);
     void onWithdrawIntegrityFees(QString error, double mwc, QString account);
 
 private
 slots:
     void respCreateIntegrityFee(QString err, QVector<wallet::IntegrityFees> result);
-    void respRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
+    void respRequestIntegrityFees(QString error, qint64 balance, QVector<wallet::IntegrityFees> fees);
     void respWithdrawIntegrityFees(QString error, double mwc, QString account );
     void respRequestMessagingStatus(QString error, wallet::MessagingStatus status);
     void respMessagingPublish(QString id, QString uuid, QString error);
@@ -248,7 +248,7 @@ slots:
 
     void onTimerEvent();
 
-    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, qint64 totalDifficulty, int connections );
     void onListeningStartResults( bool mqTry, bool tor, // what we try to start
                                   QStringList errorMessages, bool initialStart ); // error messages, if get some
 
@@ -274,7 +274,7 @@ private:
 
     // Key: <wallet>_<id>
     QHash<QString, MktSwapOffer> marketOffers;
-    int64_t lastMarketOffersCleaning = 0;
+    qint64 lastMarketOffersCleaning = 0;
     QVector<MySwapOffer>    myOffers;
 
     QSet<QString> acceptedOffers;
@@ -285,13 +285,13 @@ private:
     SwapMarketplaceWnd selectedPage = SwapMarketplaceWnd::None;
     int currentOfferId = 0;
 
-    int64_t startMktListening = 0;
-    int64_t lastMessagingStatusRequest = 0;
+    qint64 startMktListening = 0;
+    qint64 lastMessagingStatusRequest = 0;
     wallet::MessagingStatus messagingStatus;
     // Available fees
     QVector<wallet::IntegrityFees> fees;
 
-    int64_t lastCheckIntegrity = 0;
+    qint64 lastCheckIntegrity = 0;
     bool marketplaceActivated = false;
     int lastNodeHeight = 0;
 

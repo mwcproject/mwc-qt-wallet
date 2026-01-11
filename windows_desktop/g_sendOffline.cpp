@@ -24,7 +24,7 @@
 
 namespace wnd {
 
-SendOffline::SendOffline(QWidget *parent, const QString & _selectedAccountName, const QString & _selectedAccountPath, int64_t _amount) :
+SendOffline::SendOffline(QWidget *parent, const QString & _selectedAccountName, const QString & _selectedAccountPath, qint64 _amount) :
     core::NavWnd(parent),
     ui(new Ui::SendOffline),
     selectedAccountName(_selectedAccountName),

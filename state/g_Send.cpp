@@ -39,7 +39,7 @@
 namespace state {
 
 
-QString generateAmountErrorMsg(int64_t mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams) {
+QString generateAmountErrorMsg(qint64 mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams) {
     QString msg2print = "You are trying to send " + util::nano2one(mwcAmount) + " MWC, but you only have " +
                         util::nano2one(acc.currentlySpendable) + " spendable MWC.";
     if (acc.awaitingConfirmation > 0)
@@ -121,7 +121,7 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
         return 1;
     }
 
-    QPair<bool, int64_t> mwcAmount;
+    QPair<bool, qint64> mwcAmount;
     mwcAmount = util::one2nano(sendAmount);
     if (!mwcAmount.first || mwcAmount.second<=0) {
             core::getWndManager()->messageTextDlg("Incorrect Input", "Please specify the number of MWC to send");
@@ -141,7 +141,7 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
 
     // Check if we have extra for fee
     QStringList txnOutputList;
-    uint64_t fee = util::getTxnFee2( selectedAccount.accountPath, mwcAmount.second, context->wallet,
+    quint64 fee = util::getTxnFee2( selectedAccount.accountPath, mwcAmount.second, context->wallet,
                        context->appContext, sendParams.changeOutputs,
                        txnOutputList);
     if (fee < mwc::BASE_TRANSACTION_FEE) {
@@ -189,7 +189,7 @@ QString Send::getAccountPathByName(const QString account, bool showErrMessage) {
 
 
 // Handle whole workflow to send offline
-bool Send::sendMwcOffline( const QString & account, const QString & accountPath, int64_t amount, const QString & message, bool isLockLater, const QString & slatepackRecipientAddress) {
+bool Send::sendMwcOffline( const QString & account, const QString & accountPath, qint64 amount, const QString & message, bool isLockLater, const QString & slatepackRecipientAddress) {
     logger::logInfo(logger::STATE, "Call Send::sendMwcOffline with account=" + accountPath + " amount=" + QString::number(amount) +
             " message=" + (message.isEmpty() ? "<empty>" : "<hidden>") + " isLockLater=" + QString(isLockLater ? "true" : "false") + " slatepackRecipientAddress=" + (slatepackRecipientAddress.isEmpty() ? "<empty>" : "<hidden>"));
 
@@ -205,7 +205,7 @@ bool Send::sendMwcOffline( const QString & account, const QString & accountPath,
 
     // !!!! NOTE.  For mobile HODL not a case, first case can be skipped, Directly can be called util->getTxnFee
     QStringList outputs;
-    uint64_t txnFee = 0;
+    quint64 txnFee = 0;
     util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
                                   context->wallet, context->appContext,
                                   outputs, &txnFee);
@@ -266,7 +266,7 @@ bool Send::sendMwcOffline( const QString & account, const QString & accountPath,
     return true;
 }
 
-void Send::sendRespond( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag ) {
+void Send::sendRespond( bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag ) {
     logger::logInfo(logger::STATE, "Call Send::sendRespond with success=" + QString(success ? "true" : "false") + " error=" + (error.isEmpty() ? "<empty>" : error) + " tx_uuid=" + tx_uuid + " tag=" + tag + " method=" + method);
 
     if (!success) {
@@ -314,7 +314,7 @@ void Send::sendRespond( bool success, QString error, QString tx_uuid, int64_t am
     // Alos we have self send, that will be skipped
 }
 
-bool Send::sendMwcOnline( const QString & account, const QString & accountPath, int64_t amount, QString address, const QString & message) {
+bool Send::sendMwcOnline( const QString & account, const QString & accountPath, qint64 amount, QString address, const QString & message) {
     logger::logInfo(logger::STATE, "Call Send::sendMwcOnline with accountPath=" + accountPath + " amount=" + QString::number(amount) +
                 " address=" + address + " message=" + (message.isEmpty() ? "<empty>" : "<hidden>"));
 
@@ -379,7 +379,7 @@ bool Send::sendMwcOnline( const QString & account, const QString & accountPath, 
     core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
     QStringList outputs;
-    uint64_t txnFee = 0;
+    quint64 txnFee = 0;
     util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
                                   context->wallet, context->appContext,
                                   outputs, &txnFee );

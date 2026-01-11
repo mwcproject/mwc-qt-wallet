@@ -81,7 +81,7 @@ void testMwcNodeApi() {
     Q_ASSERT(!release_server_res.hasError());
 
     // Requesting all log messages
-    uint64_t last_id = 0;
+    quint64 last_id = 0;
     while (true) {
         auto get_buffered_logs_res = node::get_buffered_logs(last_id, 10);
         Q_ASSERT(!get_buffered_logs_res.hasError());

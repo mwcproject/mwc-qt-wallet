@@ -180,7 +180,7 @@ void HeartBeat::onLogout() {
     emitTorMqsStateChange();
 }
 
-void HeartBeat::onSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message ) {
+void HeartBeat::onSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message ) {
     logger::logInfo(logger::STATE, "Call HeartBeat::onSlateReceivedFrom with slate=<hidden> mwc=" + QString::number(mwc) + " fromAddr=" + fromAddr + " message=" + message);
     recievedTxs.insert(slate, ReceivedTxInfo(  mwc, fromAddr, message) );
     if (fromAddr == "http listener" || fromAddr == "self") {

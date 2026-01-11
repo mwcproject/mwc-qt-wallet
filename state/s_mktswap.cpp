@@ -381,9 +381,9 @@ QPair<QString, QStringList> SwapMarketplace::lockOutputsForSellOffer(const QStri
     std::sort(outs.begin(), outs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {
         return o1.valueNano < o2.valueNano;
     });
-    int64_t needAmount = int64_t((mwcAmount + 0.05) * 1000000000.0 + 0.5);
-    int64_t reservedAmounts = needAmount;
-    int64_t foundAmount = 0;
+    qint64 needAmount = qint64((mwcAmount + 0.05) * 1000000000.0 + 0.5);
+    qint64 reservedAmounts = needAmount;
+    qint64 foundAmount = 0;
     QStringList output2lock;
     for (auto &o : outs) {
         if (!o.isUnspent())
@@ -439,9 +439,9 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
         " selling=" + QString::number(selling) + " currency=" + currency);
     cleanMarketOffers();
 
-    int64_t timeLimit = QDateTime::currentSecsSinceEpoch() - OFFER_PUBLISHING_INTERVAL_SEC*2;
+    qint64 timeLimit = QDateTime::currentSecsSinceEpoch() - OFFER_PUBLISHING_INTERVAL_SEC*2;
     QString myTorAddress = util::extractPubKeyFromAddress(context->wallet->getTorAddress());
-    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+    qint64 curTime = QDateTime::currentSecsSinceEpoch();
 
     QVector<MktSwapOffer> result;
     for ( auto & ofr : marketOffers ) {
@@ -506,7 +506,7 @@ QVector<QPair<QString,int>> SwapMarketplace::getTotalOffers() {
     logger::logInfo(logger::STATE, "Call SwapMarketplace::getTotalOffers");
     QHash<QString, int> offers;
 
-    int64_t timeLimit = QDateTime::currentSecsSinceEpoch() - OFFER_PUBLISHING_INTERVAL_SEC*2;
+    qint64 timeLimit = QDateTime::currentSecsSinceEpoch() - OFFER_PUBLISHING_INTERVAL_SEC*2;
     QString myTorAddress = util::extractPubKeyFromAddress(context->wallet->getTorAddress());
 
     for ( const auto & mo : marketOffers ) {
@@ -584,7 +584,7 @@ void SwapMarketplace::onTimerEvent() {
     if (core::WalletApp::isExiting())
         return;
 
-    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+    qint64 curTime = QDateTime::currentSecsSinceEpoch();
 
     // checking the libp2p status periodically
     if (!context->wallet->isWalletRunningAndLoggedIn()) {
@@ -835,7 +835,7 @@ void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::Inte
     emit onMarketPlaceOffersChanged(); // Because we are listed them
 }
 
-void SwapMarketplace::respRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees) {
+void SwapMarketplace::respRequestIntegrityFees(QString error, qint64 balance, QVector<wallet::IntegrityFees> fees) {
     //
     emit onRequestIntegrityFees(error, balance, fees);
 
@@ -1005,8 +1005,8 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
     }
     std::sort(startMsgIds.begin(), startMsgIds.end());
 
-    int64_t curTime = QDateTime::currentSecsSinceEpoch();
-    int64_t expiredTime = curTime - OFFER_PUBLISHING_INTERVAL_SEC * 2;
+    qint64 curTime = QDateTime::currentSecsSinceEpoch();
+    qint64 expiredTime = curTime - OFFER_PUBLISHING_INTERVAL_SEC * 2;
 
     // Updating  marketOffers
     for ( const auto & m : msgs) {
@@ -1076,7 +1076,7 @@ QString SwapMarketplace::getOffersListeningStatus() const {
         return "Found " + QString::number(messagingStatus.gossippub_peers.size()) + " peers";
     }
 
-    int64_t collectingTime = QDateTime::currentSecsSinceEpoch() - startMktListening;
+    qint64 collectingTime = QDateTime::currentSecsSinceEpoch() - startMktListening;
     Q_ASSERT(collectingTime>=0);
 
 /* No need    if ( collectingTime < OFFER_PUBLISHING_INTERVAL_SEC ) {
@@ -1144,13 +1144,13 @@ void SwapMarketplace::pageFeeTransactions() {
 }
 
 void SwapMarketplace::cleanMarketOffers() {
-    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+    qint64 curTime = QDateTime::currentSecsSinceEpoch();
     if (curTime - OFFER_PUBLISHING_INTERVAL_SEC < lastMarketOffersCleaning)
         return;
 
     lastMarketOffersCleaning = curTime;
     // Removing all records with expired time
-    int64_t expiredTime = curTime - OFFER_PUBLISHING_INTERVAL_SEC * 2;
+    qint64 expiredTime = curTime - OFFER_PUBLISHING_INTERVAL_SEC * 2;
 
     QMutableHashIterator<QString, MktSwapOffer> i(marketOffers);
     while (i.hasNext()) {
@@ -1380,7 +1380,7 @@ void SwapMarketplace::stashMyOffers() {
     myOffers.clear();
 }
 
-void SwapMarketplace::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+void SwapMarketplace::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, qint64 totalDifficulty, int connections ) {
     Q_UNUSED(peerHeight);
     Q_UNUSED(totalDifficulty);
     Q_UNUSED(connections);

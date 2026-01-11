@@ -71,7 +71,7 @@ void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson,
 
     file2TransactionsInfo.insert(transInfo.transactionId, transInfo);
 
-    int64_t lastNodeHeight = context->nodeClient->getLastNodeHeight();
+    qint64 lastNodeHeight = context->nodeClient->getLastNodeHeight();
 
     atInitialPage = false;
     if (switch2nextPage) {
@@ -108,7 +108,7 @@ void Finalize::finalizeSlatepack(QString slatepack, QString txUuid, QString resu
 
         const util::FileTransactionInfo & trInfo = file2TransactionsInfo[txUuid];
 
-        int64_t amount = 0;
+        qint64 amount = 0;
         if (trInfo.amount_fee_not_defined) {
             // Requesting transaction info form the wallet.
             // It is a normal case, compact slate doesn;t have all info

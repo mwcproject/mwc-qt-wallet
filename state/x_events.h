@@ -48,7 +48,7 @@ protected:
     virtual bool mobileBack() override {return false;}
     virtual QString getHelpDocName() override {return "event_log.html";}
 private:
-    int64_t         messageWaterMark = 0;
+    qint64         messageWaterMark = 0;
 };
 
 }

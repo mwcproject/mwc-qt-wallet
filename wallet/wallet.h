@@ -169,7 +169,7 @@ public:
     // Check signal:  onSend
     bool sendTo( const QString &accountPathFrom,
                 const QString & responseTag,
-                int64_t amount, //  -1  - mean All
+                qint64 amount, //  -1  - mean All
                 bool amount_includes_fee,
                 const QString & message, // can be empty, means None
                 int minimum_confirmations,
@@ -183,7 +183,7 @@ public:
                 bool exclude_change_outputs,
                 const QStringList & outputs, // Outputs to use. If None, all outputs can be used
                 bool late_lock,
-                int64_t min_fee); // 0 or negative to skip. Currently no needs to define it
+                qint64 min_fee); // 0 or negative to skip. Currently no needs to define it
 
     // Receive slatepack. Will generate the resulting slatepack.
     // Return: <SlatePack, Error>
@@ -299,7 +299,7 @@ public:
     QVector<IntegrityFees> createIntegrityFee( const QString & account, double mwcReserve, const QVector<double> & fees ) { Q_ASSERT(false); return QVector<IntegrityFees>();}
 
     // Request info about paid integrity fees
-    // Check Signal: onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees)
+    // Check Signal: onRequestIntegrityFees(QString error, qint64 balance, QVector<wallet::IntegrityFees> fees)
     QVector<IntegrityFees> requestIntegrityFees()  { Q_ASSERT(false); return QVector<IntegrityFees>();}
 
     // Request withdraw for available deposit at integrity account. Return error
@@ -364,11 +364,11 @@ public:
 
     void emitStatusUpdate( const QString & response_id, const QJsonObject & status );
 
-    void sendDone( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag );
+    void sendDone( bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag );
 
     void scanRewindDone( const QString & responseId, const ViewWallet & result, const QString & error );
 
-    void emitSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message );
+    void emitSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message );
 
     // Account info is updated
     void emitWalletBalanceUpdated();
@@ -383,10 +383,10 @@ signals:
     void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
 
     // Send results
-    void onSend( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag );
+    void onSend( bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag );
 
     // I get money
-    void onSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message );
+    void onSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message );
 
     // response from scanRewindHash
     void onScanRewindHash( QString responseId, ViewWallet walletOutputs, QString errors );

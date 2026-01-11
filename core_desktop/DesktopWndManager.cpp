@@ -355,14 +355,14 @@ void DesktopWndManager::pageSendStarting() {
     }
 }
 
-void DesktopWndManager::pageSendOnline( QString selectedAccountName, QString selectedAccountPath, int64_t amount ) {
+void DesktopWndManager::pageSendOnline( QString selectedAccountName, QString selectedAccountPath, qint64 amount ) {
     logger::logInfo(logger::QT_WALLET, "Call DesktopWndManager::pageSendOnline with selectedAccount=" + selectedAccountName + " amount=" + QString::number(amount));
     restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_SEND_ONLINE,
                                      new wnd::SendOnline( windowManager->getInWndParent(), selectedAccountName, selectedAccountPath, amount ));
 }
 
-void DesktopWndManager::pageSendSlatepack( QString selectedAccountName, QString selectedAccountPath, int64_t amount ) {
+void DesktopWndManager::pageSendSlatepack( QString selectedAccountName, QString selectedAccountPath, qint64 amount ) {
     logger::logInfo(logger::QT_WALLET, "Call DesktopWndManager::pageSendSlatepack with selectedAccount=" + selectedAccountName + " amount=" + QString::number(amount));
     restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_SEND_SLATEPACK,

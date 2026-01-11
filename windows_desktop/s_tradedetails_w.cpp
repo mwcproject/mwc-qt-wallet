@@ -145,7 +145,7 @@ void TradeDetails::sgnRequestSwapDetails(QVector<QString> swapInfo,
 }
 
 void TradeDetails::sgnSwapTradeStatusUpdated(QString reqSwapId, QString stateCmd, QString currentAction, QString currentState,
-                               int64_t expirationTime,
+                               qint64 expirationTime,
                                QString lastProcessError,
                                QVector<QString> executionPlan,
                                QVector<QString> tradeJournal) {

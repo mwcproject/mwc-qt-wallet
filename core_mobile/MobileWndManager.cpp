@@ -343,7 +343,7 @@ void MobileWndManager::pageSendStarting() {
     mainWindow->setProperty("currentState", state::STATE::SEND);
     mainWindow->setProperty("initParams", "");
 }
-void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount ) {
+void MobileWndManager::pageSendOnline( QString selectedAccount, qint64 amount ) {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendOnline with selectedAccount=" + selectedAccount +
         " amount=" + QString::number(amount));
     QJsonObject obj;
@@ -352,7 +352,7 @@ void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount )
     obj["amount"] = QString::number(amount);
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
-void MobileWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
+void MobileWndManager::pageSendFile( QString selectedAccount, qint64 amount ) {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendFile with selectedAccount=" + selectedAccount + " amount=" + QString::number(amount));
     QJsonObject obj;
     obj["isSendOnline"] = false;
@@ -362,7 +362,7 @@ void MobileWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 
-void MobileWndManager::pageSendSlatepack( QString selectedAccount, int64_t amount ) {
+void MobileWndManager::pageSendSlatepack( QString selectedAccount, qint64 amount ) {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendSlatepack with selectedAccount=" + selectedAccount +
         " amount=" + QString::number(amount));
     QJsonObject obj;

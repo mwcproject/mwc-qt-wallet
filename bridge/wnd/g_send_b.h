@@ -44,7 +44,7 @@ public:
     //   2 - amount error
     Q_INVOKABLE int initialSendSelection( int sendSelectedMethod, QString accountPath, QString sendAmount, bool gotoNextPage );
     // Data that was collected by initialSendSelection. Can be used if gotoNextPage is false
-    Q_INVOKABLE int64_t getTmpAmount();
+    Q_INVOKABLE qint64 getTmpAmount();
     Q_INVOKABLE QString getTmpAccountPath();
 
 

@@ -21,13 +21,13 @@
 namespace state {
 
 struct ReceivedTxInfo {
-    int64_t mwc;
+    qint64 mwc;
     QString fromAddr;
     QString message;
 
     ReceivedTxInfo() = default;
     ReceivedTxInfo(const ReceivedTxInfo &) = default;
-    ReceivedTxInfo(int64_t _mwc, const QString &_fromAddr, const QString &_message)
+    ReceivedTxInfo(qint64 _mwc, const QString &_fromAddr, const QString &_message)
         : mwc(_mwc),
           fromAddr(_fromAddr),
           message(_message) {
@@ -56,7 +56,7 @@ private slots:
     void onLogin();
     void onLogout();
 
-    void onSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message );
+    void onSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message );
     void onScanProgress( QString responseId, QJsonObject statusMessage );
     void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
 private:
@@ -67,8 +67,8 @@ private:
     bool lastNodeIsHealty = true;
     bool lastUsePubNode = true;
     bool justLogin = true;
-    int64_t lastNodeDifficulty = 0;
-    int64_t lastNodeHeight = 0;
+    qint64 lastNodeDifficulty = 0;
+    qint64 lastNodeHeight = 0;
     bool mqsOnline = false;
     bool torOnline = false;
 

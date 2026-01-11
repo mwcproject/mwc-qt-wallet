@@ -30,14 +30,14 @@ namespace util {
     // in: nanoCoins < 0 - ALL
     // out: resultOutputs - what we want include into transaction.
     //      txnFee        - txn fee for send using these resultOutputs
-    void getOutputsToSend2( const QString & accountPath, int outputsNumber, int64_t nanoCoins,
+    void getOutputsToSend2( const QString & accountPath, int outputsNumber, qint64 nanoCoins,
                            wallet::Wallet * wallet,
                            core::AppContext * appContext,
-                           QStringList & resultOutputs, uint64_t* txnFee );
+                           QStringList & resultOutputs, quint64* txnFee );
 
 
     // Utility method. Exposed to testing only!!!
-    bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> & inputOutputs, QStringList & resultOutputs );
+    bool calcOutputsToSpend( qint64 nanoCoins, const QVector<wallet::WalletOutput> & inputOutputs, QStringList & resultOutputs );
 
     // Calculates the transaction fee (in nanocoins) for the given amount (in nanocoins).
     // Returns the transaction fee and populates txnOutputList with the outputs used
@@ -50,8 +50,8 @@ namespace util {
     //
     // returns 0 if the fee could not be calculated and the txnOutputList should not be used.
     //
-    uint64_t getTxnFee2(const QString& accountPath, int64_t amount, wallet::Wallet* wallet,
-                       core::AppContext* appContext, uint64_t changeOutputs,
+    quint64 getTxnFee2(const QString& accountPath, qint64 amount, wallet::Wallet* wallet,
+                       core::AppContext* appContext, quint64 changeOutputs,
                        QStringList& txnOutputList);
 
     //
@@ -62,12 +62,12 @@ namespace util {
     //
     // Using more inputs lowers the fee.
     //
-    uint64_t calcTxnFee(uint64_t numInputs, uint64_t numOutputs, uint64_t numKernels);
+    quint64 calcTxnFee(quint64 numInputs, quint64 numOutputs, quint64 numKernels);
 
     //
     // Converts the given txn fee in nano coins into a string of the form: x.xxx
     // If the given transaction fee is 0, "unknown" is returned.
-    QString txnFeeToString(uint64_t nanoTxnFee);
+    QString txnFeeToString(quint64 nanoTxnFee);
 
     //
     // Returns a string representing the account's spendable balance minus the transaction fee.

@@ -196,7 +196,7 @@ void MwcToolbar::timerEvent(QTimerEvent *event)
         return;
 
     static int counter = 0;
-    static int64_t lastNoGasErrorEvent = 0;
+    static qint64 lastNoGasErrorEvent = 0;
 
     Q_UNUSED(event);
     if (mwc::hasSwapErrors(30000)) {

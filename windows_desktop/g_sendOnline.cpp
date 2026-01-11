@@ -26,7 +26,7 @@
 namespace wnd {
 
 SendOnline::SendOnline(QWidget *parent,
-                       QString _account, QString _accountPath, int64_t _amount) :
+                       QString _account, QString _accountPath, qint64 _amount) :
     core::NavWnd(parent),
     ui(new Ui::SendOnline),
     account(_account),

@@ -46,7 +46,7 @@ int Send::initialSendSelection( int sendSelectedMethod, QString accountPath, QSt
     return getState()->initialSendSelection( bridge::SEND_SELECTED_METHOD(sendSelectedMethod), accountPath, sendAmount, gotoNextPage);
 }
 
-int64_t Send::getTmpAmount() {
+qint64 Send::getTmpAmount() {
     logger::logInfo(logger::BRIDGE, "Call Send::getTmpAmount");
     return getState()->getTmpAmount();
 }

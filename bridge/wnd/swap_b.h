@@ -233,7 +233,7 @@ signals:
     // executionPlan, array of triplets: <active: "true"|"false">, <end_time>, <Name> >, ....
     // tradeJournal, array of duplets: < <message>, <time> >, ...
     void sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
-                                   int64_t expirationTime,
+                                   qint64 expirationTime,
                                    QString lastProcessError,
                                    QVector<QString> executionPlan,
                                    QVector<QString> tradeJournal);

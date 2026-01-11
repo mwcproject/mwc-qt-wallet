@@ -410,7 +410,7 @@ void WalletConfig::on_walletInstanceNameEdit_textChanged(const QString &)
     updateButtons();
 }
 
-void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
+void WalletConfig::updateAutoLogoutStateUI(qint64 time) {
     if (time < 0)
         ui->logout_never->setChecked(true);
     else if(time < 4 * 60)

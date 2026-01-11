@@ -119,7 +119,7 @@ public:
     Q_INVOKABLE QString extractPubKeyFromAddress(QString address);
 
     // convert nano items to dtirng that represent that fraction as a double
-    Q_INVOKABLE QString nano2one(int64_t nano);
+    Q_INVOKABLE QString nano2one(qint64 nano);
 
 private:
     util::PasswordAnalyser * pa = nullptr;

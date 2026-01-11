@@ -91,7 +91,7 @@ control::RichItem * TransactionRecord::buildRecordContent() {
     if (trans.confirmed && trans.chain_height > 0 && trans.output_height > 0) {
         int needConfirms = trans.isCoinbase() ? mwc::COIN_BASE_CONFIRM_NUMBER : expectedConfirmNumber;
         // confirmations are 1 more than the difference between the node and transaction heights
-        int64_t confirmations = trans.chain_height - trans.output_height + 1;
+        qint64 confirmations = trans.chain_height - trans.output_height + 1;
         if (needConfirms >= confirmations) {
             txTimeStr = "(" + QString::number(confirmations) + "/" + QString::number(needConfirms) + " blocks)";
             blocksPrinted = true;

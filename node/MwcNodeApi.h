@@ -39,8 +39,8 @@ namespace mwc_api {
     struct LogBufferedEntry {
         QString log;
         QString level;
-        uint64_t time_stamp = 0;
-        uint64_t id = 0;
+        quint64 time_stamp = 0;
+        quint64 id = 0;
 
         LogBufferedEntry(const QJsonObject & obj);
         QString toString() const;
@@ -57,9 +57,9 @@ namespace node {
 
 
     struct ChainStats {
-        int64_t height = -1;
+        qint64 height = -1;
         QString last_block_h;
-        uint64_t total_difficulty = 0;
+        quint64 total_difficulty = 0;
         QString latest_timestamp;
 
         ChainStats() {}
@@ -69,9 +69,9 @@ namespace node {
 
     struct SyncStatus {
         QString status; // Sync stage name. See SyncStatus at  mwc-node/chain/src/types.rs
-        uint64_t pos = 0; // whatever current value
-        uint64_t total = 0; // total number of the same units
-        uint64_t archive_height = 0; // if known, archive height
+        quint64 pos = 0; // whatever current value
+        quint64 total = 0; // total number of the same units
+        quint64 archive_height = 0; // if known, archive height
 
         SyncStatus() {}
         SyncStatus(const QJsonValue & obj );
@@ -82,12 +82,12 @@ namespace node {
         QString state;
         QString addr;
         QString user_agent;
-        uint64_t total_difficulty = 0;
-        int64_t height = -1;
+        quint64 total_difficulty = 0;
+        qint64 height = -1;
         QString direction;
         QString last_seen;
-        uint64_t sent_bytes_per_sec = 0;
-        uint64_t received_bytes_per_sec = 0;
+        quint64 sent_bytes_per_sec = 0;
+        quint64 received_bytes_per_sec = 0;
         int capabilities;
 
         PeerStats() {}
@@ -124,7 +124,7 @@ namespace node {
     mwc_api::ApiResponse<bool> release_callback_logs();
 
     // Read some logs from the buffer
-    mwc_api::ApiResponse<QVector<mwc_api::LogBufferedEntry>> get_buffered_logs(uint64_t last_known_id, int result_size_limit);
+    mwc_api::ApiResponse<QVector<mwc_api::LogBufferedEntry>> get_buffered_logs(quint64 last_known_id, int result_size_limit);
 
     // Start tor process
     // base_dir - base data directory where tor related data can be stored

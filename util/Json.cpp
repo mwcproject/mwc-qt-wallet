@@ -112,8 +112,8 @@ QPair<bool, QString> FileTransactionInfo::parseSlateContent( QString slateConten
     switch (version) {
         case 0:
         case 1:
-            amount  = int64_t (readValueFromJson( json, "amount" ).toDouble(-10.0) + 0.5);
-            fee     = int64_t (readValueFromJson( json, "fee" ).toDouble(-10.0) + 0.5);
+            amount  = qint64 (readValueFromJson( json, "amount" ).toDouble(-10.0) + 0.5);
+            fee     = qint64 (readValueFromJson( json, "fee" ).toDouble(-10.0) + 0.5);
             height  = readValueFromJson( json, "height" ).toInt(-1);
             lock_height = readValueFromJson( json, "lock_height" ).toInt(-1);
             break;

@@ -93,7 +93,7 @@ void NodeClient::updateNodeSelection(int retry) {
     if (QDateTime::currentSecsSinceEpoch() > nodeStatusCheckTime) {
         if (config::isOnlineWallet()) {
             QPair<ServerStats, QString> embeddedStats = embeddedNode->getServerStats();
-            int64_t embeddedNodeHeight = embeddedStats.first.chain_stats.height;
+            qint64 embeddedNodeHeight = embeddedStats.first.chain_stats.height;
 
             logger::logInfo(logger::QT_WALLET, "Update node selection call");
 
@@ -103,7 +103,7 @@ void NodeClient::updateNodeSelection(int retry) {
             QJsonObject res = resJStr.isEmpty() ? QJsonObject() : QJsonDocument::fromJson(resJStr.toUtf8(), &parseError).object();
             Q_ASSERT(parseError.error == QJsonParseError::NoError);
 
-            int64_t publicNodeHeight = 0;
+            qint64 publicNodeHeight = 0;
             if (!res.isEmpty()) {
                 publicNodeHeight = res["result"].toObject()["Ok"].toObject()["height"].toInteger();
             }
@@ -159,7 +159,7 @@ QString NodeClient::foreignApiRequest(const QString & request) {
             QJsonObject doc = QJsonDocument::fromJson(res.toUtf8(), &parseError).object();
             Q_ASSERT(parseError.error == QJsonParseError::NoError);
 
-            int64_t height = doc["result"].toObject()["Ok"].toObject()["hegiht"].toInteger(0);
+            qint64 height = doc["result"].toObject()["Ok"].toObject()["hegiht"].toInteger(0);
             if (height>0) {
                 lastNodeHeight = height;
             }
@@ -212,8 +212,8 @@ wallet::NodeStatus NodeClient::requestNodeStatus() {
             result.online = peersData.size()>3;
             for (int k=0; k<peersData.size(); k++) {
                 QJsonObject peerData = peersData[k].toObject();
-                int64_t peer_height = peerData["height"].toInteger();
-                result.peerHeight = std::max((int64_t) result.peerHeight, (int64_t) peer_height);
+                qint64 peer_height = peerData["height"].toInteger();
+                result.peerHeight = std::max((qint64) result.peerHeight, (qint64) peer_height);
             }
 
             lastNodeHeight = result.nodeHeight;
@@ -236,7 +236,7 @@ wallet::NodeStatus NodeClient::requestNodeStatus() {
         result.nodeHeight = stats.chain_stats.height;
         result.peerHeight = 0;
         for (const auto & peer : stats.peer_stats) {
-            result.peerHeight = std::max((int64_t) result.peerHeight, (int64_t) peer.height);
+            result.peerHeight = std::max((qint64) result.peerHeight, (qint64) peer.height);
         }
         result.totalDifficulty = stats.chain_stats.total_difficulty;
         result.connections = stats.peer_count;
@@ -245,7 +245,7 @@ wallet::NodeStatus NodeClient::requestNodeStatus() {
 
     lastInternalNodeState = statsRes.second;
     if (usePublicNode && lastInternalNodeState == "Ready") {
-        int64_t curTime = QDateTime::currentSecsSinceEpoch();
+        qint64 curTime = QDateTime::currentSecsSinceEpoch();
         if ( nodeStatusCheckTime > curTime+3)
             nodeStatusCheckTime = curTime+3;
     }

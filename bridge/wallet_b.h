@@ -145,8 +145,8 @@ private slots:
     void onLogout();
     void onScanProgress( QString responseId, QJsonObject statusMessage );
     void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
-    void onSend( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag );
-    void onSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message );
+    void onSend( bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag );
+    void onSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message );
     void onScanRewindHash( QString responseId, wallet::ViewWallet walletOutputs, QString errors );
     void onWalletBalanceUpdated();
 

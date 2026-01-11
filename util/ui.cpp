@@ -25,14 +25,14 @@ namespace util {
 
 // forward declarations
 static
-uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs,
-                                       uint64_t changeOutputs, uint64_t totalNanoCoins, QStringList& txnOutputList);
+quint64 getTxnFeeFromSpendableOutputs(qint64 amount, const QMultiMap<qint64, wallet::WalletOutput> spendableOutputs,
+                                       quint64 changeOutputs, quint64 totalNanoCoins, QStringList& txnOutputList);
 
-static int calcSubstituteIndex( QVector<wallet::WalletOutput> & resultBucket, const wallet::WalletOutput & testOutput, int64_t change ) {
+static int calcSubstituteIndex( QVector<wallet::WalletOutput> & resultBucket, const wallet::WalletOutput & testOutput, qint64 change ) {
     double bestWeightedGain = 0.0;
     int bestIndex = -1;
 
-    const int64_t testWeightedValue = testOutput.valueNano;
+    const qint64 testWeightedValue = testOutput.valueNano;
 
     for (int k=0;k<resultBucket.size();k++) {
         const auto & out = resultBucket[k];
@@ -50,10 +50,10 @@ static int calcSubstituteIndex( QVector<wallet::WalletOutput> & resultBucket, co
 }
 
 // Return resulting bucket weighted amount. Reason: we don't case about change, minimization target is weighted amount.
-static double optimizeBucket( QVector<wallet::WalletOutput> & resultBucket, const QVector<wallet::WalletOutput> & inputOutputs, int64_t nanoCoins ) {
+static double optimizeBucket( QVector<wallet::WalletOutput> & resultBucket, const QVector<wallet::WalletOutput> & inputOutputs, qint64 nanoCoins ) {
 
     QSet<QString> bucketCommits;
-    int64_t change = -nanoCoins;
+    qint64 change = -nanoCoins;
     for (const auto & out: resultBucket) {
         bucketCommits += out.outputCommitment;
         change += out.valueNano;
@@ -98,7 +98,7 @@ static double optimizeBucket( QVector<wallet::WalletOutput> & resultBucket, cons
 
 
 // nanoCoins expected to include the fees. Here we are calculating the outputs that will produce minimal change
-bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> & inputOutputs, QStringList & resultOutputs ) {
+bool calcOutputsToSpend( qint64 nanoCoins, const QVector<wallet::WalletOutput> & inputOutputs, QStringList & resultOutputs ) {
     // Try 1,2,3 and 4 outputs to spend (sorry, different workflows)
     // Than - first smallest commits
 
@@ -120,7 +120,7 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
 
     // Min Number of outputs.
     {
-        int64_t change = nanoCoins; // Expected to be negative
+        qint64 change = nanoCoins; // Expected to be negative
         int minOutputsNumber = 0;
         for ( const auto & out : outputs ) {
             if (change <= 0)
@@ -181,10 +181,10 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
 
 // in: nanoCoins < 0 - ALL
 // out: resultOutputs - what we want include into transaction. If
-void getOutputsToSend2( const QString & accountPath, int outputsNumber, int64_t nanoCoins,
+void getOutputsToSend2( const QString & accountPath, int outputsNumber, qint64 nanoCoins,
         wallet::Wallet * wallet,
         core::AppContext * appContext,
-        QStringList & resultOutputs, uint64_t* txnFee ) {
+        QStringList & resultOutputs, quint64* txnFee ) {
     Q_ASSERT(appContext);
     Q_ASSERT(wallet);
 
@@ -201,9 +201,9 @@ void getOutputsToSend2( const QString & accountPath, int outputsNumber, int64_t 
     QVector<wallet::WalletOutput> outputs = wallet->getOutputs(accountPath, false);
 
     //QVector<wallet::WalletOutput> freeOuts;
-    QMultiMap<int64_t, wallet::WalletOutput> freeOuts;
+    QMultiMap<qint64, wallet::WalletOutput> freeOuts;
 
-    int64_t totalNanoCoins = 0;
+    qint64 totalNanoCoins = 0;
 
     QStringList allOutputs;
 
@@ -235,7 +235,7 @@ void getOutputsToSend2( const QString & accountPath, int outputsNumber, int64_t 
 //
 static void
 findSpendableOutputs(const QString& accountPath, wallet::Wallet* wallet, core::AppContext* appContext,
-                     QMultiMap<int64_t, wallet::WalletOutput>& spendableOutputs) {
+                     QMultiMap<qint64, wallet::WalletOutput>& spendableOutputs) {
 
     QVector<wallet::WalletOutput>  outputs = wallet->getOutputs(accountPath, false);
     for ( wallet::WalletOutput o : outputs) {
@@ -255,19 +255,19 @@ findSpendableOutputs(const QString& accountPath, wallet::Wallet* wallet, core::A
     }
 }
 
-static int64_t
+static qint64
 getTotalCoins(const QVector<wallet::WalletOutput> outputs) {
-    int64_t total = 0;
+    qint64 total = 0;
     for ( wallet::WalletOutput o : outputs) {
         total += o.valueNano;
     }
     return total;
 }
 
-static int64_t
-getTotalCoinsFromMap(const QMultiMap<int64_t, wallet::WalletOutput> outputs) {
-    int64_t total = 0;
-    for ( int64_t valueNano : outputs.keys()) {
+static qint64
+getTotalCoinsFromMap(const QMultiMap<qint64, wallet::WalletOutput> outputs) {
+    qint64 total = 0;
+    for ( qint64 valueNano : outputs.keys()) {
         total += valueNano;
     }
     return total;
@@ -281,8 +281,8 @@ getTotalCoinsFromMap(const QMultiMap<int64_t, wallet::WalletOutput> outputs) {
 //    spendableOutputs - Vector of spendable outputs (sorted in the order to be used)
 //
 static void
-retrieveTransactionInputs(int64_t amountNano, QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs,
-                          uint64_t* totalNanoCoins, QVector<wallet::WalletOutput>& inputs)
+retrieveTransactionInputs(qint64 amountNano, QMultiMap<qint64, wallet::WalletOutput> spendableOutputs,
+                          quint64* totalNanoCoins, QVector<wallet::WalletOutput>& inputs)
 {
     inputs.clear();
     if (*totalNanoCoins == 0) {
@@ -294,10 +294,10 @@ retrieveTransactionInputs(int64_t amountNano, QMultiMap<int64_t, wallet::WalletO
         inputs = spendableOutputs.values().toVector();
     }
     else {
-        uint64_t amount = amountNano;
+        quint64 amount = amountNano;
         if (amount < *totalNanoCoins) {
-            int64_t amountToSpend = amountNano;
-            int64_t selectedAmount = 0L;
+            qint64 amountToSpend = amountNano;
+            qint64 selectedAmount = 0L;
             for (wallet::WalletOutput o : spendableOutputs.values()) {
                 if (selectedAmount < amountToSpend) {
                     inputs.push_back(o);
@@ -316,8 +316,8 @@ retrieveTransactionInputs(int64_t amountNano, QMultiMap<int64_t, wallet::WalletO
 //
 // Using more inputs lowers the fee.
 //
-uint64_t calcTxnFee(uint64_t numInputs, uint64_t numOutputs, uint64_t numKernels) {
-    int64_t txnWeight = (4 * numOutputs) + numKernels - numInputs;
+quint64 calcTxnFee(quint64 numInputs, quint64 numOutputs, quint64 numKernels) {
+    qint64 txnWeight = (4 * numOutputs) + numKernels - numInputs;
     if (1 > txnWeight) {
         // The minimum fee is 1000000 nano coin.
         txnWeight = 1;
@@ -330,27 +330,27 @@ uint64_t calcTxnFee(uint64_t numInputs, uint64_t numOutputs, uint64_t numKernels
 // If an error occurs, displays a message on the parent window and returns -1.
 //
 static
-uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs,
-                                       uint64_t changeOutputs, uint64_t totalNanoCoins, QStringList& txnOutputList) {
+quint64 getTxnFeeFromSpendableOutputs(qint64 amount, const QMultiMap<qint64, wallet::WalletOutput> spendableOutputs,
+                                       quint64 changeOutputs, quint64 totalNanoCoins, QStringList& txnOutputList) {
 
-    uint64_t totalCoins = totalNanoCoins;
+    quint64 totalCoins = totalNanoCoins;
 
-    uint64_t numKernels = 1;     // always 1 for now
-    uint64_t resultOutputs = 1;  // we always have at least 1 result output for the receiver's output
+    quint64 numKernels = 1;     // always 1 for now
+    quint64 resultOutputs = 1;  // we always have at least 1 result output for the receiver's output
 
     // retrieval of the transaction inputs from the Map will result
     // in the inputs being sorted in ascending order by value
     QVector<wallet::WalletOutput> txnInputs;
     retrieveTransactionInputs(amount, spendableOutputs, &totalCoins, txnInputs);
 
-    uint64_t numInputs = txnInputs.size();
+    quint64 numInputs = txnInputs.size();
     if (numInputs == 0) {
         return 0;
     }
 
-    uint64_t txnFee = calcTxnFee(numInputs, resultOutputs, numKernels);
+    quint64 txnFee = calcTxnFee(numInputs, resultOutputs, numKernels);
 
-    uint64_t amountWithFee = 0;
+    quint64 amountWithFee = 0;
     if (amount < 0) {
         amountWithFee = totalCoins;
     }
@@ -363,11 +363,11 @@ uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, 
     // which when added with the fee results in all coins being spent
     if (totalCoins != amountWithFee) {
         // find the fee where we expect change for the sender
-        uint64_t numOutputs = changeOutputs + resultOutputs;
+        quint64 numOutputs = changeOutputs + resultOutputs;
         txnFee = calcTxnFee(numInputs, numOutputs, numKernels);
         amountWithFee = amount + txnFee;
 
-        uint64_t transactionTotal = 0;
+        quint64 transactionTotal = 0;
         for (wallet::WalletOutput o : txnInputs) {
             transactionTotal += o.valueNano;
         }
@@ -419,15 +419,15 @@ uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, 
 //     txnOutputList - list of output commitments to be used in transaction (from getOutputsToSend)
 //     changeOutputs - number of outputs to use for sender change outputs
 //
-uint64_t getTxnFee2(const QString& accountPath, int64_t amount, wallet::Wallet* wallet,
-                   core::AppContext* appContext, uint64_t changeOutputs,
+quint64 getTxnFee2(const QString& accountPath, qint64 amount, wallet::Wallet* wallet,
+                   core::AppContext* appContext, quint64 changeOutputs,
                    QStringList& txnOutputList) {
     // we should not have been called if the txn outputs have already been found
     if (txnOutputList.size() > 0)
         return 0;
 
-    uint64_t txnFee = 0;
-    QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs;
+    quint64 txnFee = 0;
+    QMultiMap<qint64, wallet::WalletOutput> spendableOutputs;
     findSpendableOutputs(accountPath, wallet, appContext, spendableOutputs);
 
     if (spendableOutputs.size() > 0) {
@@ -452,7 +452,7 @@ uint64_t getTxnFee2(const QString& accountPath, int64_t amount, wallet::Wallet* 
     return digits;
 }*/
 
-QString txnFeeToString(uint64_t nanoTxnFee) {
+QString txnFeeToString(quint64 nanoTxnFee) {
     if (nanoTxnFee < mwc::BASE_TRANSACTION_FEE) {
         return "unknown";
     }
@@ -462,19 +462,19 @@ QString txnFeeToString(uint64_t nanoTxnFee) {
 QString getAllSpendableAmount2(const QString& accountPath, wallet::Wallet* wallet, core::AppContext* appContext) {
     QString allSpendableAmount = "";
 
-    QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs;
+    QMultiMap<qint64, wallet::WalletOutput> spendableOutputs;
     findSpendableOutputs(accountPath, wallet, appContext, spendableOutputs);
-    int64_t numSpendableOutputs = spendableOutputs.size();
+    qint64 numSpendableOutputs = spendableOutputs.size();
     if (numSpendableOutputs > 0) {
-        int64_t totalSpendableCoins = getTotalCoinsFromMap(spendableOutputs);
+        qint64 totalSpendableCoins = getTotalCoinsFromMap(spendableOutputs);
         // we don't expect any change since we are spending all coin
-        uint64_t txnFee = calcTxnFee(numSpendableOutputs, 1, 1);
-        if (int64_t(txnFee)>=totalSpendableCoins) {
+        quint64 txnFee = calcTxnFee(numSpendableOutputs, 1, 1);
+        if (qint64(txnFee)>=totalSpendableCoins) {
             core::getWndManager()->messageTextDlg("Too small amount", "Your total amount is not enougn to cover the transaction fees."
                             " Because of that you can't spend such a small amount. In order to spend all coins, please add more funds to this account.");
             return "";
         }
-        int64_t allAmount = totalSpendableCoins - txnFee;
+        qint64 allAmount = totalSpendableCoins - txnFee;
         allSpendableAmount = util::nano2one(allAmount);
     }
     return allSpendableAmount;

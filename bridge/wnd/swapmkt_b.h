@@ -54,7 +54,7 @@ public:
     // pair of Currency, number of offers
     Q_INVOKABLE QVector<QString> getTotalOffers();
 
-    // Response at: sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
+    // Response at: sgnRequestIntegrityFees(QString error, qint64 balance, QVector<QString> IntegrityFeesJsonStr);
     Q_INVOKABLE void requestIntegrityFees();
 
     Q_INVOKABLE double getFeeLevel();
@@ -96,7 +96,7 @@ public:
     Q_INVOKABLE int getLastNodeHeight();
 private:
 signals:
-    void sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
+    void sgnRequestIntegrityFees(QString error, qint64 balance, QVector<QString> IntegrityFeesJsonStr);
     void sgnWithdrawIntegrityFees(QString error, double mwc, QString account);
 
     void sgnMarketPlaceOffersChanged();
@@ -105,7 +105,7 @@ signals:
     void sgnMessagingStatusChanged();
 
 private slots:
-    void onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
+    void onRequestIntegrityFees(QString error, qint64 balance, QVector<wallet::IntegrityFees> fees);
     void onWithdrawIntegrityFees(QString error, double mwc, QString account);
 
     void onMarketPlaceOffersChanged();

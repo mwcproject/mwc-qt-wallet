@@ -329,7 +329,7 @@ QString calculateRunningStatus(bool & pibdSyncPhase, ServerStats stats) {
     if ( stats.sync_status.status.isEmpty()  )
         return "Starting";
 
-    int64_t  peersMaxHeight = 0;
+    qint64  peersMaxHeight = 0;
     if ( stats.peer_stats.size() > 0 ) {
         peersMaxHeight = stats.peer_stats[0].height;
         for (const auto & p : stats.peer_stats) {

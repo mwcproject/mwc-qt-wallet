@@ -54,7 +54,7 @@ void ViewOutputs::backFromOutputsView() {
     getState()->backFromOutputsView();
 }
 
-void ViewOutputs::setSgnViewOutputs(const wallet::ViewWallet & walletOutputs, int64_t height) {
+void ViewOutputs::setSgnViewOutputs(const wallet::ViewWallet & walletOutputs, qint64 height) {
     QJsonArray outputs;
 
     for (const wallet::ViewWalletOutputResult & o : walletOutputs.output_result) {

@@ -50,8 +50,8 @@ struct SwapTradeInfo {
     QString tradeId;
     QString stateCmd;
     QString status; // action or state
-    int64_t initiatedTime; // timestamp in seconds
-    int64_t expirationTime; // timestamp in seconds
+    qint64 initiatedTime; // timestamp in seconds
+    qint64 expirationTime; // timestamp in seconds
     QString secondary_address;
     QString lastProcessError;
     QString tag;
@@ -78,8 +78,8 @@ struct SwapTradeInfo {
                    const QString & _tradeId,
                    const QString & _stateCmd,
                    const QString & _status,
-                   int64_t         _initiatedTime,
-                   int64_t         _expirationTime,
+                   qint64         _initiatedTime,
+                   qint64         _expirationTime,
                    const QString & _secondary_address,
                    const QString & _lastProcessError,
                    const QString & _tag) :
@@ -95,7 +95,7 @@ struct SwapTradeInfo {
     }
 
     // Update current state and UI
-    void updateData(QString stateCmd, QString status, QString lastProcessError, int64_t expirationTime, int swapTabSelection, bridge::Util * util, bridge::Config * config, bridge::Swap * swap);
+    void updateData(QString stateCmd, QString status, QString lastProcessError, qint64 expirationTime, int swapTabSelection, bridge::Util * util, bridge::Config * config, bridge::Swap * swap);
 
     void applyState2Ui(bridge::Util * util, bridge::Config * config, bridge::Swap * swap, int swapTabSelection);
 
@@ -124,7 +124,7 @@ private slots:
     void sgnSwapTradesResult( QString cookie, QVector<QString> trades, QString error );
     void sgnDeleteSwapTrade(QString swapId, QString error);
     void sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
-                                   int64_t expirationTime,
+                                   qint64 expirationTime,
                                    QString lastProcessError,
                                    QVector<QString> executionPlan,
                                    QVector<QString> tradeJournal);

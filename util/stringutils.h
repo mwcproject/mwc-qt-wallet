@@ -22,7 +22,7 @@ namespace util {
 QVector<QString> parsePhrase2Words( const QString & phrase );
 
 // convert nano items to string that represent that fraction as a double
-QString nano2one( int64_t nano, bool firstcall = true );
+QString nano2one( qint64 nano, bool firstcall = true );
 
 // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
 QString trimStrAsDouble(const QString & dblStr, int maxLen);
@@ -31,7 +31,7 @@ QString trimStrAsDouble(const QString & dblStr, int maxLen);
 QString zeroDbl2Dbl(QString  dbl);
 
 // convert string representing double into nano
-QPair<bool,int64_t> one2nano(QString str);
+QPair<bool,qint64> one2nano(QString str);
 
 // abcdefgh  => abc...
 QString string2shortStrR( QString str, int lenLimit );
@@ -56,10 +56,10 @@ QString getSubString(const QString & str, int idx1, int idx2);
 QString utcTime2LocalTime(QString utcTimeStr);
 
 // Convert timestamp to this wallet time.
-QString timestamp2ThisTime(int64_t timestamp);
+QString timestamp2ThisTime(qint64 timestamp);
 
 // Convert time interval in seconds into 2 sevel word description.
-QString interval2String(int64_t intervalSec, bool shortUnits, int tiers);
+QString interval2String(qint64 intervalSec, bool shortUnits, int tiers);
 
 // Validate string for acceptable symbols. mwc713 understand low ASCII synblos only. Need to verify that.
 QPair <bool, QString> validateMwc713Str(QString str, bool secureStr = false);
@@ -70,10 +70,10 @@ QPair <bool, QString> validateMwc713Str(QString str, bool secureStr = false);
 QString toMwc713input(QString str, bool noSpecialCharacters = true);
 
 // Formal long number to string. Example   78,765
-QString longLong2Str(int64_t n);
+QString longLong2Str(qint64 n);
 
 // Formal long number to string with length Limit. Example 1123123123, 9 => 1123.12 M
-QString longLong2ShortStr(int64_t n, int length);
+QString longLong2ShortStr(qint64 n, int length);
 
 // Encode String into URL format. Expected that it is param or value
 // https://en.wikipedia.org/wiki/Percent-encoding#Percent-encoding_in_a_URI

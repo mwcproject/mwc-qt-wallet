@@ -110,7 +110,7 @@ namespace wallet {
 
     mwc_api::ApiResponse<QString> send(
                 int context_id,
-                int64_t amount, //  -1  - mean All
+                qint64 amount, //  -1  - mean All
                 bool amount_includes_fee,
                 const QString & message, // can be empty, means None
                 int minimum_confirmations,
@@ -126,7 +126,7 @@ namespace wallet {
                 int minimum_confirmations_change_outputs,
                 QStringList outputs, // Outputs to use. If None, all outputs can be used
                 bool late_lock,
-                int64_t min_fee); // 0 or negative to skip. Currently no needs to define it
+                qint64 min_fee); // 0 or negative to skip. Currently no needs to define it
 
     mwc_api::ApiResponse<ResReceive> receive(int context_id, const QString & slatepack,
         const QString & message, // Option, Can be empty
@@ -171,7 +171,7 @@ namespace wallet {
 
     mwc_api::ApiResponse<bool> check_wallet_busy(int context_id);
 
-    mwc_api::ApiResponse<bool> faucet_request(int context_id, uint64_t amount);
+    mwc_api::ApiResponse<bool> faucet_request(int context_id, quint64 amount);
 }
 
 #endif //MWC_QT_WALLET_MWCWALLETAPI_H

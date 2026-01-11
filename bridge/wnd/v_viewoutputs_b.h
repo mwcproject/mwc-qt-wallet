@@ -31,7 +31,7 @@ public:
     explicit ViewOutputs(QObject *parent = nullptr);
     ~ViewOutputs();
 
-    void setSgnViewOutputs( const wallet::ViewWallet & walletOutputs, int64_t height);
+    void setSgnViewOutputs( const wallet::ViewWallet & walletOutputs, qint64 height);
 
     // Switching to the progress window
     Q_INVOKABLE void startScanning(QString hashKey);

@@ -136,7 +136,7 @@ void SendOfflineOnly::on_sendButton_clicked()
         return;
     }
 
-    uint64_t amount = send->getTmpAmount();
+    quint64 amount = send->getTmpAmount();
     accountPath = send->getTmpAccountPath();
 
     QString recipientWallet;

@@ -106,7 +106,7 @@ void ViewOutputs::onScanRewindHash(QString responseId, wallet::ViewWallet wallet
 
     if ( context->appContext->getActiveWndState() == STATE::VIEW_ACCOUNTS ) {
         if (error.isEmpty()) {
-            int64_t height = context->nodeClient->requestNodeStatus().nodeHeight;
+            qint64 height = context->nodeClient->requestNodeStatus().nodeHeight;
             core::getWndManager()->pageViewAccounts();
             helpDocName = "viewing_key_outputs.html";
             for (auto b: bridge::getBridgeManager()->getViewAccounts()) {

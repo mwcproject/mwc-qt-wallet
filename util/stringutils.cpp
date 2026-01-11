@@ -49,7 +49,7 @@ QVector<QString> parsePhrase2Words( const QString & phrase ) {
 
 
 // convert nano items to String that represent that fraction as a double
-QString nano2one( int64_t nano, bool firstcall ) {
+QString nano2one( qint64 nano, bool firstcall ) {
     if (nano == 0)
         return "0";
 
@@ -59,11 +59,11 @@ QString nano2one( int64_t nano, bool firstcall ) {
         nano = -nano;
         neg = true;
     }
-    QString mwcTotalFraction = QString::number( nano % int64_t(1000000000),10);
+    QString mwcTotalFraction = QString::number( nano % qint64(1000000000),10);
     while (mwcTotalFraction.length()<9)
         mwcTotalFraction = "0" + mwcTotalFraction;
 
-    QString mwcTotalWhole = QString::number( nano / int64_t(1000000000),10);
+    QString mwcTotalWhole = QString::number( nano / qint64(1000000000),10);
     return (neg ? "-" : "") + mwcTotalWhole + "." + mwcTotalFraction;
 
 /*    if (nano<0) {
@@ -112,23 +112,23 @@ QString zeroDbl2Dbl(QString  dbl) {
 
 
 // convert string representing double into nano
-QPair<bool,int64_t> one2nano(QString str) {
+QPair<bool,qint64> one2nano(QString str) {
     if (str.length()==0)
-        return QPair<bool,int64_t>(false, 0);
+        return QPair<bool,qint64>(false, 0);
 
     bool ok = false;
     double dbl = str.toDouble(&ok);
     if (!ok)
-        return QPair<bool,int64_t>(false, 0);
+        return QPair<bool,qint64>(false, 0);
 
-    int64_t s = 1;
+    qint64 s = 1;
     if ( dbl < 0.0 ) {
         s = -1;
         dbl = -dbl;
     }
 
-    int64_t nano = int64_t(dbl * 1000000000.0 + 0.5);
-    return QPair<bool,int64_t>( true, nano*s );
+    qint64 nano = qint64(dbl * 1000000000.0 + 0.5);
+    return QPair<bool,qint64>( true, nano*s );
 }
 
 // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
@@ -254,7 +254,7 @@ QString utcTime2LocalTime(QString utcTimeStr) {
 }
 
 // Convert timestamp to this wallet time.
-QString timestamp2ThisTime(int64_t timestamp) {
+QString timestamp2ThisTime(qint64 timestamp) {
     if (timestamp==0)
         return "";
     QDateTime time = QDateTime::fromSecsSinceEpoch(timestamp);
@@ -263,13 +263,13 @@ QString timestamp2ThisTime(int64_t timestamp) {
 }
 
 // Convert time interval in seconds into 2 sevel word description.
-QString interval2String(int64_t intervalSec, bool shortUnits, int tiers) {
+QString interval2String(qint64 intervalSec, bool shortUnits, int tiers) {
     if (tiers<=0 || intervalSec<=0)
         return "";
 
-    int64_t days = intervalSec / (3600*24);
-    int64_t hrs = intervalSec / 3600;
-    int64_t min = intervalSec / 60;
+    qint64 days = intervalSec / (3600*24);
+    qint64 hrs = intervalSec / 3600;
+    qint64 min = intervalSec / 60;
     QString res;
     if (days>0) {
         res = QString::number(days);
@@ -362,7 +362,7 @@ QString toMwc713input(QString str, bool noSpecialCharacters ) {
 }
 
 // Formal long number to string. Example   78,765
-QString longLong2Str(int64_t n) {
+QString longLong2Str(qint64 n) {
     QString res = QString::number(n);
 
     if (res.size()<=3)
@@ -379,7 +379,7 @@ QString longLong2Str(int64_t n) {
 }
 
 // Formal long number to string with length Limit. Example 1123123123, 9 => 1123.12 M
-QString longLong2ShortStr(int64_t n, int lengthLimit) {
+QString longLong2ShortStr(qint64 n, int lengthLimit) {
     QString numberStr = longLong2Str(n);
 
     if (numberStr.length()<=lengthLimit)

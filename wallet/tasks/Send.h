@@ -22,10 +22,10 @@ namespace wallet {
 
 class Wallet;
 
-QFuture<void> send(Wallet *wallet, QString accountPathSendFrom, QString tag, int64_t amount, bool amount_includes_fee,
+QFuture<void> send(Wallet *wallet, QString accountPathSendFrom, QString tag, qint64 amount, bool amount_includes_fee,
                     QString message, int minimum_confirmations, QString selection_strategy, QString method, QString dest,
                     bool generate_proof, int change_outputs, bool fluff, int ttl_blocks, bool exclude_change_outputs,
-                    QStringList outputs, bool late_lock, int64_t min_fee);
+                    QStringList outputs, bool late_lock, qint64 min_fee);
 
 
 }

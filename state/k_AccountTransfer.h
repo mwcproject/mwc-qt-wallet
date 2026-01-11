@@ -42,7 +42,7 @@ protected:
 
 private slots:
     // set receive account name results
-    void onSend(  bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag );
+    void onSend(  bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag );
 
 
 private:

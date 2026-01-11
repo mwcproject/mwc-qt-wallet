@@ -34,20 +34,20 @@ namespace wallet {
     struct AccountInfo {
         QString accountName = "default";
         QString accountPath = "";
-        int64_t height = 0;
+        qint64 height = 0;
         // in nano coins
-        int64_t total = 0;
-        int64_t awaitingConfirmation = 0;
-        int64_t lockedByPrevTransaction = 0;
-        int64_t currentlySpendable = 0;
+        qint64 total = 0;
+        qint64 awaitingConfirmation = 0;
+        qint64 lockedByPrevTransaction = 0;
+        qint64 currentlySpendable = 0;
 
         void setData(QString account,
             QString path,
-            int64_t total,
-            int64_t awaitingConfirmation,
-            int64_t lockedByPrevTransaction,
-            int64_t currentlySpendable,
-            int64_t height);
+            qint64 total,
+            qint64 awaitingConfirmation,
+            qint64 lockedByPrevTransaction,
+            qint64 currentlySpendable,
+            qint64 height);
 
         QString getLongAccountName() const;
         QString getSpendableAccountName() const;
@@ -117,8 +117,8 @@ struct WalletOutput {
     QString    status;
     bool       coinbase = false;
     QString    numOfConfirms;
-    int64_t    valueNano = 0L;
-    int64_t    txIdx = -1;
+    qint64    valueNano = 0L;
+    qint64    txIdx = -1;
 
     void setData(QString outputCommitment,
             QString     MMRIndex,
@@ -127,8 +127,8 @@ struct WalletOutput {
             QString     status,
             bool        coinbase,
             QString     numOfConfirms,
-            int64_t     valueNano,
-            int64_t     txIdx);
+            qint64     valueNano,
+            qint64     txIdx);
 
     static WalletOutput create(QString outputCommitment,
                                QString     MMRIndex,
@@ -137,8 +137,8 @@ struct WalletOutput {
                                QString     status,
                                bool        coinbase,
                                QString     numOfConfirms,
-                               int64_t     valueNano,
-                               int64_t     txIdx) {
+                               qint64     valueNano,
+                               qint64     txIdx) {
         WalletOutput item;
         item.setData(outputCommitment,
                 MMRIndex, blockHeight, lockedUntil,
@@ -172,22 +172,22 @@ struct WalletTransactionMessage {
 struct WalletTransaction {
     enum TRANSACTION_TYPE { NONE=0, SEND=1, RECEIVE=2, COIN_BASE=4, CANCELLED=0x8000};
 
-    int64_t    txIdx = -1;
+    qint64    txIdx = -1;
     uint    transactionType = TRANSACTION_TYPE::NONE;
     QString txid; // Full tx UUID
     QString address;
     QString creationTime;
-    int64_t ttlCutoffHeight = -1;
+    qint64 ttlCutoffHeight = -1;
     bool    confirmed = false;
-    int64_t output_height = 0;
-    int64_t chain_height = 0; // current height
+    qint64 output_height = 0;
+    qint64 chain_height = 0; // current height
     QString confirmationTime;
     int     numInputs = -1;
     int     numOutputs = -1;
-    int64_t credited = -1;
-    int64_t debited = -1;
-    int64_t fee = -1;
-    int64_t coinNano = 0; // Net diffrence, transaction weight
+    qint64 credited = -1;
+    qint64 debited = -1;
+    qint64 fee = -1;
+    qint64 coinNano = 0; // Net diffrence, transaction weight
     QString kernel;
     QVector<QString> inputs;
     QVector<QString> outputs;
@@ -199,22 +199,22 @@ struct WalletTransaction {
     WalletTransaction(const WalletTransaction & other) = default;
     WalletTransaction & operator = (const WalletTransaction & other) = default;
 
-    void setData(int64_t txIdx,
+    void setData(qint64 txIdx,
                       uint    transactionType,
                       QString txid,
                       QString address,
                       QString creationTime,
                       bool    confirmed,
-                      int64_t ttlCutoffHeight,
-                      int64_t output_height,
-                      int64_t chain_height,
+                      qint64 ttlCutoffHeight,
+                      qint64 output_height,
+                      qint64 chain_height,
                       QString confirmationTime,
                       int     numInputs,
                       int     numOutputs,
-                      int64_t credited,
-                      int64_t debited,
-                      int64_t fee,
-                      int64_t coinNano,
+                      qint64 credited,
+                      qint64 debited,
+                      qint64 fee,
+                      qint64 coinNano,
                       QString kernel,
                       QVector<QString> inputs,
                       QVector<QString> outputs,
@@ -228,7 +228,7 @@ struct WalletTransaction {
     bool isCoinbase() const { return transactionType==TRANSACTION_TYPE::COIN_BASE; }
 
     // return transaction age (time interval from creation moment) in Seconds.
-    int64_t calculateTransactionAge( const QDateTime & current ) const;
+    qint64 calculateTransactionAge( const QDateTime & current ) const;
 
     // mark transaction as cancelled
     void cancelled() {
@@ -276,12 +276,12 @@ struct WalletTransaction {
 };
 
     struct WalletUtxoSignature {
-        int64_t coinNano = 0; // Output amount
+        qint64 coinNano = 0; // Output amount
         QString messageHash;
         QString pubKeyCompressed;
         QString messageSignature;
 
-        void setData(int64_t _coinNano, // Output amount
+        void setData(qint64 _coinNano, // Output amount
                 QString _messageHash,
                 QString _pubKeyCompressed,
                 QString _messageSignature);
@@ -293,18 +293,18 @@ struct WalletTransaction {
         QString secondaryCurrency;
         QString swapId;
         QString tag;
-        int64_t startTime = 0;
+        qint64 startTime = 0;
         QString stateCmd; // state as command
         QString state; // State as string description
         QString action;
-        int64_t expiration = 0;
+        qint64 expiration = 0;
         bool    isSeller;
         QString secondaryAddress;
         QString lastProcessError;
 
         void setData( QString mwcAmount, QString secondaryAmount, QString secondaryCurrency,
-                      QString swapId, QString tag, int64_t startTime, QString stateCmd, QString state, QString action,
-                      int64_t expiration, bool isSeller, QString secondaryAddress, QString lastProcessError );
+                      QString swapId, QString tag, qint64 startTime, QString stateCmd, QString state, QString action,
+                      qint64 expiration, bool isSeller, QString secondaryAddress, QString lastProcessError );
     };
 
     struct SwapTradeInfo {
@@ -325,8 +325,8 @@ struct WalletTransaction {
         int redeemTimeLimit;
         bool sellerLockingFirst;
         int mwcLockHeight;
-        int64_t mwcLockTime;
-        int64_t secondaryLockTime;
+        qint64 mwcLockTime;
+        qint64 secondaryLockTime;
 
         QString communicationMethod;
         QString communicationAddress;
@@ -338,23 +338,23 @@ struct WalletTransaction {
                     QString secondaryCurrency,  QString secondaryAddress, double secondaryFee,
                     QString secondaryFeeUnits, int mwcConfirmations, int secondaryConfirmations,
                     int messageExchangeTimeLimit, int redeemTimeLimit, bool sellerLockingFirst,
-                    int mwcLockHeight, int64_t mwcLockTime, int64_t secondaryLockTime,
+                    int mwcLockHeight, qint64 mwcLockTime, qint64 secondaryLockTime,
                     QString communicationMethod, QString communicationAddress, QString electrumNodeUri );
     };
 
     struct SwapExecutionPlanRecord {
         bool active = false;
-        int64_t end_time = 0;
+        qint64 end_time = 0;
         QString name;
 
-        void setData( bool active, int64_t end_time, QString name );
+        void setData( bool active, qint64 end_time, QString name );
     };
 
     struct SwapJournalMessage {
         QString message;
-        int64_t time = 0;
+        qint64 time = 0;
 
-        void setData( QString message, int64_t time );
+        void setData( QString message, qint64 time );
     };
 
     // Some startus booleans for 3 listeners
@@ -385,9 +385,9 @@ struct WalletTransaction {
 
     struct IntegrityFees {
         bool confirmed = false;
-        int64_t expiration_height = -1;
-        int64_t ask_fee = -1;
-        int64_t fee = -1;
+        qint64 expiration_height = -1;
+        qint64 ask_fee = -1;
+        qint64 fee = -1;
         QString uuid;
 
         IntegrityFees() = default;
@@ -395,9 +395,9 @@ struct WalletTransaction {
         IntegrityFees & operator = (const IntegrityFees & item) = default;
 
         IntegrityFees(bool _confirmed,
-            int64_t _expiration_height,
-            int64_t _ask_fee,
-            int64_t _fee,
+            qint64 _expiration_height,
+            qint64 _ask_fee,
+            qint64 _fee,
             QString _uuid) :
                 confirmed(_confirmed),
                 expiration_height(_expiration_height),
@@ -418,7 +418,7 @@ struct WalletTransaction {
     struct BroadcastingMessage {
         QString uuid;
         int broadcasting_interval = -1;
-        int64_t fee = 0;
+        qint64 fee = 0;
         QString message;
         int published_time;
 
@@ -450,16 +450,16 @@ struct WalletTransaction {
 
     struct ReceivedMessages {
         QString topic;   // Topic where we received the message
-        int64_t fee;     // fee that was paid
+        qint64 fee;     // fee that was paid
         QString message; // message that received
         QString wallet;  // wallet onion address
-        int64_t timestamp;
+        qint64 timestamp;
 
         ReceivedMessages(QString _topic,
-                int64_t _fee,
+                qint64 _fee,
                 QString _message,
                 QString _wallet,
-                int64_t _timestamp) :
+                qint64 _timestamp) :
                 topic(_topic),
                 fee(_fee),
                 message(_message),
@@ -510,11 +510,11 @@ struct WalletTransaction {
 
     struct ViewWalletOutputResult {
         QString commit;
-        int64_t value = -1;
-        int64_t height = -1;
-        int64_t mmr_index = -1;
+        qint64 value = -1;
+        qint64 height = -1;
+        qint64 mmr_index = -1;
         bool is_coinbase = false;
-        int64_t lock_height = -1;
+        qint64 lock_height = -1;
 
         QJsonObject toJson() const;
     };
@@ -525,9 +525,9 @@ struct WalletTransaction {
         // All outputs information that belongs to the rewind hash
         QVector<ViewWalletOutputResult> output_result;
         // total balance
-        int64_t total_balance = -1;
+        qint64 total_balance = -1;
         // last pmmr index
-        int64_t last_pmmr_index = -1;
+        qint64 last_pmmr_index = -1;
 
         QJsonObject toJson() const;
     };
@@ -551,9 +551,9 @@ struct WalletTransaction {
     struct NodeStatus {
         bool internalNode = false;
         bool online = false;
-        int64_t nodeHeight = 0;
-        int64_t peerHeight = 0;
-        int64_t totalDifficulty = 0;
+        qint64 nodeHeight = 0;
+        qint64 peerHeight = 0;
+        qint64 totalDifficulty = 0;
         int connections = 0;
 
         bool isHealthy() const;

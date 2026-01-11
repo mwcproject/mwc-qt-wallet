@@ -79,7 +79,7 @@ bool acquireAppGlobalLock() {
     TestSystemSemaphoreThread *testThread = new TestSystemSemaphoreThread(instancesSemaphore);
     testThread->start();
     bool testResult = true;
-    if (!testThread->wait( (uint64_t)(500 * std::max(1.0,config::getTimeoutMultiplier()) + 0.5) ) ) {
+    if (!testThread->wait( (quint64)(500 * std::max(1.0,config::getTimeoutMultiplier()) + 0.5) ) ) {
             testResult = false;
     }
     // Windows doesn't liek an idea of deleting running thread. This thread will wait forever, so we can't destroy it

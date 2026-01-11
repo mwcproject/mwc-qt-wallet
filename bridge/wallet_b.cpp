@@ -316,18 +316,18 @@ QVector<QString> Wallet::getTotalAmount() {
 
     QVector<wallet::AccountInfo> balance = getWallet()->getWalletBalance(confNum, true, getAppContext()->getLockedOutputs());
 
-    int64_t mwcSum = 0;
-    int64_t awaiting = 0;
+    qint64 mwcSum = 0;
+    qint64 awaiting = 0;
     for ( const auto & ai : balance ) {
         mwcSum += ai.total;
         awaiting += ai.awaitingConfirmation;
     }
 
-    QString mwcTotalFraction = QString::number( mwcSum % int64_t(1000000000),10);
+    QString mwcTotalFraction = QString::number( mwcSum % qint64(1000000000),10);
     while (mwcTotalFraction.length()<9)
         mwcTotalFraction = "0" + mwcTotalFraction;
 
-    QString mwcTotalWhole = QString::number( mwcSum / int64_t(1000000000),10);
+    QString mwcTotalWhole = QString::number( mwcSum / qint64(1000000000),10);
 
     QVector<QString> res(3);
     res[0] = mwcTotalWhole;
@@ -367,7 +367,7 @@ void Wallet::onScanDone( QString responseId, bool fullScan, int height, QString 
     emit sgnScanDone(responseId, fullScan, height, errorMessage);
 }
 
-void Wallet::onSend( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag ) {
+void Wallet::onSend( bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag ) {
     Q_UNUSED(amount);
     Q_UNUSED(method);
     Q_UNUSED(dest);
@@ -375,7 +375,7 @@ void Wallet::onSend( bool success, QString error, QString tx_uuid, int64_t amoun
     emit sgnSend(success, error, tx_uuid, tag);
 }
 
-void Wallet::onSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message ) {
+void Wallet::onSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message ) {
     emit sgnSlateReceivedFrom(slate, util::nano2one(mwc), fromAddr, message);
 }
 

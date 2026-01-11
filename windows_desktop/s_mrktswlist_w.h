@@ -93,7 +93,7 @@ private slots:
     void on_withdrawHelpBtn_clicked();
     void on_newOfferButton_clicked();
 
-    void sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
+    void sgnRequestIntegrityFees(QString error, qint64 balance, QVector<QString> IntegrityFeesJsonStr);
     void sgnWithdrawIntegrityFees(QString error, double mwc, QString account);
 
     void sgnMarketPlaceOffersChanged();

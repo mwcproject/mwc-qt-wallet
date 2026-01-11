@@ -41,7 +41,7 @@ static bool compareStringLists(QStringList l1, QStringList l2) {
     return true;
 }
 
-static void runForTestSet(int64_t nanoCoins, const QVector<wallet::WalletOutput> & outputs, QStringList expectedOutputs ) {
+static void runForTestSet(qint64 nanoCoins, const QVector<wallet::WalletOutput> & outputs, QStringList expectedOutputs ) {
 
     QStringList resultOutputs;
     bool ok = calcOutputsToSpend( nanoCoins, outputs, resultOutputs );
@@ -50,7 +50,7 @@ static void runForTestSet(int64_t nanoCoins, const QVector<wallet::WalletOutput>
     Q_ASSERT( compareStringLists(expectedOutputs, resultOutputs) );
 }
 
-static void runForTestSet2(int64_t nanoCoins, const QVector<wallet::WalletOutput> & outputs, int64_t maxDiff ) {
+static void runForTestSet2(qint64 nanoCoins, const QVector<wallet::WalletOutput> & outputs, qint64 maxDiff ) {
 
     QStringList resultOutputs;
     bool ok = calcOutputsToSpend( nanoCoins, outputs, resultOutputs );
@@ -58,7 +58,7 @@ static void runForTestSet2(int64_t nanoCoins, const QVector<wallet::WalletOutput
 
     Q_ASSERT( resultOutputs.size()>0 );
 
-    int64_t sum = 0;
+    qint64 sum = 0;
     for ( const auto & s : resultOutputs) {
         sum += s.toLongLong();
     }
@@ -134,7 +134,7 @@ static void dotest_calcOutputsToSpend() {
         srand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
 
         for ( int i=0; i<outputNum; i++ ) {
-            int64_t amount = (rand() % 1000) * 10000 + i;
+            qint64 amount = (rand() % 1000) * 10000 + i;
 
             outputs.push_back( WalletOutput::create( QString::number(amount), "", "", "", "Unspent", false, "", amount, 1L));
         }
@@ -154,7 +154,7 @@ static void dotest_calcOutputsToSpend() {
             int outNum = rand() % (outputs.size()-2) + 2;
             QSet<int> hasOutputs;
 
-            int64_t amount = 0;
+            qint64 amount = 0;
 
             for  (int u=0; u<outNum; u++ ) {
                 if (!hasOutputs.contains(u)) {

@@ -62,7 +62,7 @@ private:
     bridge::Util * util = nullptr;
 
     QVector<wallet::WalletTransaction> allTrans;
-    int64_t nodeHeight    = 0;
+    qint64 nodeHeight    = 0;
 };
 
 }

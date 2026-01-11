@@ -260,7 +260,7 @@ QString Util::extractPubKeyFromAddress(QString address) {
 }
 
 // convert nano items to dtirng that represent that fraction as a double
-QString Util::nano2one(int64_t nano) {
+QString Util::nano2one(qint64 nano) {
     logger::logInfo(logger::BRIDGE, "Call Util::nano2one with nano=" + QString::number(nano));
     return util::nano2one(nano);
 }

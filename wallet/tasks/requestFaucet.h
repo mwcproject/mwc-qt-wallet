@@ -22,7 +22,7 @@ namespace wallet {
 
     class Wallet;
 
-    QFuture<QPair<bool, QString>> requestMwcFromFlooFaucet(Wallet *wallet, int64_t amount);
+    QFuture<QPair<bool, QString>> requestMwcFromFlooFaucet(Wallet *wallet, qint64 amount);
 
 }
 

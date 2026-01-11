@@ -37,7 +37,7 @@ public:
 
     wallet::NodeStatus requestNodeStatus();
 
-    int64_t getLastNodeHeight() const {return lastNodeHeight;}
+    qint64 getLastNodeHeight() const {return lastNodeHeight;}
     const QString & getLastInternalNodeState() const {return lastInternalNodeState;}
 
     bool isNodeHealthy();
@@ -57,15 +57,15 @@ private:
     volatile bool usePublicNode = true;
     int publicNodeIdx;
     // check time to define if internal or public node will be used
-    int64_t nodeStatusCheckTime = 0;
+    qint64 nodeStatusCheckTime = 0;
 
     util::HttpClient * publicNodeClient = nullptr;
 
-    int64_t lastNodeHeight = 0;
+    qint64 lastNodeHeight = 0;
 
     wallet::NodeStatus lastStatus;
     QString lastInternalNodeState;
-    int64_t lastStatusTime = 0;
+    qint64 lastStatusTime = 0;
 };
 
 void updatePablicNodeLatency();

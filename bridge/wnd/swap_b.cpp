@@ -174,12 +174,12 @@ void Swap::requestEthSend(QString dest, QString currency, QString amount) {
     getWallet()->requestEthSend(dest, currency, amount);
 }
 
-QString calcTimeLeft(int64_t time) {
-    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+QString calcTimeLeft(qint64 time) {
+    qint64 curTime = QDateTime::currentSecsSinceEpoch();
     if (curTime > time)
         return 0;
 
-    int64_t secondsLeft = time - curTime;
+    qint64 secondsLeft = time - curTime;
     int hours = secondsLeft / 3600;
     int minutes = (secondsLeft % 3600) / 60;
 
@@ -352,7 +352,7 @@ void Swap::onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString cu
                               QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                               QVector<wallet::SwapJournalMessage> tradeJournal) {
 
-    int64_t expirationTime = 0;
+    qint64 expirationTime = 0;
     for (const auto & ep : executionPlan) {
         if (ep.active) {
             expirationTime = ep.end_time;

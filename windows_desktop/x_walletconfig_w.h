@@ -78,7 +78,7 @@ private:
 
     void updateLogsStateUI(bool enabled);
 
-    void updateAutoLogoutStateUI(int64_t time);
+    void updateAutoLogoutStateUI(qint64 time);
 
     // return true if no chnages need to be made.
     // false - need to be made or was made and wallet need to be restarted
@@ -97,8 +97,8 @@ private:
     bool outputLockingEnabled = false;
     bool notificationWindowsEnabled = true;
     bool lockLater = true;
-    int64_t logoutTimeout = 20 * 60;
-    int64_t currentLogoutTimeout = 20 * 60;
+    qint64 logoutTimeout = 20 * 60;
+    qint64 currentLogoutTimeout = 20 * 60;
 
     int inputConfirmationsNumber = 1;
     int changeOutputs = 1;

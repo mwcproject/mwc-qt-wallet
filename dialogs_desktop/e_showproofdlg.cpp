@@ -29,7 +29,7 @@ void ProofInfo::parseProofRes(const QString & proof_str) {
 
     fromAdress = json["sender_address"].toString();
     toAdress = json["reciever_address"].toString();
-    mwc = util::nano2one(int64_t(json["amount"].toInteger()));
+    mwc = util::nano2one(qint64(json["amount"].toInteger()));
     // Extract outputs array
     QJsonArray outputsArray = json["outputs"].toArray();
     for (const QJsonValue &outputValue : outputsArray) {

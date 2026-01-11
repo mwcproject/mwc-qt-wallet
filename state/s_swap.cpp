@@ -191,13 +191,13 @@ void Swap::onTimerEvent() {
     if (runningSwaps.isEmpty() || !runningTask.isEmpty())
         return;
 
-    int64_t curMsec = QDateTime::currentMSecsSinceEpoch();
+    qint64 curMsec = QDateTime::currentMSecsSinceEpoch();
     if (curMsec-lastProcessedTimerData < 500)
         return; // Skipping this event, Q migth be overloaded
 
     lastProcessedTimerData = curMsec;
 
-    int64_t curTime = curMsec/1000;
+    qint64 curTime = curMsec/1000;
 
     AutoswapTask nextTask;
     nextTask.lastUpdatedTime = curTime;
@@ -269,8 +269,8 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
     // Checking if need to show deposit message for the buyer
     if (currentAction.contains("Please deposit exactly")) {
         // Let's  do reminder every 20 minutes.
-        int64_t curTime = QDateTime::currentSecsSinceEpoch();
-        int64_t timeLimit = curTime - 60*20;
+        qint64 curTime = QDateTime::currentSecsSinceEpoch();
+        qint64 timeLimit = curTime - 60*20;
 
         if (shownMessages.value(currentAction) < timeLimit) {
             shownMessages.insert( currentAction, curTime + 3600*24 );
@@ -448,8 +448,8 @@ void Swap::onAdjustSwapData(QString swapId, QString call_tag, QString errMsg) {
 
 // Request latest fees for the coins
 void Swap::updateFeesIsNeeded() {
-    int64_t curTime = QDateTime::currentSecsSinceEpoch();
-    int64_t timeLimit = curTime - 60*15; // doesn't make sense more than once on 15 minutes
+    qint64 curTime = QDateTime::currentSecsSinceEpoch();
+    qint64 timeLimit = curTime - 60*15; // doesn't make sense more than once on 15 minutes
     for (const auto & sc : SwapCurrencyList()) {
         if (sc.txFee<=0.0 || sc.txFeeUpdateTime>0) {
             if ( sc.txFeeUpdateTime < timeLimit ) {

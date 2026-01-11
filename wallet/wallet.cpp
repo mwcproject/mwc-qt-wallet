@@ -110,7 +110,7 @@ int8_t const * new_tx_callback(void* ctx, const int8_t* msg) {
 
     QString tx_uuid = newTx["tx_uuid"].toString();
     QString from = newTx["from"].toString();
-    int64_t amount = newTx["amount"].toInteger();
+    qint64 amount = newTx["amount"].toInteger();
     QString message = newTx["message"].toString();
 
     wallet->emitSlateReceivedFrom(tx_uuid, amount, from, message );
@@ -663,7 +663,7 @@ QString Wallet::verifyTransactionProof(const QString & proof) {
 // Check signal:  onSend
 bool Wallet::sendTo( const QString &accountPathFrom,
                 const QString & responseTag,
-                int64_t amount, //  -1  - mean All
+                qint64 amount, //  -1  - mean All
                 bool amount_includes_fee,
                 const QString & message, // can be empty, means None
                 int minimum_confirmations,
@@ -677,7 +677,7 @@ bool Wallet::sendTo( const QString &accountPathFrom,
                 bool exclude_change_outputs,
                 const QStringList & outputs, // Outputs to use. If None, all outputs can be used
                 bool late_lock,
-                int64_t min_fee)  // 0 or negative to skip. Currently no needs to define it
+                qint64 min_fee)  // 0 or negative to skip. Currently no needs to define it
 {
     if (started_state == STARTED_MODE::OFFLINE)
         return false;
@@ -873,7 +873,7 @@ bool Wallet::requestFaucetMWC() {
         return false;
 
     // requesting 3 MWC
-    QPair<bool, int64_t> amount = util::one2nano("3.0");
+    QPair<bool, qint64> amount = util::one2nano("3.0");
     Q_ASSERT(amount.first);
 
     QFuture<QPair<bool, QString>> rsp = wallet::requestMwcFromFlooFaucet(this, amount.second);
@@ -953,7 +953,7 @@ void Wallet::emitStatusUpdate( const QString & response_id, const QJsonObject & 
     emit  onScanProgress( response_id, status );
 }
 
-void Wallet::sendDone( bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag ) {
+void Wallet::sendDone( bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag ) {
     if (started_state == STARTED_MODE::OFFLINE)
         return;
 
@@ -967,7 +967,7 @@ void Wallet::scanRewindDone( const QString & responseId, const ViewWallet & resu
     emit onScanRewindHash( responseId, result, util::mapMessage(error) );
 }
 
-void Wallet::emitSlateReceivedFrom(QString slate, int64_t mwc, QString fromAddr, QString message ) {
+void Wallet::emitSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message ) {
     if (started_state == STARTED_MODE::OFFLINE)
         return;
 

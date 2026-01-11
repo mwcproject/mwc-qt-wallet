@@ -26,7 +26,7 @@ class QtAndroidService;
 
 namespace state {
 
-QString generateAmountErrorMsg(int64_t mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams);
+QString generateAmountErrorMsg(qint64 mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams);
 
 class Send  : public QObject, public State {
     Q_OBJECT
@@ -41,16 +41,16 @@ public:
     //   2 - amount error
     int initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString accountPath, QString sendAmount, bool gotoNextPage );
     // Data that was collected by initialSendSelection. Can be used if gotoNextPage is false
-    int64_t getTmpAmount() const {return tmpAmount;}
+    qint64 getTmpAmount() const {return tmpAmount;}
     QString getTmpAccountPath() const {return tmpAccountPath;}
 
     // Handle whole workflow to send offline
     // return true if some long process was started.
-    bool sendMwcOffline( const QString & account, const QString & accountPath, int64_t amount, const QString & message, bool isLockLater, const QString & slatepackRecipientAddress );
+    bool sendMwcOffline( const QString & account, const QString & accountPath, qint64 amount, const QString & message, bool isLockLater, const QString & slatepackRecipientAddress );
 
     // Handle whole workflow to send online
     // return true if some long process was started.
-    bool sendMwcOnline( const QString & account, const QString & accountPath, int64_t amount, QString address, const QString & message );
+    bool sendMwcOnline( const QString & account, const QString & accountPath, qint64 amount, QString address, const QString & message );
 
     // Returns the amount of coins, minus the transaction fee, which can be spent for this account
     QString getSpendAllAmount(QString accountPath);
@@ -61,7 +61,7 @@ protected:
     virtual QString getHelpDocName() override;
 
 private slots:
-    void sendRespond(bool success, QString error, QString tx_uuid, int64_t amount, QString method, QString dest, QString tag);
+    void sendRespond(bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag);
 
 private:
     void switchToStartingWindow();
@@ -71,7 +71,7 @@ private:
     bool atSendInitialPage = true;
 
     // temp buffered data
-    int64_t tmpAmount = 0;
+    qint64 tmpAmount = 0;
     QString tmpAccountPath;
 };
 

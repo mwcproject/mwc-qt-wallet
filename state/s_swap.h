@@ -40,7 +40,7 @@ struct SecCurrencyInfo {
      double  txFee; // -1.0 - need to use API
      double  txFeeMin;
      double  txFeeMax;
-     int64_t txFeeUpdateTime = 0;
+     qint64 txFeeUpdateTime = 0;
      double  minAmount; // Minimal amount for secondary currency. We don't want dust transaction
      bool    is_btc_family;
 
@@ -97,9 +97,9 @@ struct AutoswapTask {
     QString tag;
     bool    isSeller;
     QString stateCmd;
-    int64_t lastUpdatedTime = 0;
+    qint64 lastUpdatedTime = 0;
 
-    void setData(QString _swapId, QString _tag, bool _isSeller, QString _stateCmd, int64_t _lastUpdatedTime) { swapId=_swapId; tag=_tag; isSeller=_isSeller; stateCmd=_stateCmd; lastUpdatedTime=_lastUpdatedTime; }
+    void setData(QString _swapId, QString _tag, bool _isSeller, QString _stateCmd, qint64 _lastUpdatedTime) { swapId=_swapId; tag=_tag; isSeller=_isSeller; stateCmd=_stateCmd; lastUpdatedTime=_lastUpdatedTime; }
 };
 
 enum class SwapWnd {None, PageSwapList, PageSwapEdit, PageSwapTradeDetails, PageSwapNew1, PageSwapNew2, PageSwapNew3 };
@@ -366,7 +366,7 @@ private:
     QString  runningTask;
 
     // key: message.  value: time
-    QHash<QString, int64_t> shownMessages;
+    QHash<QString, qint64> shownMessages;
 
     long lastProcessedTimerData = 0;
 

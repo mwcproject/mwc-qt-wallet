@@ -41,13 +41,13 @@ struct PeerInfo {
 
 struct PeerConnectionInfo {
     QVector<PeerInfo>   peerConnections;
-    int64_t             updateTime       = 0;
+    qint64             updateTime       = 0;
 };
 
 struct NodeStatus {
     int connections     = 0;
     int tipHeight       = 0;
-    int64_t updateTime  = 0;
+    qint64 updateTime  = 0;
 };
 
 enum class SYNC_STATE {GETTING_HEADERS, GETTING_PIBD, VERIFY_KERNELS_HISTORY, VERIFY_HEADERS, VERIFY_KERNEKLS_POS, VERIFY_RANGEPROOFS, VERIFY_KERNEL, GETTING_BLOCKS };

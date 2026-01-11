@@ -48,11 +48,11 @@ static QJsonObject str2json(const QString & jsonStr) {
 
 void AccountInfo::setData(QString account,
                         QString path,
-                        int64_t _total,
-                        int64_t _awaitingConfirmation,
-                        int64_t _lockedByPrevTransaction,
-                        int64_t _currentlySpendable,
-                        int64_t _height)
+                        qint64 _total,
+                        qint64 _awaitingConfirmation,
+                        qint64 _lockedByPrevTransaction,
+                        qint64 _currentlySpendable,
+                        qint64 _height)
 {
     accountName = account;
     accountPath = path;
@@ -189,22 +189,22 @@ QString WalletTransaction::csvHeaders = "Id,Type,Shared Transaction Id,Address,C
                                         "Amount Debited,Fee,Net Difference,Kernel";
 
 
-void WalletTransaction::setData(int64_t _txIdx,
+void WalletTransaction::setData(qint64 _txIdx,
                                 uint    _transactionType,
                                 QString _txid,
                                 QString _address,
                                 QString _creationTime,
                                 bool    _confirmed,
-                                int64_t _ttlCutoffHeight,
-                                int64_t _output_height,
-                                int64_t _chain_height,
+                                qint64 _ttlCutoffHeight,
+                                qint64 _output_height,
+                                qint64 _chain_height,
                                 QString _confirmationTime,
                                 int     _numInputs,
                                 int     _numOutputs,
-                                int64_t _credited,
-                                int64_t _debited,
-                                int64_t _fee,
-                                int64_t _coinNano,
+                                qint64 _credited,
+                                qint64 _debited,
+                                qint64 _fee,
+                                qint64 _coinNano,
                                 QString _kernel,
                                 QVector<QString> _inputs,
                                 QVector<QString> _outputs,
@@ -233,7 +233,7 @@ void WalletTransaction::setData(int64_t _txIdx,
 }
 
 // return transaction age (time interval from creation moment) in Seconds.
-int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) const {
+qint64 WalletTransaction::calculateTransactionAge( const QDateTime & current ) const {
     // Example: 2019-06-22 05:44:53
     QDateTime setTime = QDateTime::fromString (creationTime, mwc::DATETIME_TEMPLATE_THIS );
 //    setTime.setOffsetFromUtc(0);
@@ -245,10 +245,10 @@ QString WalletTransaction::toStringCSV(const QStringList & extraData) const {
     // always enclose the type string in quotes as it could contain a comma
 
     // The non confirmed or cancelled transactions need to have balance 0.
-    int64_t tx_credited = credited;
-    int64_t tx_debited = debited;
-    int64_t tx_fee = fee;
-    int64_t tx_coinNano = coinNano;
+    qint64 tx_credited = credited;
+    qint64 tx_debited = debited;
+    qint64 tx_fee = fee;
+    qint64 tx_coinNano = coinNano;
 
     if (!confirmed) {
         tx_credited = tx_debited = tx_fee = tx_coinNano = 0;
@@ -287,8 +287,8 @@ void WalletOutput::setData(QString _outputCommitment,
         QString     _status,
         bool        _coinbase,
         QString     _numOfConfirms,
-        int64_t     _valueNano,
-        int64_t     _txIdx)
+        qint64     _valueNano,
+        qint64     _txIdx)
 {
     outputCommitment = _outputCommitment;
     MMRIndex = _MMRIndex;
@@ -409,7 +409,7 @@ WalletTransaction WalletTransaction::fromJson(const QJsonObject & obj) {
 ///////////////////////////////////////////////////////////////////////////////////////////
 //  WalletUtxoSignature
 
-void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
+void WalletUtxoSignature::setData(qint64 _coinNano, // Output amount
         QString _messageHash,
         QString _pubKeyCompressed,
         QString _messageSignature)
@@ -424,7 +424,7 @@ void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
 // SwapInfo
 
 void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _secondaryCurrency,
-              QString _swapId, QString _tag, int64_t _startTime, QString _stateCmd, QString _state, QString _action, int64_t _expiration,
+              QString _swapId, QString _tag, qint64 _startTime, QString _stateCmd, QString _state, QString _action, qint64 _expiration,
               bool _isSeller, QString _secondaryAddress, QString _lastProcessError ) {
     mwcAmount = _mwcAmount;
     secondaryAmount = _secondaryAmount;
@@ -448,7 +448,7 @@ void SwapTradeInfo::setData( QString _swapId, QString _tag, bool _isSeller, doub
               QString _secondaryCurrency,  QString _secondaryAddress, double _secondaryFee,
               QString _secondaryFeeUnits, int _mwcConfirmations, int _secondaryConfirmations,
               int _messageExchangeTimeLimit, int _redeemTimeLimit, bool _sellerLockingFirst,
-              int _mwcLockHeight, int64_t _mwcLockTime, int64_t _secondaryLockTime,
+              int _mwcLockHeight, qint64 _mwcLockTime, qint64 _secondaryLockTime,
               QString _communicationMethod, QString _communicationAddress, QString _electrumNodeUri ) {
 
     swapId = _swapId;
@@ -476,7 +476,7 @@ void SwapTradeInfo::setData( QString _swapId, QString _tag, bool _isSeller, doub
 ////////////////////////////////////////////////////////////////////
 // SwapExecutionPlanRecord
 
-void SwapExecutionPlanRecord::setData( bool _active, int64_t _end_time, QString _name ) {
+void SwapExecutionPlanRecord::setData( bool _active, qint64 _end_time, QString _name ) {
     active = _active;
     end_time = _end_time;
     name = _name;
@@ -485,7 +485,7 @@ void SwapExecutionPlanRecord::setData( bool _active, int64_t _end_time, QString 
 ///////////////////////////////////////////////////////////////////
 //  SwapJournalMessage
 
-void SwapJournalMessage::setData( QString _message, int64_t _time ) {
+void SwapJournalMessage::setData( QString _message, qint64 _time ) {
     message = _message;
     time = _time;
 }

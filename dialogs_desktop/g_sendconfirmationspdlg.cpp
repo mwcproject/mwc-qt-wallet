@@ -69,7 +69,7 @@ void SendConfirmationSlatePackDlg::updateMessageText() {
     int outputs = ui->outputsEdit->text().toInt();
     QString message = messageBody;
     if (outputs>0 && outputs <= 10) {
-        uint64_t txnFee = util::calcTxnFee(inputsNum, outputs, 1);
+        quint64 txnFee = util::calcTxnFee(inputsNum, outputs, 1);
         QString txnFeeStr = util::txnFeeToString(txnFee);
         message += "\n\nTransaction fee: " + txnFeeStr;
     }
