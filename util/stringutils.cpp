@@ -54,12 +54,17 @@ QString nano2one( int64_t nano, bool firstcall ) {
         return "0";
 
     Q_UNUSED(firstcall);
+    bool neg = false;
+    if (nano<0) {
+        nano = -nano;
+        neg = true;
+    }
     QString mwcTotalFraction = QString::number( nano % int64_t(1000000000),10);
     while (mwcTotalFraction.length()<9)
         mwcTotalFraction = "0" + mwcTotalFraction;
 
     QString mwcTotalWhole = QString::number( nano / int64_t(1000000000),10);
-    return mwcTotalWhole + "." + mwcTotalFraction;
+    return (neg ? "-" : "") + mwcTotalWhole + "." + mwcTotalFraction;
 
 /*    if (nano<0) {
         if (-nano < 0 || !firstcall)
