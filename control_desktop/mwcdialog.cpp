@@ -28,7 +28,7 @@ namespace control {
 
 static QString dlgStyle;
 
-MwcDialog::MwcDialog( QWidget * parent )// : QDialog( getParent(parent) )
+MwcDialog::MwcDialog( QWidget * parent )  : QDialog(parent)
 {
     if (dlgStyle.isEmpty())
     { // Apply style sheet
@@ -46,7 +46,7 @@ MwcDialog::MwcDialog( QWidget * parent )// : QDialog( getParent(parent) )
 
     setStyleSheet( dlgStyle );
 
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlag(Qt::FramelessWindowHint, true);
     setModal(true);
     // If uncomment - will show one Dlg at a time
     //setWindowModality(Qt::ApplicationModal);

@@ -16,6 +16,7 @@
 #define MWC_QT_WALLET_MWCTABWIDGET_H
 
 #include <QTabWidget>
+#include <QProxyStyle>
 
 namespace control {
 
