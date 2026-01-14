@@ -30,12 +30,22 @@ CONFIG += c++14
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 # Rust static library
-CONFIG(debug, debug|release) {
-    LIBS += $$PWD/../mwc-wallet/target/debug/libmwc_wallet_lib.a
-}
+LIBDIR = $$PWD/../mwc-wallet/target
 
-CONFIG(release, debug|release) {
-    LIBS += $$PWD/../mwc-wallet/target/release/libmwc_wallet_lib.a
+win32 {
+    CONFIG(debug, debug|release) {
+        LIBS += $$LIBDIR/debug/mwc_wallet_lib.lib
+    }
+    CONFIG(release, debug|release) {
+        LIBS += $$LIBDIR/release/mwc_wallet_lib.lib
+    }
+} else {
+    CONFIG(debug, debug|release) {
+        LIBS += $$LIBDIR/debug/libmwc_wallet_lib.a
+    }
+    CONFIG(release, debug|release) {
+        LIBS += $$LIBDIR/release/libmwc_wallet_lib.a
+    }
 }
 
 macx {
