@@ -39,7 +39,7 @@ win32 {
     CONFIG(release, debug|release) {
         LIBS += $$LIBDIR/x86_64-pc-windows-gnu/release/libmwc_wallet_lib.a
     }
-    QMAKE_LFLAGS += -Wl,-v
+    LIBS += -liphlpapi -lnetapi32 -lole32 -loleaut32 -lpropsys -lws2_32
 } else {
     CONFIG(debug, debug|release) {
         LIBS += $$LIBDIR/debug/libmwc_wallet_lib.a
