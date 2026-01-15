@@ -33,6 +33,7 @@ CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 LIBDIR = $$PWD/../mwc-wallet/target
 
 win32 {
+    # The expected build chain is MinGw
     CONFIG(debug, debug|release) {
         LIBS += $$LIBDIR/x86_64-pc-windows-gnu/debug/libmwc_wallet_lib.a
     }
