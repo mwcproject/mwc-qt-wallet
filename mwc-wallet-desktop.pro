@@ -34,10 +34,10 @@ LIBDIR = $$PWD/../mwc-wallet/target
 
 win32 {
     CONFIG(debug, debug|release) {
-        LIBS += $$LIBDIR/debug/mwc_wallet_lib.lib
+        LIBS += $$LIBDIR/x86_64-pc-windows-gnu/debug/mwc_wallet_lib.a
     }
     CONFIG(release, debug|release) {
-        LIBS += $$LIBDIR/release/mwc_wallet_lib.lib
+        LIBS += $$LIBDIR/x86_64-pc-windows-gnu/release/mwc_wallet_lib.a
     }
 } else {
     CONFIG(debug, debug|release) {
