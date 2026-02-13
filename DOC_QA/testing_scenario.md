@@ -270,8 +270,7 @@ Response: You should see the recovery progress.
 ### Recovery interruption
 
 Close the wallet<br>
-Response: Message that it might take up to XXX minutes to close the wallet. 
-Wait, after about 10 minutes it should be closed (full scan operation needs to be closed)
+Response: Wallet should exit in a few seonds. Ufter restart the acount update will take a while
 
 ### Check resulting wallet data & clean up
 

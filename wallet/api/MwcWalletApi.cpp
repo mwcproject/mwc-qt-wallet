@@ -240,6 +240,12 @@ namespace wallet {
         return call_simple_context_id_only_api(context_id, "close_wallet");
     }
 
+    // Interrupt scanning
+    mwc_api::ApiResponse<bool> stop_running_scan(int context_id) {
+        return call_simple_context_id_only_api(context_id, "stop_running_scan");
+    }
+
+
     // Get mnemonic phrase
     mwc_api::ApiResponse<QStringList> get_mnemonic(int context_id, const QString & password ) {
         Q_ASSERT(context_id>=0);

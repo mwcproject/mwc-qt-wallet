@@ -61,6 +61,9 @@ namespace wallet {
     // Logout from the account
     mwc_api::ApiResponse<bool> close_wallet(int context_id);
 
+    // Interrupt scanning
+    mwc_api::ApiResponse<bool> stop_running_scan(int context_id);
+
     // Get mnemonic phrase
     mwc_api::ApiResponse<QStringList> get_mnemonic(int context_id, const QString & password );
 

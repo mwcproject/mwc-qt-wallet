@@ -195,6 +195,11 @@ void Wallet::release() {
     CANCEL_FUTURE(sendOp);
     CANCEL_FUTURE(scanRewindHashOp);
 
+    if (context_id>=0) {
+        mwc_api::ApiResponse<bool> res = stop_running_scan(context_id);
+        LOG_CALL_RESULT("stop_running_scan", "OK" );
+    }
+
     restart_listeners.waitForFinished();
     scanOp.waitForFinished();
     sendOp.waitForFinished();

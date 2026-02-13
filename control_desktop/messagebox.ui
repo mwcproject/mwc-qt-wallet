@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>656</width>
-    <height>367</height>
+    <width>662</width>
+    <height>384</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -32,6 +32,21 @@
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>20</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>30</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>40</number>
+   </property>
    <item>
     <widget class="control::MwcLabelLarge" name="title">
      <property name="minimumSize">
@@ -55,7 +70,7 @@
       <string>Warning</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -80,13 +95,13 @@
       </size>
      </property>
      <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustIgnored</enum>
+      <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
      </property>
      <property name="undoRedoEnabled">
       <bool>false</bool>
@@ -95,7 +110,14 @@
       <bool>true</bool>
      </property>
      <property name="html">
-      <string></string>
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -104,7 +126,7 @@
      <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -135,10 +157,10 @@
         </size>
        </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <widget class="control::MwcLabelNormal" name="inputTTLBlocksLabel">
         <property name="geometry">
@@ -164,7 +186,7 @@
          <string>TTL blocks:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -206,7 +228,7 @@
          <number>64</number>
         </property>
         <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
+         <enum>QLineEdit::EchoMode::Normal</enum>
         </property>
         <property name="placeholderText">
          <string>TTL blocks</string>
@@ -239,7 +261,7 @@
          <string>Enter your password to continue:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -281,7 +303,7 @@
          <number>64</number>
         </property>
         <property name="echoMode">
-         <enum>QLineEdit::Password</enum>
+         <enum>QLineEdit::EchoMode::Password</enum>
         </property>
         <property name="placeholderText">
          <string>Password</string>
@@ -295,7 +317,7 @@
      <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -312,7 +334,7 @@
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -337,7 +359,7 @@
         </size>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
+        <enum>Qt::FocusPolicy::StrongFocus</enum>
        </property>
        <property name="text">
         <string>1</string>
@@ -350,7 +372,7 @@
      <item>
       <spacer name="central_HorizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -375,7 +397,7 @@
         </size>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
+        <enum>Qt::FocusPolicy::StrongFocus</enum>
        </property>
        <property name="text">
         <string>2</string>
@@ -391,7 +413,7 @@
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -431,10 +453,11 @@
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcPlainEditLogs.h</header>
   </customwidget>
-   <customwidget>
+  <customwidget>
    <class>control::MwcDialog</class>
    <extends>QDialog</extends>
    <header>control_desktop/mwcdialog.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
