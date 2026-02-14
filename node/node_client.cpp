@@ -26,6 +26,7 @@
 #include "core/Notification.h"
 #include "util/httpclient.h"
 #include "util/Log.h"
+#include "../wallet/wallet.h"
 
 namespace node {
 
@@ -73,9 +74,10 @@ const QString & getAuthorizationValue(const QString &network) {
                : flooNetAuthValue;
 }
 
-NodeClient::NodeClient(QString _network, node::MwcNode * _embeddedNode) :
-    network(_network), embeddedNode(_embeddedNode)
+NodeClient::NodeClient(QString _network, node::MwcNode * _embeddedNode, wallet::Wallet * _wallet) :
+    network(_network), embeddedNode(_embeddedNode), wallet(_wallet)
 {
+    Q_ASSERT(wallet);
     Q_ASSERT(embeddedNode);
     publicNodeIdx = QRandomGenerator::global()->bounded( getPublicNodes(network).size() );
 
@@ -134,6 +136,10 @@ void NodeClient::updateNodeSelection(int retry) {
 
 
 QString NodeClient::foreignApiRequest(const QString & request) {
+
+    if (wallet->getStartStatus() == wallet::Wallet::STARTED_MODE::OFFLINE) {
+        return "{}"; // empty response, wallet is exiting
+    }
 
     updateNodeSelection();
 

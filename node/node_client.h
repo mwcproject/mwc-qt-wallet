@@ -20,6 +20,10 @@
 
 #include "wallet/wallet_objs.h"
 
+namespace wallet {
+    class Wallet;
+}
+
 namespace util {
     class HttpClient;
 }
@@ -30,7 +34,7 @@ namespace node {
 class NodeClient  : public QObject {
     Q_OBJECT
 public:
-    NodeClient(QString network, node::MwcNode * embeddedNode);
+    NodeClient(QString network, node::MwcNode * embeddedNode, wallet::Wallet * wallet);
     virtual ~NodeClient();
 
     QString foreignApiRequest(const QString & request);
@@ -53,6 +57,7 @@ private:
 private:
     QString network;
     node::MwcNode * embeddedNode = nullptr;
+    wallet::Wallet * wallet = nullptr;
     // Client can use public or embedded node if it is synced up.
     volatile bool usePublicNode = true;
     int publicNodeIdx;

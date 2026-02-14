@@ -190,15 +190,15 @@ QString Wallet::init(QString _network, QString _walletDataPath, node::NodeClient
 void Wallet::release() {
     started_state = STARTED_MODE::OFFLINE;
 
-    CANCEL_FUTURE(restart_listeners);
-    CANCEL_FUTURE(scanOp);
-    CANCEL_FUTURE(sendOp);
-    CANCEL_FUTURE(scanRewindHashOp);
-
     if (context_id>=0) {
         mwc_api::ApiResponse<bool> res = stop_running_scan(context_id);
         LOG_CALL_RESULT("stop_running_scan", "OK" );
     }
+
+    CANCEL_FUTURE(restart_listeners);
+    CANCEL_FUTURE(scanOp);
+    CANCEL_FUTURE(sendOp);
+    CANCEL_FUTURE(scanRewindHashOp);
 
     restart_listeners.waitForFinished();
     scanOp.waitForFinished();

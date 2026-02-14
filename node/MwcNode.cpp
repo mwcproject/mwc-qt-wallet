@@ -57,7 +57,7 @@ static QPair<int, QString> startNode(MwcNode * node, QFuture<QString> * torStart
         // waiting for tor core to start first
         QString torStartResult = torStarter->result();
         if (!torStartResult.isEmpty()) {
-            return QPair<int, QString>(-1,"Failed to start embedded Tor");
+            return QPair<int, QString>(-1,"Failed to start embedded Tor service");
         }
     }
 

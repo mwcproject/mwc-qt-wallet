@@ -109,7 +109,7 @@ bool StateContext::initWalletNode(const QString & basePath, const QString & netw
         }
 
         Q_ASSERT(nodeClient == nullptr);
-        nodeClient = new node::NodeClient(network, mwcNode);
+        nodeClient = new node::NodeClient(network, mwcNode, wallet);
     }
 
     Q_ASSERT(nodeClient);
