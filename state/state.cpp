@@ -100,10 +100,13 @@ bool StateContext::initWalletNode(const QString & basePath, const QString & netw
         QPair<bool,QString> nodeDataPath = ioutils::getAppDataPath("mwc-node/" + network, true);
         Q_ASSERT(nodeDataPath.first);
         if (!nodeDataPath.first) {
+            // embedding node is not critical, not exiting the wallet
             logger::logError(logger::QT_WALLET, "Unable initialize directory for embedded node");
-            mwcNode->reportNodeFatalError("Unable initialize directory for embedded node");
+            mwcNode->reportNodeError("Unable initialize directory for embedded node");
         }
-        mwcNode->start( nodeDataPath.second , network );
+        else {
+            mwcNode->start( nodeDataPath.second , network );
+        }
 
         Q_ASSERT(nodeClient == nullptr);
         nodeClient = new node::NodeClient(network, mwcNode);

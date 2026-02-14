@@ -416,9 +416,8 @@ QString calculateRunningStatus(bool & pibdSyncPhase, ServerStats stats) {
 }
 
 
-void MwcNode::reportNodeFatalError( QString message ) {
+void MwcNode::reportNodeError( QString message ) {
     core::getWndManager()->messageTextDlg("Embedded MWC-Node Error", message);
-    mwc::closeApplication();
 }
 
 void MwcNode::submitStartNodeResult(QString errorStr, int context_id, bool isStartCancelled) {
@@ -427,7 +426,7 @@ void MwcNode::submitStartNodeResult(QString errorStr, int context_id, bool isSta
         if (!errorStr.isEmpty()) {
             this->nodeContextId = context_id;
             if (!isStartCancelled) {
-                this->reportNodeFatalError(errorStr);
+                this->reportNodeError(errorStr);
             }
         }
         else {

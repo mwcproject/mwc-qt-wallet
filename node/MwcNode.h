@@ -77,7 +77,7 @@ public:
 
     QString callForiegnApi(const QString & request);
 
-    void reportNodeFatalError( QString message );
+    void reportNodeError( QString message );
 
     void submitStartNodeResult(QString errorStr, int context_id, bool isStartCancelled);
 private:
