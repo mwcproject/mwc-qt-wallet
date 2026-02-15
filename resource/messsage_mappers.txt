@@ -84,3 +84,7 @@ This ownership proof record is incomplete. Some required information is missing.
 # Failed to validate ownership proof, Invalid ownership proof....
 Failed to validate ownership proof, Invalid ownership proof.+
 The ownership proof is invalid
+
+# Unable connect to Tor, Arti start error, Tor Config Error: Unable to find pluggale webtunnel client
+Unable connect to Tor, Arti start error.+
+Tor service is not accessible. Check your internet connection.

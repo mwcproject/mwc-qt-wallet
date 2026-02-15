@@ -641,7 +641,12 @@ namespace wallet {
         send_args["selection_strategy"] = selection_strategy.isEmpty() ? "smallest" : selection_strategy;
         send_args["estimate_selection_strategies"] = false;
         send_args["method"] = method;
-        send_args["dest"] = dest;
+        if (method!="slatepack") {
+            send_args["dest"] = dest; // For SP it is aestination file name. We don't want that
+        }
+        else {
+            send_args["dest"] = "";
+        }
         send_args["max_outputs"] = 500;
 
         if (http_proof_address.isEmpty())

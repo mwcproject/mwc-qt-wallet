@@ -36,7 +36,7 @@ QFuture<QString> startEmbeddedTor() {
 
                 QString startRes = tor::startEmbeddedTor(path.second);
                 if (!startRes.isEmpty()) {
-                    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to start embedded Tor service.\n"+ util::mapMessage(startRes));
+                    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to start embedded Tor service. "+ util::mapMessage(startRes));
                     return "Unable to start embedded Tor service.\n"+ startRes;
                 }
             }
