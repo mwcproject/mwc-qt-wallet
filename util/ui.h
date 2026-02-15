@@ -30,7 +30,8 @@ namespace util {
     // in: nanoCoins < 0 - ALL
     // out: resultOutputs - what we want include into transaction.
     //      txnFee        - txn fee for send using these resultOutputs
-    void getOutputsToSend2( const QString & accountPath, int outputsNumber, qint64 nanoCoins,
+    // Return true is any output was blocked
+    bool getOutputsToSend( const QString & accountPath, int outputsNumber, qint64 nanoCoins,
                            wallet::Wallet * wallet,
                            core::AppContext * appContext,
                            QStringList & resultOutputs, quint64* txnFee );
@@ -48,9 +49,10 @@ namespace util {
     // This method should only be called if there are no HODL outputs or lockedOutputs
     // is not enabled. Call only if getOutputsToSend() doesn't return resultOutputs and the txnFee
     //
+    // Return: <fee_amount, flag anything was locked>
     // returns 0 if the fee could not be calculated and the txnOutputList should not be used.
     //
-    quint64 getTxnFee2(const QString& accountPath, qint64 amount, wallet::Wallet* wallet,
+    QPair<quint64,bool> getTxnFee(const QString& accountPath, qint64 amount, wallet::Wallet* wallet,
                        core::AppContext* appContext, quint64 changeOutputs,
                        QStringList& txnOutputList);
 

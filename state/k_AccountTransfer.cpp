@@ -115,12 +115,12 @@ bool AccountTransfer::transferFunds(const QString & from,
     QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
     quint64 txnFee = 0; // not used here yet
     // nanoCoins < 0  - All
-    util::getOutputsToSend2( accFrom.accountPath, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
+    util::getOutputsToSend( accFrom.accountPath, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
 
     // Need to show confirmation dialog similar to what send has. Point to show the fees
     if (txnFee == 0 && outputs.size() == 0) {
-        txnFee = util::getTxnFee2( accFrom.accountPath, nanoCoins, context->wallet,
-                                  context->appContext, sendParams.changeOutputs, outputs );
+        txnFee = util::getTxnFee( accFrom.accountPath, nanoCoins, context->wallet,
+                                  context->appContext, sendParams.changeOutputs, outputs ).first;
     }
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
@@ -135,9 +135,9 @@ bool AccountTransfer::transferFunds(const QString & from,
 
     if (prms.changeOutputs != sendParams.changeOutputs) {
         // Recalculating the outputs and fees. There is a chance that outputs will be different.
-        util::getOutputsToSend2( accFrom.accountPath, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
+        util::getOutputsToSend( accFrom.accountPath, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
         if (outputs.size() == 0) {
-            util::getTxnFee2( accFrom.accountPath, nanoCoins, context->wallet,
+            util::getTxnFee( accFrom.accountPath, nanoCoins, context->wallet,
                                   context->appContext, sendParams.changeOutputs, outputs );
         }
     }

@@ -181,7 +181,8 @@ bool calcOutputsToSpend( qint64 nanoCoins, const QVector<wallet::WalletOutput> &
 
 // in: nanoCoins < 0 - ALL
 // out: resultOutputs - what we want include into transaction. If
-void getOutputsToSend2( const QString & accountPath, int outputsNumber, qint64 nanoCoins,
+// Return true is any output was blocked
+bool getOutputsToSend( const QString & accountPath, int outputsNumber, qint64 nanoCoins,
         wallet::Wallet * wallet,
         core::AppContext * appContext,
         QStringList & resultOutputs, quint64* txnFee ) {
@@ -207,6 +208,7 @@ void getOutputsToSend2( const QString & accountPath, int outputsNumber, qint64 n
 
     QStringList allOutputs;
 
+    bool wasAnyOutputLocked = false;
     for (wallet::WalletOutput o : outputs) {
         // Keep unspent only
         if (o.status != "Unspent") // Interesting only in Unspent outputs
@@ -217,8 +219,10 @@ void getOutputsToSend2( const QString & accountPath, int outputsNumber, qint64 n
         if (!o.coinbase && o.numOfConfirms.toInt() < appContext->getSendCoinsParams().inputConfirmationNumber)
             continue;
         // Skip locked
-        if (appContext->isLockedOutputs(o.outputCommitment).first)
+        if (appContext->isLockedOutputs(o.outputCommitment).first) {
+            wasAnyOutputLocked = true;
             continue;
+        }
 
         allOutputs.push_back(o.outputCommitment);
         totalNanoCoins += o.valueNano;
@@ -228,15 +232,17 @@ void getOutputsToSend2( const QString & accountPath, int outputsNumber, qint64 n
     // nothing on this account is in HODL
     resultOutputs = allOutputs;
     *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, totalNanoCoins, resultOutputs);
+    return wasAnyOutputLocked;
 }
 
 //
 // Populates a multimap with outputs available for spending using the output's value as the key.
+// Return true if anything was locked
 //
-static void
+static bool
 findSpendableOutputs(const QString& accountPath, wallet::Wallet* wallet, core::AppContext* appContext,
                      QMultiMap<qint64, wallet::WalletOutput>& spendableOutputs) {
-
+    bool anythingWasLocked = false;
     QVector<wallet::WalletOutput>  outputs = wallet->getOutputs(accountPath, false);
     for ( wallet::WalletOutput o : outputs) {
         if ( o.status != "Unspent" ) // Interested only in Unspent outputs
@@ -249,10 +255,13 @@ findSpendableOutputs(const QString& accountPath, wallet::Wallet* wallet, core::A
         // ensure outputs locked by Qt Wallet are not used
         // !!!! Commented because isLockOutputEnabled  is about permanent user defined settings
         // For swap marketplace also there are temporary locks that we should process here
-        if ( /*appContext->isLockOutputEnabled() &&*/ appContext->isLockedOutputs(o.outputCommitment).first )
+        if ( /*appContext->isLockOutputEnabled() &&*/ appContext->isLockedOutputs(o.outputCommitment).first ) {
+            anythingWasLocked = true;
             continue;
+        }
         spendableOutputs.insert(o.valueNano, o);
     }
+    return anythingWasLocked;
 }
 
 static qint64
@@ -418,23 +427,24 @@ quint64 getTxnFeeFromSpendableOutputs(qint64 amount, const QMultiMap<qint64, wal
 //     amount        - amount to spend in MWC nanocoins
 //     txnOutputList - list of output commitments to be used in transaction (from getOutputsToSend)
 //     changeOutputs - number of outputs to use for sender change outputs
+// Return: <fee_amount, flag anything was locked>
 //
-quint64 getTxnFee2(const QString& accountPath, qint64 amount, wallet::Wallet* wallet,
+QPair<quint64,bool> getTxnFee(const QString& accountPath, qint64 amount, wallet::Wallet* wallet,
                    core::AppContext* appContext, quint64 changeOutputs,
                    QStringList& txnOutputList) {
     // we should not have been called if the txn outputs have already been found
     if (txnOutputList.size() > 0)
-        return 0;
+        return QPair<quint64,bool>(0, false);
 
     quint64 txnFee = 0;
     QMultiMap<qint64, wallet::WalletOutput> spendableOutputs;
-    findSpendableOutputs(accountPath, wallet, appContext, spendableOutputs);
+    bool anythingWasLocked = findSpendableOutputs(accountPath, wallet, appContext, spendableOutputs);
 
     if (spendableOutputs.size() > 0) {
         txnFee = getTxnFeeFromSpendableOutputs(amount, spendableOutputs, changeOutputs, 0, txnOutputList);
     }
 
-    return txnFee;
+    return QPair<quint64,bool>(txnFee, anythingWasLocked);
 }
 
 // Function to determine the number of significant digits

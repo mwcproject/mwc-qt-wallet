@@ -141,9 +141,9 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
 
     // Check if we have extra for fee
     QStringList txnOutputList;
-    quint64 fee = util::getTxnFee2( selectedAccount.accountPath, mwcAmount.second, context->wallet,
+    quint64 fee = util::getTxnFee( selectedAccount.accountPath, mwcAmount.second, context->wallet,
                        context->appContext, sendParams.changeOutputs,
-                       txnOutputList);
+                       txnOutputList).first;
     if (fee < mwc::BASE_TRANSACTION_FEE) {
         core::getWndManager()->messageTextDlg("Incorrect Input", "Your account doesn't have enough MWC to send and cover the transaction fees.");
         return 2;
@@ -206,12 +206,14 @@ bool Send::sendMwcOffline( const QString & account, const QString & accountPath,
     // !!!! NOTE.  For mobile HODL not a case, first case can be skipped, Directly can be called util->getTxnFee
     QStringList outputs;
     quint64 txnFee = 0;
-    util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
+    bool anyOutputLocked = util::getOutputsToSend( accountPath, sendParams.changeOutputs, amount,
                                   context->wallet, context->appContext,
                                   outputs, &txnFee);
     if (txnFee == 0 && outputs.size() == 0) {
-        txnFee = util::getTxnFee2(accountPath, amount, context->wallet,
+        auto res = util::getTxnFee(accountPath, amount, context->wallet,
                                  context->appContext, sendParams.changeOutputs, outputs);
+        txnFee = res.first;
+        anyOutputLocked = anyOutputLocked || res.second;
     }
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
@@ -225,13 +227,18 @@ bool Send::sendMwcOffline( const QString & account, const QString & accountPath,
 
         if (prms.changeOutputs != sendParams.changeOutputs) {
             // Recalculating the outputs and fees. There is a chance that outputs will be different.
-            util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
+            util::getOutputsToSend( accountPath, sendParams.changeOutputs, amount,
                               context->wallet, context->appContext,
                               outputs, &txnFee);
             if (outputs.size() == 0) {
-                util::getTxnFee2(accountPath, amount, context->wallet,
+                util::getTxnFee(accountPath, amount, context->wallet,
                                          context->appContext, sendParams.changeOutputs, outputs);
             }
+        }
+
+        // For offline, we don't want to specify outputs because because of the late lock.
+        if (!anyOutputLocked) {
+            outputs.clear();
         }
 
         // Check signal: sendRespond
@@ -380,12 +387,12 @@ bool Send::sendMwcOnline( const QString & account, const QString & accountPath, 
 
     QStringList outputs;
     quint64 txnFee = 0;
-    util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
+    util::getOutputsToSend( accountPath, sendParams.changeOutputs, amount,
                                   context->wallet, context->appContext,
                                   outputs, &txnFee );
     if (txnFee == 0 && outputs.size() == 0) {
-        txnFee = util::getTxnFee2( accountPath, amount, context->wallet,
-                                  context->appContext, sendParams.changeOutputs, outputs );
+        txnFee = util::getTxnFee( accountPath, amount, context->wallet,
+                                  context->appContext, sendParams.changeOutputs, outputs ).first;
     }
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
@@ -399,11 +406,11 @@ bool Send::sendMwcOnline( const QString & account, const QString & accountPath, 
 
         if (prms.changeOutputs != sendParams.changeOutputs) {
             // Recalculating the outputs and fees. There is a chance that outputs will be different.
-            util::getOutputsToSend2( accountPath, sendParams.changeOutputs, amount,
+            util::getOutputsToSend( accountPath, sendParams.changeOutputs, amount,
                               context->wallet, context->appContext,
                               outputs, &txnFee);
             if (outputs.size() == 0) {
-                util::getTxnFee2(accountPath, amount, context->wallet,
+                util::getTxnFee(accountPath, amount, context->wallet,
                                          context->appContext, sendParams.changeOutputs, outputs);
             }
         }
