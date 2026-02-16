@@ -91,12 +91,13 @@ public:
     ListenerStatus getListenerStatus();
 
     // Start listening through services
-    // Response - error message
     void listeningStart(bool startMq, bool startTor);
 
     // Stop listening through services
-    // Response - error message
-    void listeningStop(bool stopMq, bool stopTor);
+    // return:
+    //    true if the task was schediled and will be executed.
+    //    false if nothing needs to be done. Everything is stopped
+    bool listeningStop(bool stopMq, bool stopTor);
 
     // Request MQS address
     QString getMqsAddress();
@@ -381,6 +382,7 @@ signals:
     // Scanning progress
     void onScanProgress( QString responseId, QJsonObject statusMessage );
     void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
+    void onStartStopListenersDone(int operation);
 
     // Send results
     void onSend( bool success, QString error, QString tx_uuid, qint64 amount, QString method, QString dest, QString tag );

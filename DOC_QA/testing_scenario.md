@@ -1362,6 +1362,17 @@ Wait when they will be mined.
 Check: Congrats dialogs with amounts, description and from address<br>
 Check: Number of dialogs should be 4, even 6 was sent. We show only first 4 messages
 
+## Validate that multiple receive when Wallet is Locked
+
+Lock the wallet and send 6 transactions online to it.<br>
+Check: Congrats dialogs with amounts, description and from address<br>
+Check: Number of dialogs should be 4, even 6 was sent. We show only first 4 messages
+
+Specify 3 minutes autolock and what until the wallet will be autolocked.<br>
+Send 6 transactions to it.<br>
+Check: Congrats dialogs with amounts, description and from address<br>
+Check: Number of dialogs should be 4, even 6 was sent. We show only first 4 messages
+
 # Event Window
 
 Press '!' icon at top right corner.<br>
@@ -1814,7 +1825,7 @@ Meanwhile check if wallet is robust, everything should work fine on public node,
 
 # Re-sync with cloud and network failure
 
-Close the wallet and delete mebdeed node data.<br>
+Close the wallet and delete emebdeed node data.<br>
 ```
 rm ~/mwc-qt-wallet/mwc-node/Floonet/lmdb/data.mdb
 rm ~/mwc-qt-wallet/mwc-node/Mainnet/lmdb/data.mdb

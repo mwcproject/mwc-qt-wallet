@@ -424,9 +424,12 @@ void Wallet::listeningStart(bool startMq, bool startTor) {
 }
 
 // Stop listening through services
-void Wallet::listeningStop(bool stopMq, bool stopTor) {
+// return:
+//    true if the task was schediled and will be executed.
+//    false if nothing needs to be done. Everything is stopped
+bool Wallet::listeningStop(bool stopMq, bool stopTor) {
     if (started_state == STARTED_MODE::OFFLINE)
-        return;
+        return false;
 
     if (stopMq) {
         if (mqs_running) {
@@ -442,7 +445,9 @@ void Wallet::listeningStop(bool stopMq, bool stopTor) {
         }
     }
 
+    bool needToSchedule = nextListenersTask!=0;
     startNextStartStopListeners();
+    return needToSchedule;
 }
 
 // Request MQS address
@@ -927,10 +932,10 @@ void Wallet::startNextStartStopListeners() {
 
 
 void Wallet::startStopListenersDone(int operation) {
-    Q_UNUSED(operation)
-
     if (core::WalletApp::isExiting())
         return;
+
+    emit onStartStopListenersDone(operation);
 
     restart_listeners = QFuture<void>();
 

@@ -35,8 +35,12 @@ protected:
     virtual bool canExitState(STATE nextWindowState) override;
 
 private slots:
+    void onStartStopListenersDone(int operation);
     void onScanProgress( QString responseId, QJsonObject statusMessage );
     void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
+
+private:
+    void start_scanning();
 
 private:
     int prevState = STATE::TRANSACTIONS;

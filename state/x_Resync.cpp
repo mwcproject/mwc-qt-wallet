@@ -22,6 +22,7 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/z_progresswnd_b.h"
 #include "../util/Log.h"
+#include "wallet/tasks/StartStopListeners.h"
 
 namespace state {
 
@@ -33,6 +34,9 @@ Resync::Resync( StateContext * context) :
 
     QObject::connect(context->wallet, &wallet::Wallet::onScanDone,
                      this, &Resync::onScanDone, Qt::QueuedConnection);
+
+    QObject::connect(context->wallet, &wallet::Wallet::onStartStopListenersDone,
+                     this, &Resync::onStartStopListenersDone, Qt::QueuedConnection);
 
     inSyncProcess = false;
 }
@@ -51,12 +55,17 @@ NextStateRespond Resync::execute() {
         prevState = STATE::TRANSACTIONS;
 
     // Starting recovery process
-    context->wallet->listeningStop(true, true);
+    bool scheduled = context->wallet->listeningStop(true, true);
+    scanRespId = "";
 
-    scanRespId = context->wallet->scan(true);
+    // Next should start Scan when
+    if (!scheduled) {
+        start_scanning();
+        Q_ASSERT(!scanRespId.isEmpty());
+    }
 
     core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, scanRespId,
-            "Re-sync with full node", "Preparing to re-sync", "", false);
+            "Re-sync with full node", "Stopping Listeners, please wait...", "", false);
 
     respondCounter = 0;
     respondZeroLevel = 0;
@@ -69,6 +78,14 @@ NextStateRespond Resync::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
+void Resync::start_scanning() {
+    Q_ASSERT(scanRespId.isEmpty());
+    scanRespId = context->wallet->scan(true);
+
+    core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, scanRespId,
+            "Re-sync with full node", "Preparing to re-sync", "", false);
+}
+
 void Resync::exitingState() {
     logger::logInfo(logger::STATE, "Call Resync::exitingState");
     context->stateMachine->unblockLogout("Resync");
@@ -78,6 +95,15 @@ bool Resync::canExitState(STATE nextWindowState) {
     logger::logInfo(logger::STATE, "Call Resync::canExitState with nextWindowState=" + QString::number(nextWindowState));
     Q_UNUSED(nextWindowState)
     return !inSyncProcess;
+}
+
+void Resync::onStartStopListenersDone(int operation) {
+    if (operation & (LISTENER_TOR_STOP | LISTENER_MQS_STOP) ) {
+        if (inSyncProcess && scanRespId.isEmpty()) {
+            start_scanning();
+            Q_ASSERT(!scanRespId.isEmpty());
+        }
+    }
 }
 
 void Resync::onScanProgress( QString responseId, QJsonObject statusMessage ) {

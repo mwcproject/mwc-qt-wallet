@@ -103,12 +103,29 @@ QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString
 
         logger::logInfo(logger::MWC_WALLET, "Starting StartStopListeners processing for 0x" + QString::number(operations, 16) );
 
+        int context_id = wallet->getContextId();
+
+        // Processing MQS first because it is faster
+        if (operations & LISTENER_MQS_STOP) {
+            mwc_api::ApiResponse<bool> res = stop_mqs_listener(context_id);
+            LOG_CALL_RESULT("RestartRunningListeners stop_mqs_listener", "OK")
+        }
+        if (operations & LISTENER_MQS_START) {
+            mwc_api::ApiResponse<bool> res = start_mqs_listener(context_id);
+            LOG_CALL_RESULT("RestartRunningListeners start_mqs_listener", "OK")
+        }
+        if (operations & LISTENER_MQS_RESTART) {
+            mwc_api::ApiResponse<bool> res = stop_mqs_listener(context_id);
+            LOG_CALL_RESULT("RestartRunningListeners stop_mqs_listener", "OK")
+
+            res = start_mqs_listener(context_id);
+            LOG_CALL_RESULT("RestartRunningListeners start_mqs_listener", "OK")
+        }
+
         bool toorIsOK = false;
         if ( operations & (LISTENER_TOR_START | LISTENER_TOR_RESTART) ) {
             toorIsOK = torStarter->result().isEmpty();
         }
-
-        int context_id = wallet->getContextId();
 
         while(check_wallet_busy(context_id).response || wallet->isUpdateInProgress()) {
             if (wallet->getStartStatus() == Wallet::STARTED_MODE::OFFLINE)
@@ -141,22 +158,6 @@ QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString
             else {
                 logger::logError(logger::MWC_WALLET, "Not starting Tor, because bootstrap was failed.");
             }
-        }
-
-        if (operations & LISTENER_MQS_STOP) {
-            mwc_api::ApiResponse<bool> res = stop_mqs_listener(context_id);
-            LOG_CALL_RESULT("RestartRunningListeners stop_mqs_listener", "OK")
-        }
-        if (operations & LISTENER_MQS_START) {
-            mwc_api::ApiResponse<bool> res = start_mqs_listener(context_id);
-            LOG_CALL_RESULT("RestartRunningListeners start_mqs_listener", "OK")
-        }
-        if (operations & LISTENER_MQS_RESTART) {
-            mwc_api::ApiResponse<bool> res = stop_mqs_listener(context_id);
-            LOG_CALL_RESULT("RestartRunningListeners stop_mqs_listener", "OK")
-
-            res = start_mqs_listener(context_id);
-            LOG_CALL_RESULT("RestartRunningListeners start_mqs_listener", "OK")
         }
 
         wallet->startStopListenersDone(operations);
