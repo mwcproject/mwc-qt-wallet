@@ -403,10 +403,10 @@ private:
 
     void release();
 private:
-    int context_id = -1;
+    volatile int context_id = -1;
     QString node_client_callback_name;
     QString update_status_callback_name;
-    STARTED_MODE started_state = STARTED_MODE::OFFLINE;
+    volatile STARTED_MODE started_state = STARTED_MODE::OFFLINE;
     QString network;
     QString walletDataPath;
     node::NodeClient * nodeClient = nullptr;
@@ -420,6 +420,7 @@ private:
     QAtomicInt response_id_counter = QAtomicInt(0);
 
     QFuture<void> scanOp;
+    QAtomicInt scanInProgress = QAtomicInt(0);
     QString lastScanResponseId;
     int lastTopHeight = 0;
 

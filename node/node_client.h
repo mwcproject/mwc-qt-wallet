@@ -17,6 +17,7 @@
 #define MWC_QT_WALLET_NODE_CLIENT_H
 #include <QObject>
 #include <QString>
+#include <QMutex>
 
 #include "wallet/wallet_objs.h"
 
@@ -42,7 +43,7 @@ public:
     wallet::NodeStatus requestNodeStatus();
 
     qint64 getLastNodeHeight() const {return lastNodeHeight;}
-    const QString & getLastInternalNodeState() const {return lastInternalNodeState;}
+    QString getLastInternalNodeState() const;
 
     bool isNodeHealthy();
 
@@ -51,10 +52,15 @@ private:
     signals:
 
 private:
-    void updateNodeSelection(int retry=3);
+    void updateNodeSelectionLocked(int retry=3);
 
-    QString callPublicNodeForeignApi(const QString & request);
+    QString callPublicNodeForeignApiLocked(const QString & request);
+
+    wallet::NodeStatus requestNodeStatusLocked();
 private:
+    // Don't call multiple requests with the same client.
+    mutable QMutex callMutex;
+
     QString network;
     node::MwcNode * embeddedNode = nullptr;
     wallet::Wallet * wallet = nullptr;
@@ -66,7 +72,7 @@ private:
 
     util::HttpClient * publicNodeClient = nullptr;
 
-    qint64 lastNodeHeight = 0;
+    volatile qint64 lastNodeHeight = 0;
 
     wallet::NodeStatus lastStatus;
     QString lastInternalNodeState;

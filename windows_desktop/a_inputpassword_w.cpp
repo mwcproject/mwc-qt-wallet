@@ -148,9 +148,7 @@ void InputPassword::on_submitButton_clicked() {
         ui->passwordEdit->setText("");
         ui->passwordEdit->setFocus(Qt::OtherFocusReason);
 
-        QThread::sleep(1); // sleep to prevent brute force attack.
-        // Note, we are using small hash, so the brute force attach will likely
-        // found wong password with similar hash.
+        QThread::msleep(300); // sleep to prevent brute force attack.
     }
 
     ui->passwordEdit->setEnabled(!ok);

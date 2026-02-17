@@ -94,7 +94,9 @@ int apply_operation( int cur_state, int apply_state ) {
 }
 
 QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString> * torStarter) {
-    return QtConcurrent::run([wallet, operations, torStarter] () -> void {
+    const int context_id = wallet->getContextId();
+
+    return QtConcurrent::run([wallet, operations, torStarter, context_id] () -> void {
         QThread::currentThread()->setObjectName("startStopListeners");
     #ifndef QT_NO_DEBUG
         // Checking if there are no conflict operaitons
@@ -102,8 +104,6 @@ QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString
     #endif
 
         logger::logInfo(logger::MWC_WALLET, "Starting StartStopListeners processing for 0x" + QString::number(operations, 16) );
-
-        int context_id = wallet->getContextId();
 
         // Processing MQS first because it is faster
         if (operations & LISTENER_MQS_STOP) {
@@ -127,6 +127,7 @@ QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString
             toorIsOK = torStarter->result().isEmpty();
         }
 
+        // Both wallet calls below are thread safe
         while(check_wallet_busy(context_id).response || wallet->isUpdateInProgress()) {
             if (wallet->getStartStatus() == Wallet::STARTED_MODE::OFFLINE)
                 return;
@@ -160,7 +161,12 @@ QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString
             }
         }
 
-        wallet->startStopListenersDone(operations);
+        // Wallet state must be touched from Wallet thread (main/UI thread in this app).
+        QMetaObject::invokeMethod(wallet,
+            [wallet, operations]() {
+                wallet->startStopListenersDone(operations);
+            },
+            Qt::QueuedConnection);
         QThread::currentThread()->setObjectName("QTThreadPool");
     });
 }

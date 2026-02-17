@@ -43,12 +43,16 @@ win32 {
     LIBS += -liphlpapi -lnetapi32 -lole32 -loleaut32 -lpropsys -lws2_32 -lntdll
 } else {
     CONFIG(debug, debug|release) {
-        LIBS += $$LIBDIR/debug/libmwc_wallet_lib.a
+        LIBS += $$LIBDIR/aarch64-apple-darwin/debug/libmwc_wallet_lib.a
     }
     CONFIG(release, debug|release) {
-        LIBS += $$LIBDIR/release/libmwc_wallet_lib.a
+        LIBS += $$LIBDIR/aarch64-apple-darwin/release/libmwc_wallet_lib.a
     }
 }
+
+# ---- Sanitizers (Debug/ASan config) ----
+QMAKE_CXXFLAGS += -fsanitize=address,undefined -fno-omit-frame-pointer -g -O1
+QMAKE_LFLAGS   += -fsanitize=address,undefined
 
 macx {
     CONFIG += app_bundle

@@ -27,21 +27,33 @@ QFuture<void> send(Wallet *wallet, QString accountPathSendFrom, QString tag, qin
                         bool generate_proof, int change_outputs, bool fluff, int ttl_blocks, bool exclude_change_outputs,
                         QStringList outputs, bool late_lock, qint64 min_fee) {
 
+    const int context_id = wallet->getContextId();
+
     QFuture<void> sendF = QtConcurrent::run( [wallet,accountPathSendFrom, tag, amount, amount_includes_fee,
                             message, minimum_confirmations, selection_strategy, method, dest,
                             generate_proof, change_outputs, fluff, ttl_blocks, exclude_change_outputs,
-                            outputs, late_lock, min_fee]() -> void
+                            outputs, late_lock, min_fee, context_id]() -> void
     {
         QThread::currentThread()->setObjectName("Send");
         logger::logInfo(logger::MWC_WALLET, QString("Send processing for method ") + method + " and amount " + QString::number(amount) );
-        int context_id = wallet->getContextId();
+
+        auto postSendDone = [wallet, tag](bool success, const QString & error, const QString & tx_uuid,
+                                qint64 amountVal, const QString & methodVal, const QString & destVal) {
+            // Wallet state must be touched from Wallet thread (main/UI thread in this app).
+            QMetaObject::invokeMethod(wallet,
+                [wallet, success, error, tx_uuid, amountVal, methodVal, destVal, tag]() {
+                    wallet->sendDone(success, error, tx_uuid, amountVal, methodVal, destVal, tag);
+                },
+                Qt::QueuedConnection);
+        };
+
         // if sending to Http and need proof, it is mean that we need to request proff address first
         QString proof_address;
         if (method=="http" && !dest.endsWith(".onion")) {
             mwc_api::ApiResponse<QString> res = request_receiver_proof_address(context_id, dest, "");
             if (res.hasError()) {
                 logger::logError(logger::MWC_WALLET, QString("Send, request_receiver_proof_address, for ") + dest + " failed with Error: " + res.error );
-                wallet->sendDone( false, res.error, "", amount, method, dest, tag);
+                postSendDone(false, res.error, "", amount, method, dest);
                 return;
             }
             proof_address = res.response;
@@ -60,7 +72,7 @@ QFuture<void> send(Wallet *wallet, QString accountPathSendFrom, QString tag, qin
         mwc_api::ApiResponse<QString> cur_account_path = current_account(context_id);
         if (cur_account_path.hasError()) {
             logger::logError(logger::MWC_WALLET, QString("Send, request current account, failed with Error: ") + cur_account_path.error );
-            wallet->sendDone( false, cur_account_path.error, "", amount, method, destAddr, tag);
+            postSendDone(false, cur_account_path.error, "", amount, method, destAddr);
             return;
         }
 
@@ -69,7 +81,7 @@ QFuture<void> send(Wallet *wallet, QString accountPathSendFrom, QString tag, qin
             mwc_api::ApiResponse<bool> res = switch_account(context_id, accountPathSendFrom);
             if (res.hasError()) {
                 logger::logError(logger::MWC_WALLET, QString("Send, switch_account, failed with Error: ") + cur_account_path.error );
-                wallet->sendDone( false, res.error, "", amount, method, destAddr, tag);
+                postSendDone(false, res.error, "", amount, method, destAddr);
                 return;
             }
             needRestoreAccount = true;
@@ -105,12 +117,12 @@ QFuture<void> send(Wallet *wallet, QString accountPathSendFrom, QString tag, qin
 
         if (send_res.hasError()) {
             logger::logError(logger::MWC_WALLET, QString("Send for method ") + method + " and amount " + QString::number(amount) + " failed with Error: " + send_res.error );
-            wallet->sendDone( false, send_res.error, "", amount, method, destAddr, tag);
+            postSendDone(false, send_res.error, "", amount, method, destAddr);
             return;
         }
 
         logger::logInfo(logger::MWC_WALLET, QString("Send for method ") + method + " and amount " + QString::number(amount) + " finished with success, new tx ID: " + send_res.response );
-        wallet->sendDone( true, "", send_res.response, amount, method, destAddr, tag);
+        postSendDone(true, "", send_res.response, amount, method, destAddr);
         QThread::currentThread()->setObjectName("QtThreadPool");
     });
     return sendF;

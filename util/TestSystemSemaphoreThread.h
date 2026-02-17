@@ -21,7 +21,7 @@ class QSystemSemaphore;
 
 namespace util {
 
-// Very specific class. Make it pulbilly available only because of QT magic.
+// Very specific class. Make it publicly available only because of QT magic.
 // QT magic works great only if class has both declaration and implementation in different files.
 class TestSystemSemaphoreThread : public QThread {
 Q_OBJECT

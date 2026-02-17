@@ -16,8 +16,13 @@
 #include "Notification.h"
 #include "../core/global.h"
 #include "../util/Log.h"
+#include <QCoreApplication>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QSet>
+#include <QThread>
 #include <QVector>
+#include <atomic>
 #include "WndManager.h"
 #include "MessageMapper.h"
 #include "../bridge/notification_b.h"
@@ -97,11 +102,20 @@ QString NotificationMessage::toString() const {
 Notification::Notification() {}
 
 static Notification * singletineNotification = nullptr;
+static QMutex singletineNotificationMutex;
 
 Notification * Notification::getObject2Notify() {
-    if (singletineNotification == nullptr) {
-        singletineNotification = new Notification();
+    QMutexLocker lock(&singletineNotificationMutex);
+    if (singletineNotification != nullptr) {
+        return singletineNotification;
     }
+
+    singletineNotification = new Notification();
+    QCoreApplication * app = QCoreApplication::instance();
+    if (app != nullptr && singletineNotification->thread() != app->thread()) {
+        singletineNotification->moveToThread(app->thread());
+    }
+
     return singletineNotification;
 }
 
@@ -127,8 +141,24 @@ void appendNotificationMessage( bridge::MESSAGE_LEVEL level, QString message ) {
 
     logger::logInfo(logger::NOTIFICATION, toString(level) + "  " + message );
 
+    // All notification handling must happen on Qt main thread because it may invoke UI.
+    QCoreApplication * app = QCoreApplication::instance();
+    if (app != nullptr && QThread::currentThread() != app->thread()) {
+        QMetaObject::invokeMethod(
+            app,
+            [level, message]() { appendNotificationMessage(level, message); },
+            Qt::QueuedConnection);
+        return;
+    }
+
     if (level == bridge::MESSAGE_LEVEL::FATAL_ERROR) {
-        // Fatal error. Display message box and exiting. We don't want to continue
+        // Fatal UI path must execute once only to avoid duplicate dialogs from concurrent reports.
+        static std::atomic_bool fatalDialogTriggered(false);
+        if (fatalDialogTriggered.exchange(true)) {
+            return;
+        }
+
+        // Fatal error. Display message box and exiting. We don't want to continue.
         core::getWndManager()->messageTextDlg("Wallet Error", "Wallet got a critical error:\n" + message + "\n\nPress OK to exit the wallet" );
         mwc::closeApplication();
         return;

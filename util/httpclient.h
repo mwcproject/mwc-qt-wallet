@@ -17,32 +17,49 @@
 
 #include <QString>
 #include <QByteArray>
-#include <QObject>
+#include <QMutex>
+#include <QHash>
+#include <QUrl>
 
-class QNetworkAccessManager;
-class QNetworkReply;
+class QSslSocket;
 
 namespace util {
 
-// Http client, SYNC and must be run in QT thread with event loop
-class HttpClient : public QObject {
-Q_OBJECT
+// Thread-safe synchronous HTTP client for POST requests.
+class HttpClient {
 public:
     enum HTTP_CALL {
-        GET, POST
+        POST
     };
 
-    HttpClient(QObject * parent);
+    explicit HttpClient(const QString & baseUrl);
+    ~HttpClient();
 
-    // Sync call, will wait for the response. Call from another QT thread with a loop events
-    QString sendRequest(HTTP_CALL call, const QString & url,
+    // Sync call, waits for response. Safe to call from multiple threads.
+    QString sendRequest(HTTP_CALL call, const QString & path,
                               const QVector<QString> & queryParams, // key/value
                               const QVector<QString> & headers, // key/value
                               const QByteArray & body,
                               int timeoutMs,
                               bool logRequest);
+
 private:
-    QNetworkAccessManager * nwManager = nullptr;
+    bool ensureConnectedLocked(int timeoutMs);
+    void closeSocketLocked();
+    QString buildRequestTarget(const QString & path,
+                               const QVector<QString> & queryParams) const;
+    bool readResponseLocked(int timeoutMs, int &statusCode,
+                            QHash<QByteArray, QByteArray> & responseHeaders,
+                            QByteArray & responseBody);
+
+private:
+    Q_DISABLE_COPY(HttpClient)
+
+    QMutex socketMutex;
+    QSslSocket * socket = nullptr;
+    QString baseHost;
+    quint16 basePort = 0;
+    bool baseTls = false;
 };
 
 }

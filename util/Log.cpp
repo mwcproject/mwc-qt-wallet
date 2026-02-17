@@ -18,6 +18,8 @@
 #include <QDir>
 #include <QApplication>
 #include <QDateTime>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QProcess>
 
 #include "message_mapper.h"
@@ -39,6 +41,7 @@ namespace logger {
 
 static LogSender *   logClient = nullptr;
 static LogReceiver * logServer = nullptr;
+static QMutex loggerMutex;
 
 //static bool logMwc713outBlocked = false;
 
@@ -81,7 +84,12 @@ QString who2str(Who who) {
 }
 
 void initLogger( bool logsEnabled) {
-    logClient = new LogSender(true);
+    {
+        QMutexLocker locker(&loggerMutex);
+        if (logClient == nullptr) {
+            logClient = new LogSender();
+        }
+    }
 
     enableLogs(logsEnabled);
 
@@ -89,8 +97,14 @@ void initLogger( bool logsEnabled) {
 }
 
 void cleanUpLogs() {
+    QMutexLocker locker(&loggerMutex);
+    bool canCleanup = (logServer == nullptr);
+    Q_ASSERT(canCleanup);
+
     // Logs expected to be disabled first
-    Q_ASSERT(logServer == nullptr );
+    if (!canCleanup)
+        return;
+
     QPair<bool,QString> logPath = ioutils::getAppDataPath("logs");
     if (!logPath.first) {
         core::getWndManager()->messageTextDlg("Error", logPath.second);
@@ -103,12 +117,12 @@ void cleanUpLogs() {
 
 // enable/disable logs
 void enableLogs( bool enableLogs ) {
+    QMutexLocker locker(&loggerMutex);
     if (enableLogs) {
         if (logServer != nullptr )
             return;
 
         logServer = new LogReceiver(LOG_FILE_NAME);
-        QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReceiver::onAppend2logs, Qt::DirectConnection); // Qt::QueuedConnection );
     }
     else {
         if (logServer == nullptr)
@@ -121,10 +135,8 @@ void enableLogs( bool enableLogs ) {
 
 
 void LogSender::log(bool addDate, const QString & prefix, const QString & line) {
-    if (asyncLogging) {
-        emit doAppend2logs(addDate, prefix, line);
-    }
-    else {
+    QMutexLocker locker(&loggerMutex);
+    if (logServer != nullptr) {
         logServer->onAppend2logs(addDate, prefix, line );
     }
 }
@@ -270,5 +282,3 @@ void logError(Who who, QString message) {
 }
 
 }
-
-

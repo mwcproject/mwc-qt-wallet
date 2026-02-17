@@ -25,12 +25,22 @@ QFuture<void> scanRewindHash(Wallet *wallet,
                     QString rewindHash,
                     QString update_status_callback_name, QString responseId)
 {
+    const int context_id = wallet->getContextId();
+
     QFuture<void> scanRewindHashF = QtConcurrent::run([wallet, rewindHash,
-                    update_status_callback_name, responseId]()->void {
+                    update_status_callback_name, responseId, context_id]()->void {
         QThread::currentThread()->setObjectName("scanRewindHash");
-        int context_id = wallet->getContextId();
         mwc_api::ApiResponse<ViewWallet> res = scan_rewind_hash(context_id, rewindHash, update_status_callback_name, responseId);
-        wallet->scanRewindDone( responseId, res.response, res.error );
+
+        const ViewWallet result = res.response;
+        const QString error = res.error;
+
+        // Wallet state must be touched from Wallet thread (main/UI thread in this app).
+        QMetaObject::invokeMethod(wallet,
+            [wallet, responseId, result, error]() {
+                wallet->scanRewindDone(responseId, result, error);
+            },
+            Qt::QueuedConnection);
         QThread::currentThread()->setObjectName("QtThreadPool");
     });
 

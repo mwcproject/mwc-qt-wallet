@@ -24,9 +24,8 @@
 #include "../util/address.h"
 #include "u_nodeinfo.h"
 #include <QDateTime>
+#include <QTimer>
 #include "../bridge/wnd/swap_b.h"
-#include <QThread>
-#include "../core/TimerThread.h"
 #include "s_mktswap.h"
 #include <QDir>
 
@@ -97,8 +96,9 @@ Swap::Swap(StateContext * context) :
     // You get an offer to swap BCH to MWC. SwapID is ffa15dbd-85a9-4fc9-a3c0-4cfdb144862b
     // Listen to a new swaps...
 
-    timer = new core::TimerThread(this, 1000);
-    QObject::connect( timer, &core::TimerThread::onTimerEvent, this, &Swap::onTimerEvent, Qt::QueuedConnection );
+    timer = new QTimer(this);
+    timer->setInterval(1000);
+    QObject::connect(timer, &QTimer::timeout, this, &Swap::onTimerEvent);
     timer->start();
 
     updateFeesIsNeeded();
@@ -106,9 +106,6 @@ Swap::Swap(StateContext * context) :
 
 Swap::~Swap() {
     timer->stop();
-    timer->wait();
-
-    delete timer;
 }
 
 NextStateRespond Swap::execute() {

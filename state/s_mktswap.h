@@ -25,9 +25,7 @@
 #include <QHash>
 #include <QSet>
 
-namespace core {
-class TimerThread;
-}
+class QTimer;
 
 namespace state {
 
@@ -269,7 +267,7 @@ slots:
 
     void onLogout();
 private:
-    core::TimerThread * timer = nullptr;
+    QTimer * timer = nullptr;
     Swap * swap = nullptr;
 
     // Key: <wallet>_<id>

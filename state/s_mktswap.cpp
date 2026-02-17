@@ -18,11 +18,11 @@
 
 #include "s_swap.h"
 #include "statemachine.h"
-#include "../core/TimerThread.h"
 #include "../core/appcontext.h"
 #include "../core/WndManager.h"
 #include "../wallet/wallet.h"
 #include <QTime>
+#include <QTimer>
 #include <QJsonDocument>
 #include "../util/Log.h"
 #include "../util/Files.h"
@@ -241,8 +241,9 @@ SwapMarketplace::SwapMarketplace(StateContext * context) :
     // If somebody accept the current offer, we don't want to print errors as forging. We better have 'not found' error.
     currentOfferId = int(QDateTime::currentMSecsSinceEpoch() % 30000);
 
-    timer = new core::TimerThread(this, 5000);
-    QObject::connect( timer, &core::TimerThread::onTimerEvent, this, &SwapMarketplace::onTimerEvent, Qt::QueuedConnection );
+    timer = new QTimer(this);
+    timer->setInterval(5000);
+    QObject::connect(timer, &QTimer::timeout, this, &SwapMarketplace::onTimerEvent);
     timer->start();
 
     QObject::connect( context->wallet, &wallet::Wallet::onCreateIntegrityFee, this, &SwapMarketplace::respCreateIntegrityFee, Qt::QueuedConnection );
@@ -266,8 +267,6 @@ SwapMarketplace::SwapMarketplace(StateContext * context) :
 
 SwapMarketplace::~SwapMarketplace() {
     timer->stop();
-    timer->wait();
-    delete timer;
 }
 
 

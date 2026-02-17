@@ -34,9 +34,11 @@
 #include "tasks/requestFaucet.h"
 #include "util/message_mapper.h"
 
+const int CALLBACK_SLOTS = 1000;
+
 // Problem that we return pointer to a string from the callback. It is mean that we must
 // store somewhere an instance. Using buffer for that
-static std::string node_client_callback_responses[50];
+static std::string node_client_callback_responses[CALLBACK_SLOTS];
 static QAtomicInt resp_idx(0);
 
 extern "C"
@@ -45,7 +47,7 @@ const int8_t* node_client_callback(void* ctx, const int8_t* message)
     node::NodeClient * nodeClient = (node::NodeClient *) ctx;
     Q_ASSERT(nodeClient);
 
-    int respIdx = std::abs(resp_idx.fetchAndAddRelaxed(1)) % 50;
+    int respIdx = std::abs(resp_idx.fetchAndAddRelaxed(1)) % CALLBACK_SLOTS;
 
     QString request((const char*)message);
     QString response = nodeClient->foreignApiRequest(request);
@@ -147,7 +149,7 @@ bool Wallet::isBusy() const {
 }
 
 bool Wallet::isUpdateInProgress() const {
-    return scanOp.isRunning();
+    return scanInProgress.loadAcquire() != 0;
 }
 
 
@@ -189,6 +191,7 @@ QString Wallet::init(QString _network, QString _walletDataPath, node::NodeClient
 
 void Wallet::release() {
     started_state = STARTED_MODE::OFFLINE;
+    scanInProgress.storeRelease(0);
 
     if (context_id>=0) {
         mwc_api::ApiResponse<bool> res = stop_running_scan(context_id);
@@ -220,6 +223,7 @@ void Wallet::release() {
     mqs_running = false;
     tor_running = false;
 
+    // Callbacks are garanteed be not in use. release_wallet did finish all threads and destroy all wallet's internals
     if (!node_client_callback_name.isEmpty()) {
         unregister_lib_callback(node_client_callback_name.toStdString().c_str());
         node_client_callback_name = "";
@@ -515,7 +519,7 @@ QVector<AccountInfo> Wallet::getWalletBalance(int confirmations, bool filterDele
                 balance.response.amount_awaiting_confirmation.toLongLong() + balance.response.amount_awaiting_finalization.toLongLong() +  balance.response.amount_immature.toLongLong(), // awaitingConfirmation
                 balance.response.amount_locked.toLongLong(),  // lockedByPrevTransaction
                 balance.response.amount_currently_spendable.toLongLong(), // currentlySpendable
-                balance.response.last_confirmed_height.toLongLong()); // hegiht
+                balance.response.last_confirmed_height.toLongLong()); // height
             if (filterDeleted && wi.isDeleted())
                 continue;
             result.push_back(wi);
@@ -589,6 +593,7 @@ QString Wallet::scan(bool delete_unconfirmed) {
 
     // Scan started in any case
     lastScanResponseId = responseId;
+    scanInProgress.storeRelease(1);
 
     scanOp = startScan(this, update_status_callback_name, responseId, true, delete_unconfirmed);
     return responseId;
@@ -608,6 +613,7 @@ QString Wallet::update_wallet_state() {
     QString responseId = "upd_" + QString::number(id);
 
     lastScanResponseId = responseId;
+    scanInProgress.storeRelease(1);
 
     // Scan started in any case
     scanOp = startScan(this, update_status_callback_name, responseId, false, false);
@@ -946,6 +952,7 @@ void Wallet::startStopListenersDone(int operation) {
 }
 
 void Wallet::scanDone(QString responseId, bool fullScan, int height, QString errorMessage ) {
+    scanInProgress.storeRelease(0);
     if (started_state == STARTED_MODE::OFFLINE)
         return;
 

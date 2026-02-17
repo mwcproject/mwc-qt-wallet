@@ -15,7 +15,7 @@
 #ifndef GUI_WALLET_LOG_H
 #define GUI_WALLET_LOG_H
 
-#include <QObject>
+#include <QString>
 
 class QFile;
 
@@ -42,27 +42,20 @@ namespace logger {
 
     QString who2str(Who who);
 
-    class LogSender : public QObject {
-        Q_OBJECT
+    class LogSender {
     public:
-        LogSender(bool _asyncLogging) : asyncLogging(_asyncLogging) {}
-        virtual ~LogSender() override {}
+        LogSender() = default;
+        ~LogSender() = default;
 
         void log(bool addDate, const QString & prefix, const QString & line);
-
-    signals:
-        void doAppend2logs(bool addDate, QString prefix, QString line );
-    private:
-        bool asyncLogging; // Use QT messaging or write directly. Direct writing might cause concurrency issues
     };
 
-    class LogReceiver : public QObject {
-        Q_OBJECT
+    class LogReceiver {
     public:
         LogReceiver(const QString & filename);
-        virtual ~LogReceiver() override;
+        ~LogReceiver();
 
-    public slots:
+    public:
         void onAppend2logs(bool addDate, QString prefix, QString line );
     private:
         void rotateLogFileIfNeeded();
@@ -76,18 +69,6 @@ namespace logger {
 
     // Must be call before first log usage
     void initLogger(bool logsEnabled);
-
-    // mwc713 IOs
-    //void blockLogMwc713out(bool blockOutput);
-    //void logMwc713out(QString str); //
-    //void logMwc713in(QString str); //
-    //void logMwcNodeOut(QString str); //
-
-//    void logParsingEvent(wallet::WALLET_EVENTS event, QString message );
-//    void logNodeEvent( const QString & api, const QString & event, const QString & data );
-
-    // Tasks to excecute on mwc713
-//    void logTask( QString who, wallet::Mwc713Task * task, QString comment );
 
     // Events activity
     void logEmit(Who who, QString event, QString params);

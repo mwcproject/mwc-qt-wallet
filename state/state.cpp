@@ -87,6 +87,8 @@ bool StateContext::initWalletNode(const QString & basePath, const QString & netw
     if (!baseFullPath.first)
         return false;
 
+    wallet->logout();
+
     Q_ASSERT(mwcNode);
     if (mwcNode->isRunning() && mwcNode->getCurrentNetwork() != network) {
         Q_ASSERT(nodeClient != nullptr);
@@ -111,9 +113,8 @@ bool StateContext::initWalletNode(const QString & basePath, const QString & netw
         Q_ASSERT(nodeClient == nullptr);
         nodeClient = new node::NodeClient(network, mwcNode, wallet);
     }
-
     Q_ASSERT(nodeClient);
-    wallet->logout();
+
     wallet->init(network, baseFullPath.second, nodeClient);
 
     walletPasePath = basePath;

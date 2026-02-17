@@ -24,12 +24,9 @@
 #include <QMap>
 #include <QHash>
 #include "../util/httpclient.h"
-#include <QThread>
 #include "s_mktswap.h"
 
-namespace core {
-class TimerThread;
-}
+class QTimer;
 
 namespace state {
 struct SecCurrencyInfo {
@@ -359,7 +356,7 @@ slots:
 
     void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 private:
-    core::TimerThread * timer = nullptr;
+    QTimer * timer = nullptr;
 
     // Key: swapId,  Value: running Task
     QMap<QString, AutoswapTask> runningSwaps;
