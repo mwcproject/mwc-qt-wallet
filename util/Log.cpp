@@ -17,10 +17,11 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QApplication>
+#include <QCoreApplication>
 #include <QDateTime>
-#include <QMutex>
-#include <QMutexLocker>
+#include <QMetaObject>
 #include <QProcess>
+#include <QThread>
 
 #include "message_mapper.h"
 #include "../core/Config.h"
@@ -41,7 +42,17 @@ namespace logger {
 
 static LogSender *   logClient = nullptr;
 static LogReceiver * logServer = nullptr;
-static QMutex loggerMutex;
+
+static inline bool isMainThread() {
+    QCoreApplication * app = QCoreApplication::instance();
+    return app == nullptr || QThread::currentThread() == app->thread();
+}
+
+static void appendToServer(bool addDate, const QString & prefix, const QString & line) {
+    if (logServer != nullptr) {
+        logServer->onAppend2logs(addDate, prefix, line );
+    }
+}
 
 //static bool logMwc713outBlocked = false;
 
@@ -84,11 +95,10 @@ QString who2str(Who who) {
 }
 
 void initLogger( bool logsEnabled) {
-    {
-        QMutexLocker locker(&loggerMutex);
-        if (logClient == nullptr) {
-            logClient = new LogSender();
-        }
+    Q_ASSERT(isMainThread());
+
+    if (logClient == nullptr) {
+        logClient = new LogSender();
     }
 
     enableLogs(logsEnabled);
@@ -97,7 +107,8 @@ void initLogger( bool logsEnabled) {
 }
 
 void cleanUpLogs() {
-    QMutexLocker locker(&loggerMutex);
+    Q_ASSERT(isMainThread());
+
     bool canCleanup = (logServer == nullptr);
     Q_ASSERT(canCleanup);
 
@@ -117,7 +128,8 @@ void cleanUpLogs() {
 
 // enable/disable logs
 void enableLogs( bool enableLogs ) {
-    QMutexLocker locker(&loggerMutex);
+    Q_ASSERT(isMainThread());
+
     if (enableLogs) {
         if (logServer != nullptr )
             return;
@@ -135,10 +147,16 @@ void enableLogs( bool enableLogs ) {
 
 
 void LogSender::log(bool addDate, const QString & prefix, const QString & line) {
-    QMutexLocker locker(&loggerMutex);
-    if (logServer != nullptr) {
-        logServer->onAppend2logs(addDate, prefix, line );
+    QCoreApplication * app = QCoreApplication::instance();
+    if (app != nullptr && QThread::currentThread() != app->thread()) {
+        QMetaObject::invokeMethod(
+            app,
+            [addDate, prefix, line]() { appendToServer(addDate, prefix, line); },
+            Qt::QueuedConnection);
+        return;
     }
+
+    appendToServer(addDate, prefix, line);
 }
 
 // Create logger file with some simplest rotation
