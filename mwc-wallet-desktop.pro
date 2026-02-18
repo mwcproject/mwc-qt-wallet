@@ -23,10 +23,10 @@ DEFINES += WALLET_DESKTOP
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 unix:!macx {
-    QMAKE_CXXFLAGS += -include features.h
+    DEFINES += _GNU_SOURCE
 }
 
-CONFIG += c++14
+CONFIG += c++17
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 # Rust static library
@@ -55,6 +55,22 @@ win32 {
 # ---- Sanitizers (Debug/ASan config) ----
 # QMAKE_CXXFLAGS += -fsanitize=address,undefined -fno-omit-frame-pointer -g -O1
 # QMAKE_LFLAGS   += -fsanitize=address,undefined
+
+CONFIG(release, debug|release) {
+    # Keep symbols in Release
+    QMAKE_CXXFLAGS_RELEASE += -g
+    QMAKE_LFLAGS_RELEASE   += -g
+
+    # Prefer O2 over O3 for stability (Qt's mkspec often uses -O2 already, but enforce)
+    QMAKE_CXXFLAGS_RELEASE -= -O3
+    QMAKE_CXXFLAGS_RELEASE += -O2
+
+    QMAKE_CXXFLAGS_RELEASE += -fno-omit-frame-pointer
+    QMAKE_CXXFLAGS_RELEASE += -fno-strict-aliasing
+}
+
+# Just in case if it is not a default for the compiler
+QMAKE_CXXFLAGS += -fno-common
 
 macx {
     CONFIG += app_bundle

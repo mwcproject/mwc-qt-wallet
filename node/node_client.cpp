@@ -41,7 +41,7 @@ const QStringList & getPublicNodes(const QString &network) {
     };
 
     static const QStringList flooNetPublicNodes = {
-        //"https://mwc713.floonet.mwc.mw",
+        "https://mwc713.floonet.mwc.mw",
         "http://13.236.73.43:13413"
     };
 

@@ -20,7 +20,7 @@ find_package(Qt6 COMPONENTS Core Gui Widgets Network Svg Concurrent REQUIRED)
 # Compiler options
 #
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 add_definitions( -DWALLET_DESKTOP )
