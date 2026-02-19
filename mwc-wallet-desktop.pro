@@ -35,10 +35,10 @@ LIBDIR = $$PWD/../mwc-wallet/target
 win32 {
     # The expected build chain is MinGw
     CONFIG(debug, debug|release) {
-        LIBS += $$LIBDIR/x86_64-pc-windows-gnu/debug/libmwc_wallet_lib.a
+        LIBS += $$LIBDIR/x86_64-pc-windows-msvc/debug/mwc_wallet_lib.lib
     }
     CONFIG(release, debug|release) {
-        LIBS += $$LIBDIR/x86_64-pc-windows-gnu/release/libmwc_wallet_lib.a
+        LIBS += $$LIBDIR/x86_64-pc-windows-msvc/release/mwc_wallet_lib.lib
     }
     LIBS += -liphlpapi -lnetapi32 -lole32 -loleaut32 -lpropsys -lws2_32 -lntdll
 } else {

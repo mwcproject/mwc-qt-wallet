@@ -17,31 +17,37 @@
 
 #include <QString>
 #include <QByteArray>
-#include <QMutex>
 #include <QHash>
+#include <QObject>
 #include <QUrl>
+#include <QVector>
 
 class QSslSocket;
+class QThread;
 
 namespace util {
 
+enum HTTP_CALL {
+    POST
+};
+
 // Thread-safe synchronous HTTP client for POST requests.
-class HttpClient {
+class HttpClientSyncImpl : public QObject {
+    Q_OBJECT
 public:
-    enum HTTP_CALL {
-        POST
-    };
+    explicit HttpClientSyncImpl(const QString & baseUrl, QObject * parent = nullptr);
+    ~HttpClientSyncImpl() override;
 
-    explicit HttpClient(const QString & baseUrl);
-    ~HttpClient();
-
-    // Sync call, waits for response. Safe to call from multiple threads.
+    // Sync call. Must be executed from HttpClientSyncImpl's owning thread.
     QString sendRequest(HTTP_CALL call, const QString & path,
                               const QVector<QString> & queryParams, // key/value
                               const QVector<QString> & headers, // key/value
                               const QByteArray & body,
                               int timeoutMs,
                               bool logRequest);
+
+    // Releases live socket state before thread shutdown.
+    void shutdown();
 
 private:
     bool ensureConnectedLocked(int timeoutMs);
@@ -53,13 +59,32 @@ private:
                             QByteArray & responseBody);
 
 private:
-    Q_DISABLE_COPY(HttpClient)
-
-    QMutex socketMutex;
+    Q_DISABLE_COPY(HttpClientSyncImpl)
     QSslSocket * socket = nullptr;
     QString baseHost;
     quint16 basePort = 0;
     bool baseTls = false;
+};
+
+// Owns a dedicated request thread and dispatches calls to HttpClientSyncImpl via invokeMethod.
+class HttpClient {
+public:
+    explicit HttpClient(const QString & baseUrl);
+    ~HttpClient();
+
+    // Sync call from any thread. Work executes in the HttpClient thread.
+    QString sendRequest(HTTP_CALL call, const QString & path,
+                        const QVector<QString> & queryParams, // key/value
+                        const QVector<QString> & headers, // key/value
+                        const QByteArray & body,
+                        int timeoutMs,
+                        bool logRequest);
+
+private:
+    Q_DISABLE_COPY(HttpClient)
+
+    QThread * requestThread = nullptr;
+    HttpClientSyncImpl * httpClient = nullptr;
 };
 
 }

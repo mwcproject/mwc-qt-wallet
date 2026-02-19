@@ -15,6 +15,7 @@
 #include "wallet/wallet.h"
 
 #include <qjsondocument.h>
+#include <QMetaObject>
 
 #include "api/MwcWalletApi.h"
 #include "core/global.h"
@@ -65,22 +66,26 @@ const int8_t* update_status_callback(void* ctx, const int8_t* message)
     Q_ASSERT(wallet);
 
     QString updateMsg((const char*)message);
-    logger::logDebug(logger::MWC_WALLET, "Status update : " + updateMsg);
+    QMetaObject::invokeMethod(wallet,
+        [wallet, updateMsg]() {
+            logger::logDebug(logger::MWC_WALLET, "Status update : " + updateMsg);
 
-    QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(updateMsg.toUtf8(), &err);
+            QJsonParseError err;
+            QJsonDocument doc = QJsonDocument::fromJson(updateMsg.toUtf8(), &err);
 
-    if (err.error != QJsonParseError::NoError) {
-        logger::logError(logger::MWC_WALLET,
-            "Unable to parse state update message: " + updateMsg + ".  Error: " + err.errorString() +  " at offset " + QString::number(err.offset));
-        return nullptr;
-    }
-    QJsonObject updateJson = doc.object();
+            if (err.error != QJsonParseError::NoError) {
+                logger::logError(logger::MWC_WALLET,
+                    "Unable to parse state update message: " + updateMsg + ".  Error: " + err.errorString() +  " at offset " + QString::number(err.offset));
+                return;
+            }
+            QJsonObject updateJson = doc.object();
 
-    QString response_id = updateJson["response_id"].toString();
-    QJsonObject status = updateJson["status"].toObject();
+            QString response_id = updateJson["response_id"].toString();
+            QJsonObject status = updateJson["status"].toObject();
 
-    wallet->emitStatusUpdate( response_id, status );
+            wallet->emitStatusUpdate( response_id, status );
+        },
+        Qt::QueuedConnection);
 
     return nullptr;
 }
@@ -92,30 +97,34 @@ int8_t const * new_tx_callback(void* ctx, const int8_t* msg) {
 
     // message is a json string with ReceiveData
     QString newTransaction((const char*)msg);
-    logger::logDebug(logger::MWC_WALLET, "Receive transaction message: " + newTransaction);
+    QMetaObject::invokeMethod(wallet,
+        [wallet, newTransaction]() {
+            logger::logDebug(logger::MWC_WALLET, "Receive transaction message: " + newTransaction);
 
-    QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(newTransaction.toUtf8(), &err);
+            QJsonParseError err;
+            QJsonDocument doc = QJsonDocument::fromJson(newTransaction.toUtf8(), &err);
 
-    if (err.error != QJsonParseError::NoError) {
-        logger::logError(logger::MWC_WALLET,
-            "Unable to parse Receive transaction message: " + newTransaction + ".  Error: " + err.errorString() +  " at offset " + QString::number(err.offset));
-        return nullptr;
-    }
-    QJsonObject newTx = doc.object();
+            if (err.error != QJsonParseError::NoError) {
+                logger::logError(logger::MWC_WALLET,
+                    "Unable to parse Receive transaction message: " + newTransaction + ".  Error: " + err.errorString() +  " at offset " + QString::number(err.offset));
+                return;
+            }
+            QJsonObject newTx = doc.object();
 
-    int context_id = newTx["context_id"].toInt();
-    if (wallet->getContextId()!=context_id) {
-        logger::logError(logger::MWC_WALLET, "Get new Tx message with invalid context id");
-        return nullptr;
-    }
+            int context_id = newTx["context_id"].toInt();
+            if (wallet->getContextId()!=context_id) {
+                logger::logError(logger::MWC_WALLET, "Get new Tx message with invalid context id");
+                return;
+            }
 
-    QString tx_uuid = newTx["tx_uuid"].toString();
-    QString from = newTx["from"].toString();
-    qint64 amount = newTx["amount"].toInteger();
-    QString message = newTx["message"].toString();
+            QString tx_uuid = newTx["tx_uuid"].toString();
+            QString from = newTx["from"].toString();
+            qint64 amount = newTx["amount"].toInteger();
+            QString message = newTx["message"].toString();
 
-    wallet->emitSlateReceivedFrom(tx_uuid, amount, from, message );
+            wallet->emitSlateReceivedFrom(tx_uuid, amount, from, message );
+        },
+        Qt::QueuedConnection);
     return nullptr;
 }
 

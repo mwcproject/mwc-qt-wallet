@@ -16,8 +16,10 @@
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QHash>
+#include <QMetaObject>
 #include <QSslConfiguration>
 #include <QSslSocket>
+#include <QThread>
 #include <QUrl>
 #include <QUrlQuery>
 
@@ -26,9 +28,7 @@
 
 namespace util {
 
-namespace {
-
-bool parseStatusAndHeaders(const QByteArray &headerBlock,
+static bool parseStatusAndHeaders(const QByteArray &headerBlock,
                            int &statusCode,
                            QHash<QByteArray, QByteArray> &responseHeaders) {
     responseHeaders.clear();
@@ -73,7 +73,7 @@ bool parseStatusAndHeaders(const QByteArray &headerBlock,
     return true;
 }
 
-bool decodeChunkedBody(const QByteArray &chunkedBody, QByteArray &decodedBody) {
+static bool decodeChunkedBody(const QByteArray &chunkedBody, QByteArray &decodedBody) {
     decodedBody.clear();
 
     int pos = 0;
@@ -123,9 +123,7 @@ bool decodeChunkedBody(const QByteArray &chunkedBody, QByteArray &decodedBody) {
     }
 }
 
-} // namespace
-
-HttpClient::HttpClient(const QString &baseUrl_) {
+HttpClientSyncImpl::HttpClientSyncImpl(const QString &baseUrl_, QObject * parent) : QObject(parent) {
     QUrl baseUrl(baseUrl_);
     baseHost = baseUrl.host();
     basePort = baseUrl.port(baseUrl.scheme().compare("https", Qt::CaseInsensitive) == 0 ? 443 : 80);
@@ -134,12 +132,13 @@ HttpClient::HttpClient(const QString &baseUrl_) {
     Q_ASSERT( !baseHost.isEmpty() && basePort>0 && basePort<65535 );
 }
 
-HttpClient::~HttpClient() {
-    QMutexLocker locker(&socketMutex);
-    closeSocketLocked();
+HttpClientSyncImpl::~HttpClientSyncImpl() {
+    Q_ASSERT(socket==nullptr); //  closeSocketLocked() expected to be called before
 }
 
-bool HttpClient::ensureConnectedLocked(int timeoutMs) {
+bool HttpClientSyncImpl::ensureConnectedLocked(int timeoutMs) {
+   Q_ASSERT(QThread::currentThread() == thread());
+
     if (baseHost.isEmpty() || basePort == 0) {
         Q_ASSERT(false);
         return false;
@@ -150,7 +149,7 @@ bool HttpClient::ensureConnectedLocked(int timeoutMs) {
 
     closeSocketLocked();
 
-    socket = new QSslSocket();
+    socket = new QSslSocket(this);
     socket->setPeerVerifyMode(QSslSocket::VerifyNone);
     socket->setProtocol(QSsl::TlsV1_2OrLater);
 
@@ -171,7 +170,9 @@ bool HttpClient::ensureConnectedLocked(int timeoutMs) {
     return true;
 }
 
-void HttpClient::closeSocketLocked() {
+void HttpClientSyncImpl::closeSocketLocked() {
+    Q_ASSERT(QThread::currentThread() == thread());
+
     if (socket == nullptr) {
         return;
     }
@@ -181,7 +182,7 @@ void HttpClient::closeSocketLocked() {
     socket = nullptr;
 }
 
-QString HttpClient::buildRequestTarget(const QString &path,
+QString HttpClientSyncImpl::buildRequestTarget(const QString &path,
                                        const QVector<QString> &queryParams) const {
     if (path.isEmpty()) {
         return QString();
@@ -212,9 +213,11 @@ QString HttpClient::buildRequestTarget(const QString &path,
     return target;
 }
 
-bool HttpClient::readResponseLocked(int timeoutMs, int &statusCode,
+bool HttpClientSyncImpl::readResponseLocked(int timeoutMs, int &statusCode,
                                     QHash<QByteArray, QByteArray> &responseHeaders,
                                     QByteArray &responseBody) {
+    Q_ASSERT(QThread::currentThread() == thread());
+
     statusCode = 0;
     responseHeaders.clear();
     responseBody.clear();
@@ -305,12 +308,13 @@ bool HttpClient::readResponseLocked(int timeoutMs, int &statusCode,
     }
 }
 
-QString HttpClient::sendRequest(HTTP_CALL call, const QString & path,
+QString HttpClientSyncImpl::sendRequest(HTTP_CALL call, const QString & path,
                           const QVector<QString> & queryParams, // key/value
                           const QVector<QString> & headers, // key/value
                           const QByteArray & body,
                           int timeoutMs,
                           bool logRequest) {
+    Q_ASSERT(QThread::currentThread() == thread());
 
     qDebug() << "Sending request to base URL:" << baseHost << ":" << basePort
              << ", path:" << path << ", params: " << queryParams << ",  headers: " << headers;
@@ -351,8 +355,6 @@ QString HttpClient::sendRequest(HTTP_CALL call, const QString & path,
             continue;
         }
 
-        const QByteArray lowerHeader = headerName.toLower();
-
         requestData += headerName + ": " + headerValue + "\r\n";
     }
 
@@ -364,8 +366,6 @@ QString HttpClient::sendRequest(HTTP_CALL call, const QString & path,
     requestData += body;
 
     QString response;
-    QMutexLocker locker(&socketMutex);
-
     for (int attempt = 0; attempt < 2; ++attempt) {
         if (!ensureConnectedLocked(timeoutMs)) {
             continue;
@@ -415,5 +415,54 @@ QString HttpClient::sendRequest(HTTP_CALL call, const QString & path,
     return response;
 }
 
+void HttpClientSyncImpl::shutdown() {
+    Q_ASSERT(QThread::currentThread() == thread());
+    closeSocketLocked();
+}
+
+HttpClient::HttpClient(const QString & baseUrl) {
+    requestThread = new QThread();
+    requestThread->setObjectName("HttpClient_" + baseUrl);
+    requestThread->start();
+
+    httpClient = new HttpClientSyncImpl(baseUrl);
+    httpClient->moveToThread(requestThread);
+}
+
+HttpClient::~HttpClient() {
+    HttpClientSyncImpl *client = httpClient;
+    QMetaObject::invokeMethod(
+            client,
+            [client]() { client->shutdown(); },
+            Qt::BlockingQueuedConnection);
+
+    delete httpClient;
+    httpClient = nullptr;
+
+    requestThread->quit();
+    requestThread->wait();
+    requestThread = nullptr;
+}
+
+QString HttpClient::sendRequest(HTTP_CALL call, const QString &path,
+                                    const QVector<QString> &queryParams, // key/value
+                                    const QVector<QString> &headers, // key/value
+                                    const QByteArray &body, int timeoutMs, bool logRequest) {
+    HttpClientSyncImpl *client = httpClient;
+    QString response;
+    const bool invoked = QMetaObject::invokeMethod(
+        client,
+        [&response, client, call, path, queryParams, headers, body, timeoutMs, logRequest]() {
+            response = client->sendRequest(call, path, queryParams, headers, body, timeoutMs, logRequest);
+        },
+        Qt::BlockingQueuedConnection);
+
+    if (!invoked) {
+        logger::logError(logger::HTTP_CLIENT, "Failed to dispatch request to HttpClient thread");
+        return "";
+    }
+
+    return response;
+}
 
 }

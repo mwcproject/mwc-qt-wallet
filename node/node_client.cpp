@@ -190,7 +190,7 @@ QString NodeClient::callPublicNodeForeignApiLocked(const QString & request) {
         return "";
     }
 
-    QString res = publicNodeClient->sendRequest(util::HttpClient::POST, "/v2/foreign",
+    QString res = publicNodeClient->sendRequest(util::POST, "/v2/foreign",
                           {}, // key/value
                           {"Content-Type", "application/json", // key/value
                               "Connection", "keep-alive",
