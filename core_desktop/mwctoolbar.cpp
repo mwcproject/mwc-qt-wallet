@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "../features.h"
+#include "../wallet_features.h"
 #include "mwctoolbar.h"
 #include "ui_mwctoolbar.h"
 #include <QPainter>

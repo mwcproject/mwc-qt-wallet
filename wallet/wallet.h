@@ -15,7 +15,7 @@
 #ifndef MWCWALLET_H
 #define MWCWALLET_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 #include <QMutex>
 #include "wallet_objs.h"
 #include "tasks/TorEmbeddedStarter.h"

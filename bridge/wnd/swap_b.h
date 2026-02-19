@@ -15,7 +15,7 @@
 #ifndef MWC_QT_WALLET_SWAP_H
 #define MWC_QT_WALLET_SWAP_H
 
-#include "../../features.h"
+#include "../../wallet_features.h"
 
 #ifdef FEATURE_SWAP
 

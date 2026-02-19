@@ -15,7 +15,7 @@
 #ifndef S_MKTSHOWPARAMSDLG_D_H
 #define S_MKTSHOWPARAMSDLG_D_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 
 #ifdef FEATURE_MKTPLACE
 

@@ -15,7 +15,7 @@
 #ifndef S_NEWSWAP2_W_H
 #define S_NEWSWAP2_W_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 
 #ifdef FEATURE_SWAP
 

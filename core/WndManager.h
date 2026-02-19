@@ -15,7 +15,7 @@
 #ifndef MWC_QT_WALLET_IWALLETWNDMANANGER_H
 #define MWC_QT_WALLET_IWALLETWNDMANANGER_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 #include "../util/Json.h"
 #include "../wallet/wallet.h"
 

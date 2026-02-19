@@ -15,7 +15,7 @@
 #ifndef S_ADJUSTSTATEDLG_H
 #define S_ADJUSTSTATEDLG_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 
 #ifdef FEATURE_SWAP
 

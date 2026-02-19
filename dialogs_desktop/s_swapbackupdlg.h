@@ -15,7 +15,7 @@
 #ifndef S_SWAPBACKUPDLG_H
 #define S_SWAPBACKUPDLG_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 
 #ifdef FEATURE_SWAP
 

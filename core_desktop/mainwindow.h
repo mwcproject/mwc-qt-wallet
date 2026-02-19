@@ -15,7 +15,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 #include <QMainWindow>
 #include <QTimer>
 #include "../state/state.h"

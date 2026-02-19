@@ -15,7 +15,7 @@
 #ifndef MWC_QT_WALLET_DESKTOPWNDMANAGER_H
 #define MWC_QT_WALLET_DESKTOPWNDMANAGER_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 #include "../core/WndManager.h"
 
 namespace core {

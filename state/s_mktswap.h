@@ -15,7 +15,7 @@
 #ifndef MWC_QT_WALLET_S_MKTSWAP_H
 #define MWC_QT_WALLET_S_MKTSWAP_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 
 #ifdef FEATURE_MKTPLACE
 

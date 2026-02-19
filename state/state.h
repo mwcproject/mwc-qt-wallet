@@ -16,7 +16,7 @@
 #define STATE_H
 
 #include <QString>
-#include "../features.h"
+#include "../wallet_features.h"
 
 namespace core {
     class WindowManager;

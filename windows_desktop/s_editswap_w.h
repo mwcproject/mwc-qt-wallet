@@ -15,7 +15,7 @@
 #ifndef S_EDITSWAP_W_H
 #define S_EDITSWAP_W_H
 
-#include "../features.h"
+#include "../wallet_features.h"
 
 #ifdef FEATURE_SWAP
 
