@@ -629,7 +629,7 @@ Validate that 'Available' amount includes only unlocked output. 'Locked' is equa
 Go to 'Transaction' page.<br>
 Validate that 'Available' amount includes only unlocked output. 'Locked' is equal to Locked outputs amounts.
 
-Go to meny -> 'Accounts' page.<br>
+Go to menu -> 'Accounts' page.<br>
 Validate that 'Available' amount includes only unlocked output. 'Locked' is equal to Locked outputs amounts.
 
 Press 'transfer between accounts' icon. Transfer some coins, make change outputs 1.

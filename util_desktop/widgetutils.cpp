@@ -46,6 +46,8 @@ void resizeEditByContent( QWidget * parentWindow, QTextEdit * edit, bool html, c
 
         bool resized = false;
 
+        parentWindow->adjustSize();
+
         do {
             // prepare for rendering
             QSize curSz = edit->size();

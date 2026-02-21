@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>735</width>
-    <height>557</height>
+    <height>495</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -70,7 +70,7 @@
       <string>Warning</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -95,13 +95,13 @@
       </size>
      </property>
      <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustIgnored</enum>
+      <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
      </property>
      <property name="undoRedoEnabled">
       <bool>false</bool>
@@ -117,7 +117,7 @@
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Orientation::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -132,7 +132,7 @@
      <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -156,7 +156,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
      <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -171,7 +171,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
    <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Orientation::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -186,7 +186,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
      <item>
       <spacer name="horizontalSpacer_5">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -217,10 +217,10 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
         </size>
        </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <widget class="control::MwcLabelNormal" name="inputPassLabel_2">
         <property name="geometry">
@@ -246,7 +246,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
          <string>Enter your password to continue:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -291,7 +291,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
          <number>64</number>
         </property>
         <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
+         <enum>QLineEdit::EchoMode::Normal</enum>
         </property>
         <property name="placeholderText">
          <string>Outputs num.</string>
@@ -324,7 +324,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
          <string>Change outputs:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -369,7 +369,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
          <number>64</number>
         </property>
         <property name="echoMode">
-         <enum>QLineEdit::Password</enum>
+         <enum>QLineEdit::EchoMode::Password</enum>
         </property>
         <property name="placeholderText">
          <string>Password</string>
@@ -383,7 +383,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
      <item>
       <spacer name="horizontalSpacer_6">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -400,7 +400,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -425,7 +425,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
         </size>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
+        <enum>Qt::FocusPolicy::StrongFocus</enum>
        </property>
        <property name="toolTip">
         <string>Cancel this transaction</string>
@@ -441,7 +441,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
      <item>
       <spacer name="central_HorizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -466,7 +466,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
         </size>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
+        <enum>Qt::FocusPolicy::StrongFocus</enum>
        </property>
        <property name="toolTip">
         <string>Authorize this transaction</string>
@@ -482,7 +482,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -522,15 +522,16 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcPlainEditLogs.h</header>
   </customwidget>
-   <customwidget>
-   <class>control::MwcCheckBox</class>
-   <extends>QCheckBox</extends>
-   <header>control_desktop/MwcCheckBox.h</header>
-  </customwidget>
   <customwidget>
    <class>control::MwcDialog</class>
    <extends>QDialog</extends>
    <header>control_desktop/mwcdialog.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

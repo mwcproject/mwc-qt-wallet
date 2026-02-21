@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>491</height>
+    <width>787</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -58,7 +58,7 @@
       <string>Warning</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -83,13 +83,13 @@
       </size>
      </property>
      <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
      </property>
      <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustIgnored</enum>
+      <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
      </property>
      <property name="undoRedoEnabled">
       <bool>false</bool>
@@ -107,7 +107,7 @@
      <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -138,10 +138,10 @@
         </size>
        </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <widget class="control::MwcLabelNormal" name="inputTTLBlocksLabel">
         <property name="geometry">
@@ -167,7 +167,7 @@
          <string>TTL blocks:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -212,7 +212,7 @@
          <number>64</number>
         </property>
         <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
+         <enum>QLineEdit::EchoMode::Normal</enum>
         </property>
         <property name="placeholderText">
          <string>TTL blocks</string>
@@ -245,7 +245,7 @@
          <string>Enter your password to continue:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -290,7 +290,7 @@
          <number>64</number>
         </property>
         <property name="echoMode">
-         <enum>QLineEdit::Password</enum>
+         <enum>QLineEdit::EchoMode::Password</enum>
         </property>
         <property name="placeholderText">
          <string>Password</string>
@@ -338,7 +338,7 @@
          <number>64</number>
         </property>
         <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
+         <enum>QLineEdit::EchoMode::Normal</enum>
         </property>
         <property name="placeholderText">
          <string>Outputs num.</string>
@@ -371,7 +371,7 @@
          <string>Change outputs:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -382,7 +382,7 @@
      <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -399,7 +399,7 @@
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -424,7 +424,7 @@
         </size>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
+        <enum>Qt::FocusPolicy::StrongFocus</enum>
        </property>
        <property name="toolTip">
         <string>Cancel this transaction</string>
@@ -440,7 +440,7 @@
      <item>
       <spacer name="central_HorizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -465,7 +465,7 @@
         </size>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
+        <enum>Qt::FocusPolicy::StrongFocus</enum>
        </property>
        <property name="toolTip">
         <string>Authorize this transaction</string>
@@ -484,7 +484,7 @@
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -524,10 +524,11 @@
    <extends>QTextEdit</extends>
    <header>control_desktop/MwcPlainEditLogs.h</header>
   </customwidget>
-   <customwidget>
+  <customwidget>
    <class>control::MwcDialog</class>
    <extends>QDialog</extends>
    <header>control_desktop/mwcdialog.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

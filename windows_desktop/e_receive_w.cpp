@@ -93,7 +93,7 @@ Receive::Receive(QWidget *parent) :
         ui->torAddress->hide();
     }
 
-    if ( !config->isOnlineWallet() || config->isFaucetRequested()) {
+    if ( !config->isOnlineWallet() || config->isFaucetRequested() || config->getNetwork() == "Mainnet" ) {
         ui->requestFaucetMWCButton->hide();
     }
 
@@ -163,12 +163,23 @@ void Receive::onSgnUpdateListenerStatus(bool mqsOnline, bool torOnline) {
 
 void Receive::on_requestFaucetMWCButton_clicked()
 {
-    // even it is sync call, it is a long operation and wallet will continue to handle the events.
-    // Not great design, but OK for single call at floonet
-    ui->progress->show();
-    ui->requestFaucetMWCButton->setEnabled(false);
-    wallet->requestFaucetMWC();
-    // Response at onSgnFaucetMWCDone
+    QVector<bool> listenerStatus = wallet->getListenerStatus();
+    if (listenerStatus.length()>2 && listenerStatus[1]) {
+        // even it is sync call, it is a long operation and wallet will continue to handle the events.
+        // Not great design, but OK for single call at floonet
+        ui->progress->show();
+        ui->requestFaucetMWCButton->setEnabled(false);
+        wallet->requestFaucetMWC();
+        // Response at onSgnFaucetMWCDone
+    }
+    else {
+        if (!listenerStatus[0]) {
+            control::MessageBox::messageText(this, "MWCMQS Listener", "MWCMQS Listener is not activated. Please activate it at the 'Wallet Configuration'.");
+        }
+        else {
+            control::MessageBox::messageText(this, "MWCMQS Listener", "MWCMQS Listentener is offline, please check your network connection.");
+        }
+    }
 }
 
 void Receive::onSgnFaucetMWCDone(bool success) {
