@@ -40,7 +40,7 @@ public:
     void stopDisplay();
     int windowPosition() { return statusWindowNumber; }
     void checkWindowFlags(bool displayOnTop);
-
+    const QString & getStatusMessage() const {return statusMessage;}
 private slots:
     void on_statusMessage_clicked();
 

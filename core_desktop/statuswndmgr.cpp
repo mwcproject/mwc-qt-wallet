@@ -131,15 +131,27 @@ void StatusWndMgr::handleStatusMessage(QString prefix, QString message) {
         initWindows();
     }
 
+    QString statusMessage = prefix + message;
+
     // skip any duplicate messages
-    if (pendingStatusMessages.size() > 0 && pendingStatusMessages.last() == message)
+    if (pendingStatusMessages.contains(statusMessage))
         return;
+    // Also check if visible already haev such message as well
+    for (int i=0; i<visibleMsgCount; i++) {
+        if ( i<statusWindowList.size()) {
+            StatusWnd* swnd = statusWindowList.value(i);
+            if (swnd!=nullptr) {
+                if (swnd->getStatusMessage() == statusMessage)
+                    return; // return as duplicated
+            }
+        }
+    }
 
     // only append the message if there is room in the queue
     // the call to displayPendingStatusMessages() will then check
     // if we can take and display any more messages from the queue
     if (pendingStatusMessages.size() < pendingMsgLimit) {
-        pendingStatusMessages.append(prefix + message);
+        pendingStatusMessages.append(statusMessage);
     }
     displayPendingStatusMessages();
 }
