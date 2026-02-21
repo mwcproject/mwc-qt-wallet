@@ -56,19 +56,6 @@ win32 {
 # QMAKE_CXXFLAGS += -fsanitize=address,undefined -fno-omit-frame-pointer -g -O1
 # QMAKE_LFLAGS   += -fsanitize=address,undefined
 
-CONFIG(release, debug|release) {
-    # Keep symbols in Release
-    QMAKE_CXXFLAGS_RELEASE += -g
-    QMAKE_LFLAGS_RELEASE   += -g
-
-    # Prefer O2 over O3 for stability (Qt's mkspec often uses -O2 already, but enforce)
-    QMAKE_CXXFLAGS_RELEASE -= -O3
-    QMAKE_CXXFLAGS_RELEASE += -O2
-
-    QMAKE_CXXFLAGS_RELEASE += -fno-omit-frame-pointer
-    QMAKE_CXXFLAGS_RELEASE += -fno-strict-aliasing
-}
-
 # Just in case if it is not a default for the compiler
 QMAKE_CXXFLAGS += -fno-common
 
