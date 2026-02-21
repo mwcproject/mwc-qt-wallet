@@ -60,7 +60,7 @@ bool AccountTransfer::transferFunds(const QString & from,
                    const QString & sendAmount ) {
     logger::logInfo(logger::STATE, "Call AccountTransfer::transferFunds with from=" + from + " to=" + to + " sendAmount=" + sendAmount);
 
-    if ( !context->nodeClient->isNodeHealthy() ) {
+    if ( !context->wallet->isNodeHealthy() ) {
         core::getWndManager()->messageTextDlg("Unable to transfer", "Your MWC Node, that wallet is connected to, is not ready.\n"
                                                                  "MWC Node needs to be connected to a few peers and finish block synchronization process");
         return false;

@@ -25,6 +25,7 @@
 #include "../bridge/wnd/a_inputpassword_b.h"
 #include <QDir>
 #include "../util/crypto.h"
+#include "util/ioutils.h"
 
 namespace state {
 
@@ -39,18 +40,13 @@ InputPassword::~InputPassword() {
 }
 
 NextStateRespond InputPassword::execute() {
-    bool running = context->wallet->getStartStatus() != wallet::Wallet::STARTED_MODE::OFFLINE;
+    bool running = context->wallet->isInit();
     QString lockStr = context->appContext->pullCookie<QString>("LockWallet");
     inLockMode = false;
 
     // Always try to start the wallet. State before is responsible for the first init
     if ( !running ) {
-        // We are at the right place. Let's start the wallet
-
-        // Processing all pending to clean up the processes
-        QCoreApplication::processEvents();
-
-        // As a node we can exit because no password is expected
+        // As an online node we can go forward because no password is expected
         if (config::isOnlineNode()) {
             core::getWndManager()->pageNodeInfo();
             // Starting the wallet normally for the node
@@ -76,10 +72,15 @@ NextStateRespond InputPassword::execute() {
 
 bool InputPassword::submitPassword(const QString & password, const QString & selectedPath) {
     logger::logInfo(logger::STATE, "Call InputPassword::submitPassword with <password> selectedPath=" + selectedPath);
-    bool running = context->wallet->getStartStatus() != wallet::Wallet::STARTED_MODE::OFFLINE;
+    bool running = context->wallet->isInit();
+
+    QPair<bool,QString> baseFullPath = ioutils::getAppDataPath( selectedPath );
+    if (!baseFullPath.first)
+        return false;
+
     // Check if we can skip logout/login step.
     // If wallet wasn't changed, there is no reason logout and restart all listeners.
-    if (inLockMode && running && context->getCurrentBasePath() == selectedPath &&
+    if (inLockMode && running && context->wallet->getWalletConfig().getDataPath() == baseFullPath.second &&
                 context->appContext->getActiveWndState() != STATE::SHOW_SEED) {
         // We can just verify the password and we should be good
 
@@ -96,6 +97,14 @@ bool InputPassword::submitPassword(const QString & password, const QString & sel
         return true;
     }
 
+    QVector<QString> walletInfo = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(selectedPath,  context->appContext);
+    std::shared_ptr<node::NodeClient> nodeCLient;
+    if (walletInfo.size()>=1) {
+        QString network = walletInfo[0];
+        if (context->wallet->getWalletConfig().getNetwork() == network)
+            nodeCLient = context->wallet->getNodeClient();
+    }
+
     // Check if we need to logout first. It is very valid case if we in lock mode
     context->wallet->logout();
 
@@ -104,12 +113,12 @@ bool InputPassword::submitPassword(const QString & password, const QString & sel
         mwc::setWalletLocked(inLockMode);
     }
 
-    if (!context->initWalletNode(selectedPath)) {
+    if (!context->initWalletNode(selectedPath, nodeCLient)) {
         logger::logError(logger::QT_WALLET, "Unable to init wallet for data location " + selectedPath);
         return false;
     }
 
-    QString err = context->wallet->loginWithPassword( password, context->appContext );
+    QString err = context->wallet->loginWithPassword( password );
     if (!err.isEmpty()) {
         logger::logDebug(logger::QT_WALLET, "Log attempt was failed. Error: " + err);
         core::getWndManager()->messageTextDlg("Login error", err);
@@ -117,7 +126,7 @@ bool InputPassword::submitPassword(const QString & password, const QString & sel
     }
 
     // Going forward by initializing the wallet
-    if ( context->wallet->getStartStatus() == wallet::Wallet::STARTED_MODE::NORMAL ) {
+    if ( context->wallet->isInit() ) {
         if (! config::isOnlineNode()) {
             // Updating the wallet balance
             updateRespId = context->wallet->update_wallet_state();

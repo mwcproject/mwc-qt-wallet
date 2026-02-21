@@ -20,7 +20,7 @@
 
 namespace wallet {
 
-class Wallet;
+class WalletInternals;
 
 #define LISTENER_TOR_STOP     0x0001
 #define LISTENER_TOR_START    0x0002
@@ -32,7 +32,7 @@ class Wallet;
 
 int apply_operation( int prev_state, int apply_state );
 
-QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString> * torStarter);
+QFuture<void> startStopListeners(WalletInternals *internals, int operations, QFuture<QString> * torStarter);
 
 }
 

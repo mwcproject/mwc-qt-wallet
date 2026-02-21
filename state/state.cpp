@@ -14,6 +14,7 @@
 
 #include "state.h"
 
+#include <QCoreApplication>
 #include <QFileInfo>
 
 #include "statemachine.h"
@@ -48,13 +49,12 @@ State * getState(STATE state) {
     return res;
 }
 
-StateContext::StateContext(core::AppContext * _appContext,
-                     wallet::Wallet * _wallet,
-                     node::MwcNode * _mwcNode) :
-            appContext(_appContext), wallet(_wallet), mwcNode(_mwcNode), stateMachine(nullptr) {
+    StateContext::StateContext(core::AppContext * _appContext,
+                     wallet::Wallet * _wallet, QFuture<QString> * _torStarter) :
+            appContext(_appContext), wallet(_wallet), stateMachine(nullptr), torStarter(_torStarter) {
     Q_ASSERT(appContext);
     Q_ASSERT(wallet);
-    Q_ASSERT(mwcNode);
+    Q_ASSERT(torStarter);
 }
 
 
@@ -73,51 +73,47 @@ bool StateContext::isWalletDataValid(const QString & basePath, bool hasSeed) {
 }
 
 // Will read the network from the base path
-bool StateContext::initWalletNode(const QString & basePath) {
+bool StateContext::initWalletNode(const QString & basePath, std::shared_ptr<node::NodeClient> nodeClient) {
     QVector<QString> walletInfo = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(basePath, appContext);
     if (walletInfo.size()>=1) {
-        return initWalletNode(basePath, walletInfo[0]);
+        return initWalletNode(basePath, walletInfo[0], nodeClient);
     }
     return false;
 }
 
 // Dont expect any wallet info in the base Path (online network case)
-bool StateContext::initWalletNode(const QString & basePath, const QString & network) {
+bool StateContext::initWalletNode(const QString & basePath, const QString & network, std::shared_ptr<node::NodeClient> nodeClient) {
+    Q_ASSERT(QThread::currentThread() == QCoreApplication::instance()->thread());
+
     QPair<bool,QString> baseFullPath = ioutils::getAppDataPath( basePath );
     if (!baseFullPath.first)
         return false;
 
-    wallet->logout();
-
-    Q_ASSERT(mwcNode);
-    if (mwcNode->isRunning() && mwcNode->getCurrentNetwork() != network) {
-        Q_ASSERT(nodeClient != nullptr);
-        nodeClient->deleteLater();
-        nodeClient = nullptr;
-        mwcNode->stop();
+    if (wallet->isInit() && wallet->getWalletConfig().getNetwork()==network) {
+        nodeClient = wallet->getNodeClient();
     }
 
-    // Starting new embedded node
-    if (!mwcNode->isRunning()) {
+    wallet->logout();
+    Q_ASSERT(wallet->getContextId()<0);
+
+    if (nodeClient != nullptr) {
+       Q_ASSERT( nodeClient->getCurrentNetwork() == network );
+    }
+
+    if (nodeClient==nullptr) {
         QPair<bool,QString> nodeDataPath = ioutils::getAppDataPath("mwc-node/" + network, true);
         Q_ASSERT(nodeDataPath.first);
         if (!nodeDataPath.first) {
+            Q_ASSERT(false);
             // embedding node is not critical, not exiting the wallet
             logger::logError(logger::QT_WALLET, "Unable initialize directory for embedded node");
-            mwcNode->reportNodeError("Unable initialize directory for embedded node");
-        }
-        else {
-            mwcNode->start( nodeDataPath.second , network );
         }
 
-        Q_ASSERT(nodeClient == nullptr);
-        nodeClient = new node::NodeClient(network, mwcNode, wallet);
+        nodeClient = std::shared_ptr<node::NodeClient>(new node::NodeClient( nodeDataPath.second, network, appContext, torStarter));
     }
-    Q_ASSERT(nodeClient);
-
+    Q_ASSERT(nodeClient!=nullptr);
+    Q_ASSERT(wallet->getContextId()<0);
     wallet->init(network, baseFullPath.second, nodeClient);
-
-    walletPasePath = basePath;
 
     return true;
 }

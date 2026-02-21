@@ -18,10 +18,9 @@
 #include <QtConcurrent>
 
 #include "util/Log.h"
-#include "wallet/wallet.h"
+#include "wallet/wallet_internals.h"
 #include "wallet/wallet_macro.h"
 #include "wallet/api/MwcWalletApi.h"
-#include "../wallet.h"
 
 namespace wallet {
 
@@ -93,11 +92,10 @@ int apply_operation( int cur_state, int apply_state ) {
     return cur_state;
 }
 
-QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString> * torStarter) {
-    const int context_id = wallet->getContextId();
+QFuture<void> startStopListeners(WalletInternals *internals, int operations, QFuture<QString> * torStarter) {
+    const int context_id = internals->context_id;
 
-    return QtConcurrent::run([wallet, operations, torStarter, context_id] () -> void {
-        QThread::currentThread()->setObjectName("startStopListeners");
+    return QtConcurrent::run([internals, operations, torStarter, context_id] () -> void {
     #ifndef QT_NO_DEBUG
         // Checking if there are no conflict operaitons
         apply_operation(operations, 0);
@@ -128,10 +126,9 @@ QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString
         }
 
         // Both wallet calls below are thread safe
-        while(check_wallet_busy(context_id).response || wallet->isUpdateInProgress()) {
-            if (wallet->getStartStatus() == Wallet::STARTED_MODE::OFFLINE)
+        while(check_wallet_busy(context_id).response || internals->isUpdateInProgress()) {
+            if (internals->isExiting())
                 return;
-
             QThread::msleep(150);
         }
 
@@ -162,12 +159,11 @@ QFuture<void> startStopListeners(Wallet *wallet, int operations, QFuture<QString
         }
 
         // Wallet state must be touched from Wallet thread (main/UI thread in this app).
-        QMetaObject::invokeMethod(wallet,
-            [wallet, operations]() {
-                wallet->startStopListenersDone(operations);
+        QMetaObject::invokeMethod(internals,
+            [internals, operations]() {
+                    internals->startStopListenersDone(operations);
             },
             Qt::QueuedConnection);
-        QThread::currentThread()->setObjectName("QTThreadPool");
     });
 }
 

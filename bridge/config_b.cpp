@@ -454,10 +454,5 @@ bool Config::isFaucetRequested() {
     return getAppContext()->isFaucetRequested();
 }
 
-void Config::faucetRequested() {
-    logger::logInfo(logger::BRIDGE, "Call Config::faucetRequested");
-    getAppContext()->faucetRequested();
-}
-
 
 }

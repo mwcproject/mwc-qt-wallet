@@ -414,9 +414,6 @@ int main(int argc, char *argv[])
 
         QFuture<QString> torStarter = wallet::startEmbeddedTor();
 
-        // Update Node
-        node::MwcNode * mwcNode = new node::MwcNode( &appContext, &torStarter );
-
 #ifdef WALLET_DESKTOP
         wallet::Wallet * wallet = new wallet::Wallet(&torStarter);
 #else
@@ -426,7 +423,7 @@ int main(int argc, char *argv[])
         qtAndroidService->sendToService("Start Service");
 #endif
 
-        state::StateContext context( &appContext, wallet, mwcNode );
+        state::StateContext context( &appContext, wallet, &torStarter );
 
         state::setStateContext(&context);
 
@@ -468,13 +465,6 @@ int main(int argc, char *argv[])
 #ifdef WALLET_DESKTOP
         delete windowManager; windowManager=nullptr;
 #endif
-
-        // Stopping embedded node after the wallet. Otherwise wallet will report connect to the node errors
-        if (mwcNode->isRunning()) {
-            mwcNode->stop();
-        }
-
-        delete mwcNode; mwcNode = nullptr;
 
         torStarter.waitForFinished();
 

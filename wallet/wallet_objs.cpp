@@ -115,6 +115,7 @@ QString WalletConfig::toString() const {
             "dataPath=" + dataPath;
 }
 
+// Return: [Network, Arch, InstanceName]
 // Return empty if not found
 //static
 QVector<QString>  WalletConfig::readNetworkArchInstanceFromDataPath(QString configPath, core::AppContext * context) // local path as writen in config

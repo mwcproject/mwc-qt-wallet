@@ -73,19 +73,19 @@ void HeartBeat::timerEvent(QTimerEvent *event) {
 
     updateNodeStatus();
 
-    if ( context->wallet->getStartStatus() != wallet::Wallet::STARTED_MODE::NORMAL ) {
+    if ( !context->wallet->isInit() ) {
            lastNodeIsHealty = true;
            return;
     }
 
-    bool pubNode = context->nodeClient->isUsePublicNode();
+    bool pubNode = context->wallet->isUsePublicNode();
     if (lastUsePubNode != pubNode) {
         lastUsePubNode = pubNode;
         notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                               QString("Wallet switched to ") + (pubNode ? "public" : "embedded") + " MWC-Node");
     }
 
-    if ( context->nodeClient->isNodeHealthy() ) {
+    if ( context->wallet->isNodeHealthy() ) {
         if (!lastNodeIsHealty) {
             if (config::isOnlineWallet()) {
                 notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
@@ -133,10 +133,10 @@ void HeartBeat::timerEvent(QTimerEvent *event) {
 }
 
 void HeartBeat::updateNodeStatus() {
-    if (context->nodeClient==nullptr)
+    if (!context->wallet->isInit())
         return;
 
-    wallet::NodeStatus nodeStatus = context->nodeClient->requestNodeStatus();
+    wallet::NodeStatus nodeStatus = context->wallet->requestNodeStatus();
 
     if (justLogin) {
         justLogin = false;
@@ -149,16 +149,14 @@ void HeartBeat::updateNodeStatus() {
         }
     }
 
-    QString localNodeProgress =  context->nodeClient->getLastInternalNodeState();
+    QString localNodeProgress =  context->wallet->getLastInternalNodeState();
     for (auto b : bridge::getBridgeManager()->getHeartBeat())
         b->emitNodeStatus( localNodeProgress, nodeStatus );
 
     if (lastNodeDifficulty != nodeStatus.totalDifficulty ) {
         lastNodeDifficulty = nodeStatus.totalDifficulty;
         // trigger update because the height was changed
-        if (context->wallet->getStartStatus() == wallet::Wallet::STARTED_MODE::NORMAL) {
-            context->wallet->update_wallet_state();
-        }
+        context->wallet->update_wallet_state();
         lastNodeHeight = nodeStatus.nodeHeight;
     }
 }

@@ -549,6 +549,7 @@ struct WalletTransaction {
     };
 
     struct NodeStatus {
+        bool wasUpdated = false;
         bool internalNode = false;
         bool online = false;
         qint64 nodeHeight = 0;

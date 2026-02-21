@@ -63,16 +63,14 @@ void StatusWndMgr::removeWindows() {
     if (statusWindowList.size() > 0) {
         for (int i=0; i<maxStatusDisplay; i++) {
             StatusWnd* swnd = statusWindowList.takeFirst();
-            swnd->stopDisplay();
-            delete swnd;
+            swnd->deleteLater();
         }
     }
 
     if (pendingWindowList.size() > 0) {
         for (int j=0; j<numPendingMsgWindows; j++) {
             StatusWnd* pwnd = pendingWindowList.takeFirst();
-            pwnd->stopDisplay();
-            delete pwnd;
+            pwnd->deleteLater();
         }
     }
 }
@@ -251,7 +249,8 @@ void StatusWndMgr::hideWindow(StatusWnd* swnd) {
     if (visibleMsgCount > 0) {
         // reposition any visible status windows
         int idx = statusWindowList.indexOf(swnd);
-        statusWindowList.removeAt(idx);
+        if (idx>=0)
+            statusWindowList.removeAt(idx);
 
         int newPosition = 0;
         // reposition all of the remaining status messages

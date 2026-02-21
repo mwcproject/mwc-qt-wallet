@@ -19,6 +19,7 @@
 #include <QString>
 #include <QMutex>
 
+#include "MwcNode.h"
 #include "wallet/wallet_objs.h"
 
 namespace wallet {
@@ -32,10 +33,9 @@ namespace util {
 namespace node {
     class MwcNode;
 
-class NodeClient  : public QObject {
-    Q_OBJECT
+class NodeClient {
 public:
-    NodeClient(QString network, node::MwcNode * embeddedNode, wallet::Wallet * wallet);
+    NodeClient(const QString & nodeDataPath, QString network, core::AppContext * appContext, QFuture<QString> * torStarter);
     virtual ~NodeClient();
 
     QString foreignApiRequest(const QString & request);
@@ -48,6 +48,11 @@ public:
     bool isNodeHealthy();
 
     bool isUsePublicNode() const {return usePublicNode;}
+
+    std::shared_ptr<node::MwcNode> takeEmbeddedNode();
+    void restoreEmbeddedNode(std::shared_ptr<node::MwcNode> node);
+
+    QString getCurrentNetwork() const;
 private:
     signals:
 
@@ -61,9 +66,8 @@ private:
     // Don't call multiple requests with the same client.
     mutable QMutex callMutex;
 
-    QString network;
-    node::MwcNode * embeddedNode = nullptr;
-    wallet::Wallet * wallet = nullptr;
+    const QString network;
+    std::shared_ptr<node::MwcNode> embeddedNode;
     // Client can use public or embedded node if it is synced up.
     volatile bool usePublicNode = true;
     int publicNodeIdx;

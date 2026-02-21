@@ -26,7 +26,6 @@
 #include "core/Notification.h"
 #include "util/httpclient.h"
 #include "util/Log.h"
-#include "../wallet/wallet.h"
 
 namespace node {
 
@@ -50,10 +49,6 @@ const QStringList & getPublicNodes(const QString &network) {
                : flooNetPublicNodes;
 }
 
-void updatePablicNodeLatency() {
-
-}
-
 const QString & getAuthorizationValue(const QString &network) {
     static const QString publicNodeSecret = "11ne3EAUtOXVKwhxm84U";
     static const QString mainNetAuthValue = QString::fromLatin1(
@@ -74,12 +69,13 @@ const QString & getAuthorizationValue(const QString &network) {
                : flooNetAuthValue;
 }
 
-NodeClient::NodeClient(QString _network, node::MwcNode * _embeddedNode, wallet::Wallet * _wallet) :
-    network(_network), embeddedNode(_embeddedNode), wallet(_wallet)
+NodeClient::NodeClient(const QString & _nodeDataPath, QString _network,
+    core::AppContext * _appContext, QFuture<QString> * _torStarter) :
+    network(_network), embeddedNode( _nodeDataPath.isEmpty() ? nullptr : new MwcNode(_appContext, _torStarter))
 {
-    Q_ASSERT(wallet);
-    Q_ASSERT(embeddedNode);
     publicNodeIdx = QRandomGenerator::global()->bounded( getPublicNodes(network).size() );
+    if (embeddedNode!=nullptr)
+        embeddedNode->start(_nodeDataPath, network);
 
     QString publicNodeClientUrl = getPublicNodes(network)[publicNodeIdx];
     publicNodeClient = new util::HttpClient(publicNodeClientUrl);
@@ -96,39 +92,52 @@ NodeClient::~NodeClient() {
 void NodeClient::updateNodeSelectionLocked(int retry) {
     if (QDateTime::currentSecsSinceEpoch() > nodeStatusCheckTime) {
         if (config::isOnlineWallet()) {
-            QPair<ServerStats, QString> embeddedStats = embeddedNode->getServerStats();
-            qint64 embeddedNodeHeight = embeddedStats.first.chain_stats.height;
-
-            logger::logInfo(logger::QT_WALLET, "Update node selection call");
-
-            // Checking public node stats
-            QString resJStr = callPublicNodeForeignApiLocked("{\"jsonrpc\": \"2.0\",\"method\": \"get_tip\",\"params\": [],\"id\": 1}");
-            QJsonParseError parseError;
-            QJsonObject res = resJStr.isEmpty() ? QJsonObject() : QJsonDocument::fromJson(resJStr.toUtf8(), &parseError).object();
-            Q_ASSERT(parseError.error == QJsonParseError::NoError);
-
-            qint64 publicNodeHeight = 0;
-            if (!res.isEmpty()) {
-                publicNodeHeight = res["result"].toObject()["Ok"].toObject()["height"].toInteger();
+            if (embeddedNode==nullptr) {
+                logger::logInfo(logger::QT_WALLET, "Using public node because emebedded node is not set");
+                usePublicNode = true;
             }
             else {
-                // Changing public node
-                if (retry>0) {
-                    publicNodeIdx = (publicNodeIdx + 1) % getPublicNodes(network).size();
-                    if (publicNodeClient!=nullptr) {
-                        delete publicNodeClient;
+                QPair<ServerStats, QString> embeddedStats = embeddedNode->getServerStats();
+                const ServerStats & stats = embeddedStats.first;
+                qint64 embeddedNodeHeight = stats.chain_stats.height;
+
+                if (!usePublicNode && stats.peer_count>5 && stats.sync_status.status=="NoSync") {
+                    // Embedded node is good, we can keep usint it. No need to
+                    logger::logInfo(logger::QT_WALLET, "Skipping node selection. Running on embedded node and it is good");
+                }
+                else {
+                    logger::logInfo(logger::QT_WALLET, "Update node selection call");
+
+                    // Checking public node stats
+                    QString resJStr = callPublicNodeForeignApiLocked("{\"jsonrpc\": \"2.0\",\"method\": \"get_tip\",\"params\": [],\"id\": 1}");
+                    QJsonParseError parseError;
+                    QJsonObject res = resJStr.isEmpty() ? QJsonObject() : QJsonDocument::fromJson(resJStr.toUtf8(), &parseError).object();
+                    Q_ASSERT(parseError.error == QJsonParseError::NoError);
+
+                    qint64 publicNodeHeight = 0;
+                    if (!res.isEmpty()) {
+                        publicNodeHeight = res["result"].toObject()["Ok"].toObject()["height"].toInteger();
                     }
-                    QString publicNodeClientUrl = getPublicNodes(network)[publicNodeIdx];
-                    publicNodeClient = new util::HttpClient(publicNodeClientUrl);
-                    updateNodeSelectionLocked(retry-1);
-                    return;
+                    else {
+                        // Changing public node
+                        if (retry>0) {
+                            publicNodeIdx = (publicNodeIdx + 1) % getPublicNodes(network).size();
+                            if (publicNodeClient!=nullptr) {
+                                delete publicNodeClient;
+                            }
+                            QString publicNodeClientUrl = getPublicNodes(network)[publicNodeIdx];
+                            publicNodeClient = new util::HttpClient(publicNodeClientUrl);
+                            updateNodeSelectionLocked(retry-1);
+                            return;
+                        }
+                    }
+
+                    usePublicNode = (embeddedNodeHeight < publicNodeHeight-2);
+
+                    logger::logInfo(logger::QT_WALLET, "Embedded node hight: " + QString::number(embeddedNodeHeight) +
+                        " public node height: " + QString::number(publicNodeHeight) + "  Selected: " + (usePublicNode ? "public" : "embedded"));
                 }
             }
-
-            usePublicNode = (embeddedNodeHeight < publicNodeHeight-2);
-
-            logger::logInfo(logger::QT_WALLET, "Embedded node hight: " + QString::number(embeddedNodeHeight) +
-                " public node height: " + QString::number(publicNodeHeight) + "  Selected: " + (usePublicNode ? "public" : "embedded"));
         }
         else {
             Q_ASSERT( config::isColdWallet() || config::isOnlineNode() );
@@ -143,11 +152,6 @@ void NodeClient::updateNodeSelectionLocked(int retry) {
 
 
 QString NodeClient::foreignApiRequest(const QString & request) {
-
-    if (wallet->getStartStatus() == wallet::Wallet::STARTED_MODE::OFFLINE) {
-        return "{}"; // empty response, wallet is exiting
-    }
-
     QMutexLocker locker(&callMutex);
 
     updateNodeSelectionLocked();
@@ -155,7 +159,7 @@ QString NodeClient::foreignApiRequest(const QString & request) {
     bool skipLogs = request.contains("get_tip") || request.contains("get_header");
 
     QString res;
-    if (usePublicNode) {
+    if (usePublicNode || embeddedNode==nullptr) {
         res = callPublicNodeForeignApiLocked(request).remove('\n');
         if (!skipLogs) {
             logger::logInfo(logger::NODE_CLIENT, "Public Node IO: " + util::string2shortStrR(request, 50) + "   Response: " + util::string2shortStrR( res, 70) );
@@ -213,6 +217,7 @@ wallet::NodeStatus NodeClient::requestNodeStatusLocked() {
     updateNodeSelectionLocked();
     wallet::NodeStatus result;
     if (usePublicNode) {
+        result.wasUpdated = true;
         result.internalNode = false;
         QString tipJStr = callPublicNodeForeignApiLocked("{\"jsonrpc\": \"2.0\",\"method\": \"get_tip\",\"params\": [],\"id\": 1}");
         QJsonParseError parseError;
@@ -244,10 +249,18 @@ wallet::NodeStatus NodeClient::requestNodeStatusLocked() {
         }
     }
 
-    QPair<ServerStats, QString> statsRes = embeddedNode->getServerStats();
+    QPair<ServerStats, QString> statsRes;
+    if (embeddedNode!=nullptr) {
+        statsRes = embeddedNode->getServerStats();
+    }
+    else {
+        statsRes = QPair<ServerStats, QString>(ServerStats(), "None");
+    }
+
     if (!usePublicNode) {
         ServerStats stats = statsRes.first;
         result.internalNode = true;
+        result.wasUpdated = true;
         result.online = (config::isColdWallet() && stats.chain_stats.height>0) || stats.peer_stats.size()>0;
 
         if (config::isOnlineWallet()) {
@@ -283,12 +296,32 @@ bool NodeClient::isNodeHealthy() {
    if (lastStatusTime < QDateTime::currentSecsSinceEpoch() - 30) {
        NodeClient::requestNodeStatus();
    }
+
+   if (!lastStatus.wasUpdated)
+       return true;
+
    return lastStatus.isHealthy();
 }
 
 QString NodeClient::getLastInternalNodeState() const {
     QMutexLocker locker(&callMutex);
     return lastInternalNodeState;
+}
+
+std::shared_ptr<node::MwcNode> NodeClient::takeEmbeddedNode() {
+    QMutexLocker locker(&callMutex);
+    std::shared_ptr<node::MwcNode> node = embeddedNode;
+    embeddedNode.reset();
+    return node;
+}
+
+void NodeClient::restoreEmbeddedNode(std::shared_ptr<node::MwcNode> node) {
+    QMutexLocker locker(&callMutex);
+    embeddedNode = node;
+}
+
+QString NodeClient::getCurrentNetwork() const {
+    return network;
 }
 
 

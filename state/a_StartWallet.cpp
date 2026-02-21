@@ -36,7 +36,7 @@ StartWallet::~StartWallet() {
 }
 
 NextStateRespond StartWallet::execute() {
-    if ( context->wallet->getStartStatus()==wallet::Wallet::STARTED_MODE::OFFLINE ||
+    if ( !context->wallet->isInit() ||
         !context->appContext->getCookie<QString>("checkWalletInitialized").isEmpty() ) {
 
         if ( context->appContext->getCookie<QString>("checkWalletInitialized").isEmpty() ) {

@@ -127,7 +127,7 @@ public:
     // [2] - unconfirmed
     Q_INVOKABLE QVector<QString> getTotalAmount();
 
-    Q_INVOKABLE bool requestFaucetMWC();
+    Q_INVOKABLE void requestFaucetMWC();
 signals:
     void sgnConfigUpdate();
     void sgnLogin();
@@ -138,6 +138,7 @@ signals:
     void sgnSlateReceivedFrom(QString slate, QString mwc, QString fromAddr, QString message );
     void sgnScanRewindHash( QString responseId, QJsonObject walletOutputs, QString errors );
     void sgnWalletBalanceUpdated();
+    void sgnFaucetMWCDone(bool success);
 
 private slots:
     void onConfigUpdate();
@@ -149,6 +150,7 @@ private slots:
     void onSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message );
     void onScanRewindHash( QString responseId, wallet::ViewWallet walletOutputs, QString errors );
     void onWalletBalanceUpdated();
+    void onFaucetMWCDone(bool success);
 
 private:
 };

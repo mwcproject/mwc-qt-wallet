@@ -20,9 +20,9 @@
 
 namespace wallet {
 
-    class Wallet;
+    class WalletInternals;
 
-    QFuture<QPair<bool, QString>> requestMwcFromFlooFaucet(Wallet *wallet, qint64 amount);
+    QFuture<void> requestMwcFromFlooFaucet(WalletInternals *internals, qint64 amount);
 
 }
 

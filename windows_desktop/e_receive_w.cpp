@@ -47,6 +47,8 @@ Receive::Receive(QWidget *parent) :
                       this, &Receive::onSgnTransactionActionIsFinished, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
                       this, &Receive::onSgnWalletBalanceUpdated, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnFaucetMWCDone,
+                      this, &Receive::onSgnFaucetMWCDone, Qt::QueuedConnection);
 
     QObject::connect( heartBeat, &bridge::HeartBeat::sgnUpdateListenerStatus,
                       this, &Receive::onSgnUpdateListenerStatus, Qt::QueuedConnection);
@@ -164,9 +166,17 @@ void Receive::on_requestFaucetMWCButton_clicked()
     // even it is sync call, it is a long operation and wallet will continue to handle the events.
     // Not great design, but OK for single call at floonet
     ui->progress->show();
-    if (wallet->requestFaucetMWC()) {
-        config->faucetRequested();
+    ui->requestFaucetMWCButton->setEnabled(false);
+    wallet->requestFaucetMWC();
+    // Response at onSgnFaucetMWCDone
+}
+
+void Receive::onSgnFaucetMWCDone(bool success) {
+    if (success) {
         ui->requestFaucetMWCButton->hide();
+    }
+    else {
+        ui->requestFaucetMWCButton->setEnabled(true);
     }
     ui->progress->hide();
 }

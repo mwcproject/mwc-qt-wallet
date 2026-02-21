@@ -51,7 +51,7 @@ InitAccount::~InitAccount() {
 }
 
 NextStateRespond InitAccount::execute() {
-    bool running = context->wallet->getStartStatus() != wallet::Wallet::STARTED_MODE::OFFLINE;
+    bool running = context->wallet->isInit();
 
     currentPage = InitAccountPage::None;
 
@@ -62,7 +62,7 @@ NextStateRespond InitAccount::execute() {
     if (config::isOnlineNode()) {
         if ( !running) {
             QPair<QString, QString> network_path = context->appContext->getOnlineNodeWalletNetworkAndPath();
-            if (!context->initWalletNode(network_path.second, network_path.first)) {
+            if (!context->initWalletNode(network_path.second, network_path.first, nullptr)) {
                 core::getWndManager()->messageTextDlg("Wallet Init Error",
                 "Unable to build temporary wallet with base path " + network_path.first + " and network " + network_path.second );
                 mwc::closeApplication();
@@ -75,14 +75,15 @@ NextStateRespond InitAccount::execute() {
                                         util::mapMessage(init_res.second));
                     mwc::closeApplication();
                 }
+                auto node_client = context->wallet->getNodeClient();
                 context->wallet->logout(); // Stop will wait enough time
-                if (!context->initWalletNode(network_path.second, network_path.first)) {
+                if (!context->initWalletNode(network_path.second, network_path.first, node_client)) {
                     core::getWndManager()->messageTextDlg("Wallet Init Error",
                     "Unable to build temporary wallet with base path " + network_path.first + " and network " + network_path.second );
                     mwc::closeApplication();
                 }
             }
-            QString loginError = context->wallet->loginWithPassword("", context->appContext);
+            QString loginError = context->wallet->loginWithPassword("");
             if (!loginError.isEmpty()) {
                 core::getWndManager()->messageTextDlg("Internal error",
                     "Unable to open temporary wallet with base path " + network_path.first + " and network " + network_path.second );
@@ -185,7 +186,7 @@ void InitAccount::setPassword(const QString & password ) {
 void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instanceName) {
     logger::logInfo(logger::STATE, "Call InitAccount::submitWalletCreateChoices with network=" + QString::number(network) + " instanceName=" + instanceName);
     // Apply network first
-    Q_ASSERT( context->wallet->getStartStatus() == wallet::Wallet::STARTED_MODE::OFFLINE );
+    Q_ASSERT( !context->wallet->isInit() );
     QString path = context->appContext->getCurrentWalletInstance(false);
 
     wallet::WalletConfig walletCfg;
@@ -218,7 +219,7 @@ void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instan
 #endif
     }
 
-    if (!context->initWalletNode(path)) {
+    if (!context->initWalletNode(path, nullptr)) {
         logger::logError(logger::QT_WALLET, "Unable to init wallet for data location " + path);
     }
 }
@@ -349,7 +350,7 @@ bool InitAccount::finishSeedVerification() {
         seed.clear();
 
         wallet::WalletConfig config = context->wallet->getWalletConfig();
-        node::NodeClient * nodeCient = context->wallet->getNodeClient();
+        std::shared_ptr<node::NodeClient> nodeCient = context->wallet->getNodeClient();
 
         // clean up the state
         context->wallet->logout(); // Stop the wallet with init process first
@@ -361,7 +362,7 @@ bool InitAccount::finishSeedVerification() {
         }
 
         // Now need to start the normall wallet...
-        err = context->wallet->loginWithPassword(pass, context->appContext);
+        err = context->wallet->loginWithPassword(pass);
         if ( !err.isEmpty() ) {
             notify::reportFatalError("Unfortunately we unable to login into the wallet after provisioning. " + util::mapMessage(err));
             return true;
@@ -395,7 +396,7 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
     }
 
     wallet::WalletConfig config = context->wallet->getWalletConfig();
-    node::NodeClient * nodeCient = context->wallet->getNodeClient();
+    std::shared_ptr<node::NodeClient> nodeCient = context->wallet->getNodeClient();
     context->wallet->logout();
 
     err = context->wallet->init(config.getNetwork(), config.getDataPath(), nodeCient);
@@ -404,7 +405,7 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
         return;
     }
 
-    err = context->wallet->loginWithPassword(pass, context->appContext);
+    err = context->wallet->loginWithPassword(pass);
     if ( !err.isEmpty() ) {
         notify::reportFatalError("Unfortunately we unable to login into the wallet after restore. " + util::mapMessage(err));
         return;
@@ -448,7 +449,7 @@ void InitAccount::onScanDone( QString responseId, bool fullScan, int height, QSt
     Q_UNUSED(height);
 
     wallet::WalletConfig config = context->wallet->getWalletConfig();
-    node::NodeClient * nodeCient = context->wallet->getNodeClient();
+    std::shared_ptr<node::NodeClient> nodeCient = context->wallet->getNodeClient();
 
     context->wallet->logout();
 
@@ -473,7 +474,7 @@ void InitAccount::onScanDone( QString responseId, bool fullScan, int height, QSt
             return;
         }
 
-        err = context->wallet->loginWithPassword(pass, context->appContext);
+        err = context->wallet->loginWithPassword(pass);
         if (err.isEmpty()) {
             if ( config::isOnlineWallet() ) {
                 context->wallet->listeningStart( context->appContext->isFeatureMWCMQS(), context->appContext->isFeatureTor());

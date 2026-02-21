@@ -141,6 +141,8 @@ void InputPassword::on_submitButton_clicked() {
     QString selectedPath = ui->accountComboBox->currentData().toString();
     config->setActiveInstance(selectedPath);
 
+    ui->progress->show();
+
     // Submit the password and wait until state will push us.
     bool ok = inputPassword->submitPassword(pswd, selectedPath);
     if (!ok) {

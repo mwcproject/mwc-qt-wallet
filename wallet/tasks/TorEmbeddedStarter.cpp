@@ -25,7 +25,6 @@ namespace wallet {
 
 QFuture<QString> startEmbeddedTor() {
     return QtConcurrent::run([] () -> QString {
-            QThread::currentThread()->setObjectName("startEmbeddedTor");
             if ( !config::isColdWallet() ) {
                 // Starting tor core
                 QPair<bool,QString> path = ioutils::getAppDataPath("tor");
@@ -40,7 +39,6 @@ QFuture<QString> startEmbeddedTor() {
                     return "Unable to start embedded Tor service.\n"+ startRes;
                 }
             }
-            QThread::currentThread()->setObjectName("QTThreadPool");
             return "";
     });
 }

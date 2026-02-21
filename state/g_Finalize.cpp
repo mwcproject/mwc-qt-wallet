@@ -71,7 +71,7 @@ void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson,
 
     file2TransactionsInfo.insert(transInfo.transactionId, transInfo);
 
-    qint64 lastNodeHeight = context->nodeClient->getLastNodeHeight();
+    qint64 lastNodeHeight = context->wallet->getLastNodeHeight();
 
     atInitialPage = false;
     if (switch2nextPage) {

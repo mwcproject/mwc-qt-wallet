@@ -50,6 +50,7 @@ private slots:
     void onSgnTransactionActionIsFinished( bool success, QString message );
     void onSgnWalletBalanceUpdated();
     void onSgnUpdateListenerStatus(bool mqsOnline, bool torOnline);
+    void onSgnFaucetMWCDone(bool success);
 
     void on_accountComboBox_activated(int index);
     void on_recieveSlatepackButton_clicked();

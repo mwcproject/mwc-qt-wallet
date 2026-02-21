@@ -19,9 +19,9 @@
 
 namespace wallet {
 
-class Wallet;
+class WalletInternals;
 
-QFuture<void> startScan(Wallet *wallet, QString update_status_callback_name, QString responseId, bool full_scan,
+QFuture<void> startScan(WalletInternals *internals, QString update_status_callback_name, QString responseId, bool full_scan,
                         bool delete_unconfirmed);
 
 }

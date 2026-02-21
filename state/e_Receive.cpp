@@ -66,7 +66,7 @@ void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QSt
         signingFile = false;
         core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS,
                     slatepack, flTrInfo,
-                    context->nodeClient->getLastNodeHeight());
+                    context->wallet->getLastNodeHeight());
         atInitialPage = false;
     }
 }

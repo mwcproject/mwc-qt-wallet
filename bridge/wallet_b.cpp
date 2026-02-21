@@ -57,6 +57,8 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                          this, &Wallet::onScanRewindHash, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onWalletBalanceUpdated,
                          this, &Wallet::onWalletBalanceUpdated, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onFaucetMWCDone,
+                         this, &Wallet::onFaucetMWCDone, Qt::QueuedConnection);
 }
 
 Wallet::~Wallet() {}
@@ -338,9 +340,9 @@ QVector<QString> Wallet::getTotalAmount() {
     return res;
 }
 
-bool Wallet::requestFaucetMWC() {
+void Wallet::requestFaucetMWC() {
     logger::logInfo(logger::BRIDGE, "Call Wallet::requestFaucetMWC");
-    return getWallet()->requestFaucetMWC();
+    getWallet()->requestFaucetMWC();
 }
 
 
@@ -385,6 +387,10 @@ void Wallet::onScanRewindHash( QString responseId, wallet::ViewWallet walletOutp
 
 void Wallet::onWalletBalanceUpdated() {
     emit sgnWalletBalanceUpdated();
+}
+
+void Wallet::onFaucetMWCDone(bool success) {
+    emit sgnFaucetMWCDone(success);
 }
 
 

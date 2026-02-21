@@ -158,6 +158,8 @@ MwcNode::MwcNode(core::AppContext * _appContext, QFuture<QString> * _torStarter)
         torStarter(_torStarter),
         stoppingFlag(0)
 {
+    // We want node be attached to the main thread
+    Q_ASSERT( QThread::currentThread() == QCoreApplication::instance()->thread() );
 }
 
 MwcNode::~MwcNode() {
@@ -209,38 +211,15 @@ void MwcNode::stop() {
     nodeNetwork = "";
     pibdSyncPhase = false;
 
-    QFuture<QString> nodeStoping = QtConcurrent::run([contextId]()-> QString {
-        QThread::currentThread()->setObjectName("node::release_context");
-        auto res = node::release_context(contextId);
-        QThread::currentThread()->setObjectName("QtThreadPool");
-        return util::mapMessage(res.error);
-    });
+    auto nodeStoping = node::release_context(contextId);
 
-    int waitCnt = 0;
-    while (!nodeStoping.isFinished()) {
-        // waiting for minute
-        waitCnt++;
-        QThread::msleep(100);
-        QCoreApplication::processEvents();
-        if (waitCnt>60*10) // waiting for a minute
-            break;
-    }
-
-    if (nodeStoping.isFinished()) {
-        QString stopError = nodeStoping.result();
-        if (stopError.isEmpty()) {
-            logger::logInfo( logger::MWC_NODE, "Mwc-node is stopped" );
-            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped." );
-        }
-        else {
-            logger::logError(logger::MWC_NODE, "Mwc-node is stopped with error " + stopError );
-            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Embedded mwc-node stopped with error: " + stopError );
-
-        }
+    if (nodeStoping.hasError()) {
+        logger::logError(logger::MWC_NODE, "Mwc-node is stopped with error " + nodeStoping.error );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Embedded mwc-node stopped with error: " + nodeStoping.error );
     }
     else {
-        logger::logError( logger::MWC_NODE, "Mwc-node wasn't stopped, abandoning it" );
-        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable safely stop embedded mwc-node, abandoning the context." );
+        logger::logInfo( logger::MWC_NODE, "Mwc-node is stopped" );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped." );
     }
 }
 
@@ -474,11 +453,8 @@ void MwcNode::waitCancelStart() {
 
         stoppingFlag.storeRelease(1);
 
-        while (startingNode.isRunning()) {
-            // wait for auto finish
-            QThread::msleep(200);
-            QCoreApplication::processEvents();
-        }
+        startingNode.waitForFinished();
+
         logger::logInfo(logger::MWC_NODE, "Starting thread is stopped");
         startingNode = QFuture<void>();
         Q_ASSERT(!startingNode.isValid());

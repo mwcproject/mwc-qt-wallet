@@ -18,9 +18,9 @@
 
 namespace wallet {
 
-class Wallet;
+class WalletInternals;
 
-QFuture<void> scanRewindHash(Wallet *wallet,
+QFuture<void> scanRewindHash(WalletInternals *internals,
                 QString rewindHash,
                 QString update_status_callback_name, QString responseId);
 

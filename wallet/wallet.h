@@ -17,6 +17,8 @@
 
 #include "../wallet_features.h"
 #include <QMutex>
+
+#include "wallet_internals.h"
 #include "wallet_objs.h"
 #include "tasks/TorEmbeddedStarter.h"
 
@@ -41,21 +43,17 @@ public:
     virtual ~Wallet();
 
     bool isBusy() const;
-    bool isUpdateInProgress() const;
-
-    enum STARTED_MODE { OFFLINE, NORMAL, INIT, RECOVER };
-    STARTED_MODE getStartStatus();
 
     // Init the instance for a starting/created wallet
     // Return error
-    QString init(QString network, QString walletDataPath, node::NodeClient * nodeClient);
+    QString init(QString network, QString walletDataPath, std::shared_ptr<node::NodeClient> nodeClient);
 
-    int getWalletId() { return (int) qHash(walletDataPath);}
+    int getWalletId();
 
-    // Return tru is wallet is init, so API calls can be used
-    bool isInit() const {return context_id>=0;}
+    // Return true if wallet is init, so API calls can be used
+    bool isInit() const;
 
-    const QString & getWalletDataPath() {return walletDataPath;}
+    QString getWalletDataPath() const;
 
     // Create new wallet and generate a seed for it. Return empty seed in case of error
     // Return: Seed, Error
@@ -69,7 +67,7 @@ public:
     // Note, return error include invalid password case as well
     // Return: Error
     // Signal:  onLogin
-    QString loginWithPassword(const QString & password, core::AppContext * appContext);
+    QString loginWithPassword(const QString & password);
 
     // Return true if wallet has this password. Wallet might not have password (has empty password) if it was created manually.
     // Expected that the wallet is already open,
@@ -100,12 +98,12 @@ public:
     bool listeningStop(bool stopMq, bool stopTor);
 
     // Request MQS address
-    QString getMqsAddress();
+    QString getMqsAddress() const;
     // Request Tor address
-    QString getTorSlatepackAddress();
+    QString getTorSlatepackAddress() const;
 
     // request current address index
-    int getAddressIndex();
+    int getAddressIndex() const;
 
     // Note, set address index does update the MQS and Tor addresses
     // The Listeners, if running, will be restarted automatically
@@ -123,7 +121,7 @@ public:
     QVector<Account> listAccounts() const;
 
     // return current account path
-    QString getCurrentAccountId();
+    QString getCurrentAccountId() const;
 
     // Create another account, note no delete exist for accounts
     // Return acount path
@@ -152,8 +150,15 @@ public:
     QString update_wallet_state();
 
     // Get current configuration of the wallet.
-    WalletConfig getWalletConfig();
-    node::NodeClient * getNodeClient() {return nodeClient;}
+    WalletConfig getWalletConfig() const;
+    std::shared_ptr<node::NodeClient> getNodeClient() const;
+
+    NodeStatus requestNodeStatus() const;
+
+    bool isNodeHealthy() const;
+    bool isUsePublicNode() const;
+    qint64 getLastNodeHeight() const;
+    QString getLastInternalNodeState() const;
 
     // Proof results
 
@@ -199,16 +204,16 @@ public:
     QString submitFile( QString fileTx, bool fluff );
 
     // Show outputs for the wallet
-    QVector<WalletOutput> getOutputs(const QString & accountPath, bool show_spent);
+    QVector<WalletOutput> getOutputs(const QString & accountPath, bool show_spent) const;
 
     // Show all transactions for current account
-    QVector<WalletTransaction> getTransactions( const QString & accountPath );
+    QVector<WalletTransaction> getTransactions( const QString & accountPath ) const;
 
     // Request single transaction by UUID, any account
-    WalletTransaction getTransactionByUUID( const QString & tx_uuid );
+    WalletTransaction getTransactionByUUID( const QString & tx_uuid ) const;
 
     // True if transaction was finalized and can be reposted
-    bool hasFinalizedData(const QString & txUUID);
+    bool hasFinalizedData(const QString & txUUID) const;
 
     // Cancel TX by UUID (in case of multi accouns, we want to cancel both)
     // Return error string
@@ -219,7 +224,7 @@ public:
     QString repostTransaction(const QString & txUUID, bool fluff);
 
     // Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
-    DecodedSlatepack decodeSlatepack(const QString & slatepackContent);
+    DecodedSlatepack decodeSlatepack(const QString & slatepackContent) const;
 
 
     // ---------------- Swaps -------------
@@ -337,7 +342,7 @@ public:
 #endif
 
     // Get rewind hash
-    QString viewRewindHash();
+    QString viewRewindHash() const;
 
     // Scan with revind hash. That will generate bunch or messages similar to scan
     // Check Signal: onScanProgress
@@ -351,13 +356,14 @@ public:
     // Validate ownership proof
     OwnershipProofValidation validateOwnershipProof(const QJsonObject & proof);
 
-    int getContextId() const {return context_id;}
+    int getContextId() const;
 
-    bool isMqsRunning() const {return mqs_running;}
-    bool isTorRunning() const {return tor_running;}
+    bool isMqsRunning() const;
+    bool isTorRunning() const;
 
     // Sync long call, wallet will process QT events and show Success/Error Dlg
-    bool requestFaucetMWC();
+    void requestFaucetMWC();
+    void mwcFromFlooFaucetDone(bool success, QString errorMsg);
 
     // Note, Done methods called from another thread.
     void startStopListenersDone(int operation);
@@ -396,6 +402,7 @@ signals:
     // Account info might be updated (we just got a new block and finish the scan)
     void onWalletBalanceUpdated();
 
+    void onFaucetMWCDone(bool success);
 private:
     void reportWalletFatalError( QString message ) const;
 
@@ -403,32 +410,12 @@ private:
 
     void release();
 private:
-    volatile int context_id = -1;
-    QString node_client_callback_name;
-    QString update_status_callback_name;
-    volatile STARTED_MODE started_state = STARTED_MODE::OFFLINE;
-    QString network;
-    QString walletDataPath;
-    node::NodeClient * nodeClient = nullptr;
-    bool mqs_running = false;
-    bool tor_running = false;
+    WalletInternals * internals = nullptr;
 
-    // running tasks
-    QFuture<void> restart_listeners;
-    int nextListenersTask = 0;
-
-    QAtomicInt response_id_counter = QAtomicInt(0);
-
-    QFuture<void> scanOp;
-    QAtomicInt scanInProgress = QAtomicInt(0);
-    QString lastScanResponseId;
-    int lastTopHeight = 0;
-
-    QFuture<void> sendOp;
-    QFuture<void> scanRewindHashOp;
-
-    // Outside tast, we don't manage it, just reading
+    // Outside task, we don't manage it, just reading
     QFuture<QString> * torStarter;
+
+    QVector<QFuture<void>> releaseTasks;
 };
 
 }

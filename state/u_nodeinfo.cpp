@@ -28,6 +28,8 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/u_nodeInfo_b.h"
 #include <QDir>
+#include <QtConcurrent>
+
 #include "zz_heart_beat.h"
 #include "node/node_client.h"
 
@@ -43,7 +45,7 @@ NodeInfo::NodeInfo(StateContext * _context) :
 }
 
 NodeInfo::~NodeInfo() {
-
+    runningJob.waitForFinished();
 }
 
 NextStateRespond NodeInfo::execute() {
@@ -67,7 +69,7 @@ NextStateRespond NodeInfo::execute() {
 
 bool NodeInfo::isNodeHealthy() const {
     logger::logInfo(logger::STATE, "Call NodeInfo::isNodeHealthy");
-    return context->nodeClient->isNodeHealthy();
+    return context->wallet->isNodeHealthy();
 }
 
 
@@ -83,29 +85,42 @@ void NodeInfo::exportBlockchainData(QString fileName) {
     // 2. Export node data
     // 3. start mwc-node
 
-    QCoreApplication::processEvents();
-
     notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
-    QString nodeNetwork = context->mwcNode->getCurrentNetwork();
-    QString nodePath = context->mwcNode->getNodeDataPath();
+    std::shared_ptr<node::NodeClient> nodeClient = context->wallet->getNodeClient();
+    NodeInfo * response = this;
+    runningJob.waitForFinished();
 
-    context->mwcNode->stop();
+    runningJob = QtConcurrent::run( [nodeClient, fileName, response]() {
+        std::shared_ptr<node::MwcNode> mwcNode = nodeClient->takeEmbeddedNode();
+        Q_ASSERT(mwcNode!=nullptr);
+        QPair<bool, QString> res;
+        if (mwcNode==nullptr) {
+            res = QPair<bool, QString>(false, "Mwc Node is not running");
+        }
+        else {
+            QString nodeNetwork = mwcNode->getCurrentNetwork();
+            QString nodePath = mwcNode->getNodeDataPath();
 
-    QCoreApplication::processEvents();
+            mwcNode->stop();
 
-    QPair<bool, QString> res = compress::compressFolder( nodePath, fileName, nodeNetwork );
+            res = compress::compressFolder( nodePath, fileName, nodeNetwork );
 
-    QCoreApplication::processEvents();
+            mwcNode->start(nodePath, nodeNetwork); //, context->appContext->useTorForNode());
+            nodeClient->restoreEmbeddedNode(mwcNode);
+        }
 
-    context->mwcNode->start(nodePath, nodeNetwork); //, context->appContext->useTorForNode());
+        QMetaObject::invokeMethod(response,
+        [response, res, fileName]() {
+                response->finishExportBlockchainData(res, fileName);
+            },
+            Qt::QueuedConnection);
+    });
+}
 
-    QCoreApplication::processEvents();
-
+void NodeInfo::finishExportBlockchainData(QPair<bool, QString> res, QString fileName) {
     for (auto b : bridge::getBridgeManager()->getNodeInfo())
         b->hideProgress();
-
-    QCoreApplication::processEvents();
 
     notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
@@ -123,31 +138,44 @@ void NodeInfo::importBlockchainData(QString fileName) {
     // 2. Import node data
     // 3. start mwc-node
 
-    QCoreApplication::processEvents();
-
     notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
-    QString nodeNetwork = context->mwcNode->getCurrentNetwork();
-    QString nodePath = context->mwcNode->getNodeDataPath();
+    std::shared_ptr<node::NodeClient> nodeClient = context->wallet->getNodeClient();
+    NodeInfo * response = this;
+    runningJob.waitForFinished();
 
-    context->mwcNode->stop();
+    runningJob = QtConcurrent::run( [nodeClient, fileName, response]() {
+        std::shared_ptr<node::MwcNode> mwcNode = nodeClient->takeEmbeddedNode();
+        Q_ASSERT(mwcNode!=nullptr);
+        QPair<bool, QString> res;
+        if (mwcNode==nullptr) {
+            res = QPair<bool, QString>(false, "Mwc Node is not running");
+        }
+        else {
+            QString nodeNetwork = mwcNode->getCurrentNetwork();
+            QString nodePath = mwcNode->getNodeDataPath();
 
-    QCoreApplication::processEvents();
+            mwcNode->stop();
 
-    QPair<bool, QString> res = compress::decompressFolder( fileName,  nodePath, nodeNetwork );
+            res = compress::decompressFolder( fileName,  nodePath, nodeNetwork );
 
-    QCoreApplication::processEvents();
+            mwcNode->start(nodePath, nodeNetwork); //, context->appContext->useTorForNode());
+            nodeClient->restoreEmbeddedNode(mwcNode);
+        }
 
-    context->mwcNode->start(nodePath, nodeNetwork); //, context->appContext->useTorForNode());
+        QMetaObject::invokeMethod(response,
+        [response, res, fileName]() {
+                response->finishImportBlockchainData(res, fileName);
+            },
+            Qt::QueuedConnection);
+    });
+}
 
-    QCoreApplication::processEvents();
-
+void NodeInfo::finishImportBlockchainData(QPair<bool, QString> res, QString fileName) {
     notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
     for (auto b : bridge::getBridgeManager()->getNodeInfo())
         b->hideProgress();
-
-    QCoreApplication::processEvents();
 
     if (res.first) {
         core::getWndManager()->messageTextDlg("MWC Blockchain data is ready", "MWC blockchain data was successfully imported from the archive " + fileName);
@@ -180,31 +208,51 @@ void NodeInfo::resetEmbeddedNodeData() {
     logger::logInfo(logger::STATE, "Call NodeInfo::resetEmbeddedNodeData");
     notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
-    QString nodeNetwork = context->mwcNode->getCurrentNetwork();
-    QString nodePath = context->mwcNode->getNodeDataPath();
+    std::shared_ptr<node::NodeClient> nodeClient = context->wallet->getNodeClient();
+    NodeInfo * response = this;
+    runningJob.waitForFinished();
 
-    context->mwcNode->stop();
+    runningJob = QtConcurrent::run( [nodeClient, response]() {
+        std::shared_ptr<node::MwcNode> mwcNode = nodeClient->takeEmbeddedNode();
+        Q_ASSERT(mwcNode!=nullptr);
+        QString errMessage;
+        if (mwcNode!=nullptr) {
+            QString nodeNetwork = mwcNode->getCurrentNetwork();
+            QString nodePath = mwcNode->getNodeDataPath();
 
-    QCoreApplication::processEvents();
+            mwcNode->stop();
 
-    // Cleaning up the folder
-    QString nodeDataPath = nodePath;
-    QDir dir(nodeDataPath);
-    if (!dir.removeRecursively()) {
-        core::getWndManager()->messageTextDlg("Error", "Unable to clean up the node data at " + nodeDataPath);
-    }
+            // Cleaning up the folder
+            QString nodeDataPath = nodePath;
+            QDir dir(nodeDataPath);
+            if (!dir.removeRecursively()) {
+                errMessage = "Unable to clean up the node data at " + nodeDataPath;
+            }
 
-    QCoreApplication::processEvents();
+            mwcNode->start(nodePath, nodeNetwork); //, context->appContext->useTorForNode());
+            nodeClient->restoreEmbeddedNode(mwcNode);
+        }
+        else {
+            errMessage = "Mwc Node is not running";
+        }
 
-    context->mwcNode->start( nodePath, nodeNetwork);
+        QMetaObject::invokeMethod(response,
+        [response, errMessage]() {
+                response->finishResetEmbeddedNodeData(errMessage);
+            },
+            Qt::QueuedConnection);
+    });
+}
 
+void NodeInfo::finishResetEmbeddedNodeData(QString errorMessage) {
     notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
     for (auto b : bridge::getBridgeManager()->getNodeInfo())
         b->hideProgress();
 
-    QCoreApplication::processEvents();
+    if (!errorMessage.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Error", errorMessage);
+    }
 }
-
 
 }

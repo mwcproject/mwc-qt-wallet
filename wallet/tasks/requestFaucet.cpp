@@ -17,23 +17,26 @@
 #include <QtConcurrent>
 
 #include "../api/MwcWalletApi.h"
-#include "../wallet.h"
+#include "../wallet_internals.h"
 #include "util/Log.h"
 
 namespace wallet {
 
-QFuture<QPair<bool, QString>> requestMwcFromFlooFaucet(Wallet *wallet, qint64 amount) {
+QFuture<void> requestMwcFromFlooFaucet(WalletInternals *internals, qint64 amount) {
 
-    int context_id = wallet->getContextId();
+    int context_id = internals->context_id;
 
-    QFuture<QPair<bool, QString>> sendF = QtConcurrent::run( [wallet, amount, context_id]() -> QPair<bool, QString>
+    QFuture<void> sendF = QtConcurrent::run( [internals, amount, context_id]()
     {
-        QThread::currentThread()->setObjectName("requestMwcFromFlooFaucet");
         logger::logInfo(logger::MWC_WALLET, QString("Processing faucet_request for amount ") + QString::number(amount) );
         // if sending to Http and need proof, it is mean that we need to request proff address first
         mwc_api::ApiResponse<bool> request_res = faucet_request(context_id, amount);
-        QThread::currentThread()->setObjectName("TQThreadPool");
-        return QPair<bool, QString>(request_res.response, request_res.error);
+
+        QMetaObject::invokeMethod(internals,
+        [internals, request_res]() {
+                internals->mwcFromFlooFaucetDone(!request_res.hasError(), request_res.error);
+            },
+            Qt::QueuedConnection);
     });
     return sendF;
 }

@@ -17,32 +17,31 @@
 #include <QtConcurrent>
 
 #include "../api/MwcWalletApi.h"
-#include "../wallet.h"
+#include "../wallet_internals.h"
 #include "util/Log.h"
 
 namespace wallet {
 
-QFuture<void> send(Wallet *wallet, QString accountPathSendFrom, QString tag, qint64 amount, bool amount_includes_fee,
+QFuture<void> sendTask(WalletInternals *internals, QString accountPathSendFrom, QString tag, qint64 amount, bool amount_includes_fee,
                         QString message, int minimum_confirmations, QString selection_strategy, QString method, QString dest,
                         bool generate_proof, int change_outputs, bool fluff, int ttl_blocks, bool exclude_change_outputs,
                         QStringList outputs, bool late_lock, qint64 min_fee) {
 
-    const int context_id = wallet->getContextId();
+    const int context_id = internals->context_id;
 
-    QFuture<void> sendF = QtConcurrent::run( [wallet,accountPathSendFrom, tag, amount, amount_includes_fee,
+    QFuture<void> sendF = QtConcurrent::run( [internals,accountPathSendFrom, tag, amount, amount_includes_fee,
                             message, minimum_confirmations, selection_strategy, method, dest,
                             generate_proof, change_outputs, fluff, ttl_blocks, exclude_change_outputs,
                             outputs, late_lock, min_fee, context_id]() -> void
     {
-        QThread::currentThread()->setObjectName("Send");
         logger::logInfo(logger::MWC_WALLET, QString("Send processing for method ") + method + " and amount " + QString::number(amount) );
 
-        auto postSendDone = [wallet, tag](bool success, const QString & error, const QString & tx_uuid,
+        auto postSendDone = [internals, tag](bool success, const QString & error, const QString & tx_uuid,
                                 qint64 amountVal, const QString & methodVal, const QString & destVal) {
             // Wallet state must be touched from Wallet thread (main/UI thread in this app).
-            QMetaObject::invokeMethod(wallet,
-                [wallet, success, error, tx_uuid, amountVal, methodVal, destVal, tag]() {
-                    wallet->sendDone(success, error, tx_uuid, amountVal, methodVal, destVal, tag);
+            QMetaObject::invokeMethod(internals,
+                [internals, success, error, tx_uuid, amountVal, methodVal, destVal, tag]() {
+                        internals->sendDone(success, error, tx_uuid, amountVal, methodVal, destVal, tag);
                 },
                 Qt::QueuedConnection);
         };
@@ -123,7 +122,6 @@ QFuture<void> send(Wallet *wallet, QString accountPathSendFrom, QString tag, qin
 
         logger::logInfo(logger::MWC_WALLET, QString("Send for method ") + method + " and amount " + QString::number(amount) + " finished with success, new tx ID: " + send_res.response );
         postSendDone(true, "", send_res.response, amount, method, destAddr);
-        QThread::currentThread()->setObjectName("QtThreadPool");
     });
     return sendF;
 }

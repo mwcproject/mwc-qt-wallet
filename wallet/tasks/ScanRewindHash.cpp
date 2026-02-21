@@ -15,33 +15,31 @@
 #include "ScanRewindHash.h"
 
 #include <QtConcurrent>
-#include "../wallet.h"
+#include "../wallet_internals.h"
 #include "util/Log.h"
 #include "../api/MwcWalletApi.h"
 
 namespace wallet {
 
-QFuture<void> scanRewindHash(Wallet *wallet,
+QFuture<void> scanRewindHash(WalletInternals *internals,
                     QString rewindHash,
                     QString update_status_callback_name, QString responseId)
 {
-    const int context_id = wallet->getContextId();
+    const int context_id = internals->context_id;
 
-    QFuture<void> scanRewindHashF = QtConcurrent::run([wallet, rewindHash,
+    QFuture<void> scanRewindHashF = QtConcurrent::run([internals, rewindHash,
                     update_status_callback_name, responseId, context_id]()->void {
-        QThread::currentThread()->setObjectName("scanRewindHash");
         mwc_api::ApiResponse<ViewWallet> res = scan_rewind_hash(context_id, rewindHash, update_status_callback_name, responseId);
 
         const ViewWallet result = res.response;
         const QString error = res.error;
 
         // Wallet state must be touched from Wallet thread (main/UI thread in this app).
-        QMetaObject::invokeMethod(wallet,
-            [wallet, responseId, result, error]() {
-                wallet->scanRewindDone(responseId, result, error);
+        QMetaObject::invokeMethod(internals,
+            [internals, responseId, result, error]() {
+                internals->scanRewindDone(responseId, result, error);
             },
             Qt::QueuedConnection);
-        QThread::currentThread()->setObjectName("QtThreadPool");
     });
 
     return scanRewindHashF;

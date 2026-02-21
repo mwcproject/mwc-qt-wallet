@@ -37,6 +37,10 @@ public:
     void importBlockchainData(QString fileName);
     void publishTransaction(QString fileName, bool fluff);
     void resetEmbeddedNodeData();
+
+    void finishExportBlockchainData(QPair<bool, QString> res, QString fileName);
+    void finishImportBlockchainData(QPair<bool, QString> res, QString fileName);
+    void finishResetEmbeddedNodeData(QString errorMessage);
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override {return false;}
@@ -46,6 +50,9 @@ private slots:
 private:
 private:
     bool  justLogin = false;
+
+    // There are 3 different long run jobs. Because type is the same, we don't need destinguish them
+    QFuture<void> runningJob;
 };
 
 }

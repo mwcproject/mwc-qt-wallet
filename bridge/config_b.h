@@ -179,7 +179,6 @@ public:
     Q_INVOKABLE void setSwapMktCurrency(QString currency);
 
     Q_INVOKABLE bool isFaucetRequested();
-    Q_INVOKABLE void faucetRequested();
 };
 
 }

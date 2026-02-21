@@ -25,7 +25,7 @@ namespace notify {
 // Enum to string
 QString toString(bridge::MESSAGE_LEVEL level);
 
-// Some notifications can have different meaning because of the state. For example when we stop/start node, mwc713 error connection messages are expected.
+// Some notifications can have different meaning because of the state. For example when we stop/start node, error connection messages are expected.
 enum NOTIFICATION_STATES { ONLINE_NODE_IMPORT_EXPORT_DATA = 0x0001 };
 void notificationStateSet(NOTIFICATION_STATES state);
 void notificationStateClean(NOTIFICATION_STATES state);

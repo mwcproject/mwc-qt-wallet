@@ -16,20 +16,19 @@
 
 #include <QtConcurrent>
 
-#include "../wallet.h"
+#include "../wallet_internals.h"
 #include "util/Log.h"
 #include "../api/MwcWalletApi.h"
 #include "util/message_mapper.h"
 
 namespace wallet {
 
-QFuture<void> startScan(Wallet *wallet, QString update_status_callback_name, QString responseId,
+QFuture<void> startScan(WalletInternals *internals, QString update_status_callback_name, QString responseId,
     bool full_scan, bool delete_unconfirmed) {
 
-    const int context_id = wallet->getContextId();
+    const int context_id = internals->context_id;
 
-    QFuture<void> scanF = QtConcurrent::run( [wallet,update_status_callback_name,responseId,full_scan,delete_unconfirmed,context_id]() -> void {
-        QThread::currentThread()->setObjectName("Scan");
+    QFuture<void> scanF = QtConcurrent::run( [internals,update_status_callback_name,responseId,full_scan,delete_unconfirmed,context_id]() -> void {
         logger::logInfo(logger::MWC_WALLET, QString("Starting Scan processing with full_scan=") + (full_scan?"True":"False") );
         mwc_api::ApiResponse<int> res;
         if (full_scan) {
@@ -43,12 +42,11 @@ QFuture<void> startScan(Wallet *wallet, QString update_status_callback_name, QSt
         const QString errorMessage = util::mapMessage(res.error);
 
         // Wallet state must be touched from Wallet thread (main/UI thread in this app).
-        QMetaObject::invokeMethod(wallet,
-            [wallet, responseId, full_scan, height, errorMessage]() {
-                wallet->scanDone(responseId, full_scan, height, errorMessage);
+        QMetaObject::invokeMethod(internals,
+            [internals, responseId, full_scan, height, errorMessage]() {
+                internals->scanDone(responseId, full_scan, height, errorMessage);
             },
             Qt::QueuedConnection);
-        QThread::currentThread()->setObjectName("QtThreadPool");
     });
 
     return scanF;
