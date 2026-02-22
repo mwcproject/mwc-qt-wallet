@@ -415,7 +415,7 @@ private:
     // Outside task, we don't manage it, just reading
     QFuture<QString> * torStarter;
 
-    QVector<QFuture<void>> releaseTasks;
+    QMap<QString, QFuture<void>> releaseTasks;
 };
 
 }

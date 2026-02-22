@@ -90,7 +90,7 @@ Wallet::~Wallet()
     release();
 
     // Waiting for all started before tasks to finish
-    for (auto & tasks : releaseTasks) {
+    for (auto & tasks : releaseTasks.values()) {
         tasks.waitForFinished();
     }
 }
@@ -112,6 +112,10 @@ QString Wallet::init(QString network, QString walletDataPath,
     if (internals!=nullptr)
         return "Internal error, wallet is not released!";
 
+    // The same wallet might be still in the process ot release
+    QFuture<void> pendingTask = releaseTasks.take(walletDataPath);
+    pendingTask.waitForFinished();
+
     QString errMsg;
     internals = new WalletInternals(this, torStarter, network, walletDataPath, nodeClient, errMsg);
 
@@ -130,11 +134,12 @@ void Wallet::release() {
         return;
 
     internals->detach();
+    QString path = getWalletDataPath();
     WalletInternals * internals2 = internals;
     QFuture<void> releaseWalletTask = QtConcurrent::run( [internals2]() -> void {
         delete internals2;
     });
-    releaseTasks.push_back(releaseWalletTask);
+    releaseTasks.insert( path, releaseWalletTask);
     internals = nullptr;
 }
 
