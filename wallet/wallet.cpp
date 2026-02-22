@@ -526,7 +526,7 @@ QJsonObject Wallet::generateOwnershipProof(const QString & message, bool include
     if (!isInit())
         return QJsonObject();
 
-    return generateOwnershipProof(message, includeRewindHash, includeTorAddress, includeMqsAddress );
+    return internals->generateOwnershipProof(message, includeRewindHash, includeTorAddress, includeMqsAddress );
 }
 
 // Validate ownership proof
