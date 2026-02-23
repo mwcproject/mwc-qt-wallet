@@ -95,7 +95,7 @@ bool Send::mobileBack() {
 void Send::switchToStartingWindow() {
     core::getWndManager()->pageSendStarting();
     atSendInitialPage = true;
-    context->wallet->update_wallet_state();
+    context->wallet->scan(false, false);
 }
 
 // onlineOffline => Next step

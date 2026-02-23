@@ -140,14 +140,9 @@ public:
     // -------------- Maintaince
 
     // Check and repair the wallet. Will take a while
-    // Check Signal: onScanProgress, onScanDone
+    // Check Signal: onScanStart, onScanProgress, onScanDone
     // Return responseId
-    QString scan(bool delete_unconfirmed);
-
-    // Update the wallet state, resync with a current node state
-    // Check Signal: onScanProgress, onScanDone
-    // Return responseId
-    QString update_wallet_state();
+    QString scan(bool delete_unconfirmed, bool fullScan);
 
     // Get current configuration of the wallet.
     WalletConfig getWalletConfig() const;
@@ -159,6 +154,8 @@ public:
     bool isUsePublicNode() const;
     qint64 getLastNodeHeight() const;
     QString getLastInternalNodeState() const;
+    // True if the node is loaded and can process any requests. Return folse for cold wallet starting process
+    bool isNodeAlive() const;
 
     // Proof results
 
@@ -386,6 +383,7 @@ signals:
     void onLogout();
 
     // Scanning progress
+    void onScanStart(QString responseId, bool fullScan);
     void onScanProgress( QString responseId, QJsonObject statusMessage );
     void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
     void onStartStopListenersDone(int operation);

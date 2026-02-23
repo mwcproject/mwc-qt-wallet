@@ -80,7 +80,7 @@ NextStateRespond Resync::execute() {
 
 void Resync::start_scanning() {
     Q_ASSERT(scanRespId.isEmpty());
-    scanRespId = context->wallet->scan(true);
+    scanRespId = context->wallet->scan(true, true);
 
     core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, scanRespId,
             "Re-sync with full node", "Preparing to re-sync", "", false);

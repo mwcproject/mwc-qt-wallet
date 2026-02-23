@@ -194,7 +194,6 @@ void MwcNode::start(const QString & dataPath, const QString & network ) {
     Q_ASSERT(nodeContextId<0);
 }
 
-
 void MwcNode::stop() {
     qDebug() << "MwcNode::stop ...";
 

@@ -45,6 +45,7 @@ public:
     qint64 getLastNodeHeight() const {return lastNodeHeight;}
     QString getLastInternalNodeState() const;
 
+    bool isNodeAlive() const;
     bool isNodeHealthy();
 
     bool isUsePublicNode() const {return usePublicNode;}
@@ -69,8 +70,8 @@ private:
     const QString network;
     std::shared_ptr<node::MwcNode> embeddedNode;
     // Client can use public or embedded node if it is synced up.
-    volatile bool usePublicNode = true;
-    int publicNodeIdx;
+    bool usePublicNode = true;
+    int publicNodeIdx = 0;
     // check time to define if internal or public node will be used
     qint64 nodeStatusCheckTime = 0;
 

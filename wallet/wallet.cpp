@@ -322,23 +322,15 @@ void Wallet::renameAccountById( const QString & accountPath, const QString & new
 }
 
 // Check and repair the wallet. Will take a while
-// Check Signal: onScanProgress, onScanDone
+// Check Signal: onScanStart, onScanProgress, onScanDone
 // Return responseId
-QString Wallet::scan(bool delete_unconfirmed) {
+QString Wallet::scan(bool delete_unconfirmed, bool fullScan) {
     if (!isInit())
         return "";
 
-    return internals->scan(delete_unconfirmed);
-}
-
-// Update the wallet state, resync with a current node state
-// Check Signal: onScanProgress, onScanDone
-// Return responseId
-QString Wallet::update_wallet_state() {
-    if (!isInit())
-        return "";
-
-    return internals->update_wallet_state();
+    QString responseId = internals->scan(delete_unconfirmed, fullScan);
+    emit onScanStart(responseId, fullScan);
+    return responseId;
 }
 
 // Get current configuration of the wallet.
@@ -655,6 +647,14 @@ bool Wallet::isNodeHealthy() const {
         return false;
 
     return internals->isNodeHealthy();
+}
+
+// True if the node is loaded and can process any requests. Return folse for cold wallet starting process
+bool Wallet::isNodeAlive() const {
+    if (internals==nullptr)
+        return false;
+
+    return internals->isNodeAlive();
 }
 
 bool Wallet::isUsePublicNode() const {

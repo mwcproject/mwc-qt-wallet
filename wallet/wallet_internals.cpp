@@ -576,7 +576,7 @@ namespace wallet {
     // Check and repair the wallet. Will take a while
     // Check Signal: onScanProgress, onScanDone
     // Return responseId
-    QString WalletInternals::scan(bool delete_unconfirmed) {
+    QString WalletInternals::scan(bool delete_unconfirmed, bool fullScan) {
         if (scanOp.isRunning())
             return lastScanResponseId;
 
@@ -587,25 +587,7 @@ namespace wallet {
         lastScanResponseId = responseId;
         scanInProgress.storeRelease(1);
 
-        scanOp = startScan(this, update_status_callback_name, responseId, true, delete_unconfirmed);
-        return responseId;
-    }
-
-    // Update the wallet state, resync with a current node state
-    // Check Signal: onScanProgress, onScanDone
-    // Return responseId
-    QString WalletInternals::update_wallet_state() {
-        if (scanOp.isRunning())
-            return lastScanResponseId;
-
-        int id = response_id_counter.fetchAndAddRelaxed(1);
-        QString responseId = "upd_" + QString::number(id);
-
-        lastScanResponseId = responseId;
-        scanInProgress.storeRelease(1);
-
-        // Scan started in any case
-        scanOp = startScan(this, update_status_callback_name, responseId, false, false);
+        scanOp = startScan(this, update_status_callback_name, responseId, fullScan, delete_unconfirmed);
         return responseId;
     }
 
@@ -795,8 +777,12 @@ namespace wallet {
         return res;
     }
 
-    bool WalletInternals::isNodeHealthy() {
+    bool WalletInternals::isNodeHealthy() const {
         return nodeClient->isNodeHealthy();
+    }
+
+    bool WalletInternals::isNodeAlive() const {
+        return nodeClient->isNodeAlive();
     }
 
     bool WalletInternals::isUsePublicNode() const {

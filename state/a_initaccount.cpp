@@ -411,7 +411,7 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
         return;
     }
 
-    recoverResponseId = context->wallet->update_wallet_state();
+    recoverResponseId = context->wallet->scan(false, false);
 
     // switching to a progress Wnd
     core::getWndManager()->pageProgressWnd(mwc::PAGE_A_RECOVERY_FROM_PASSPHRASE, recoverResponseId,

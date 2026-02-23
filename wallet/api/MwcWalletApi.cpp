@@ -551,6 +551,7 @@ namespace wallet {
         return mwc_api::ApiResponse<int> (height, response.second);
     }
 
+    // Return success with 0 height if wallet update step was skipped (no height was changed from last call)
     mwc_api::ApiResponse<int> update_wallet_state(int context_id, const QString & response_callback, const QString & response_id) {
         Q_ASSERT(context_id>=0);
         QJsonObject params;

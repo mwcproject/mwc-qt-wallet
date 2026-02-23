@@ -57,6 +57,7 @@ private slots:
     void onLogout();
 
     void onSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr, QString message );
+    void onScanStart(QString responseId, bool fullScan);
     void onScanProgress( QString responseId, QJsonObject statusMessage );
     void onScanDone( QString responseId, bool fullScan, int height, QString errorMessage );
 private:
@@ -76,6 +77,7 @@ private:
     QMap<QString, ReceivedTxInfo> recievedTxs;
 
     state::STATE coldWalletSyncState = state::STATE::NONE;
+    QString coldWalletSyncResponseId;
 };
 
 

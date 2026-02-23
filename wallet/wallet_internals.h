@@ -123,12 +123,7 @@ namespace wallet {
         // Check and repair the wallet. Will take a while
         // Check Signal: onScanProgress, onScanDone
         // Return responseId
-        QString scan(bool delete_unconfirmed);
-
-        // Update the wallet state, resync with a current node state
-        // Check Signal: onScanProgress, onScanDone
-        // Return responseId
-        QString update_wallet_state();
+        QString scan(bool delete_unconfirmed, bool fullScan);
 
         QString getReceiveAccountPath() const;
 
@@ -211,10 +206,11 @@ namespace wallet {
         // Validate ownership proof
         OwnershipProofValidation validateOwnershipProof(const QJsonObject & proof);
 
-        bool isNodeHealthy();
+        bool isNodeHealthy() const;
         bool isUsePublicNode() const;
         qint64 getLastNodeHeight() const;
         QString getLastInternalNodeState() const;
+        bool isNodeAlive() const;
 
         NodeStatus requestNodeStatus() const;
     public:

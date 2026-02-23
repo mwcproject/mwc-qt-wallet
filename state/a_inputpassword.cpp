@@ -127,13 +127,10 @@ bool InputPassword::submitPassword(const QString & password, const QString & sel
 
     // Going forward by initializing the wallet
     if ( context->wallet->isInit() ) {
-        if (! config::isOnlineNode()) {
+        if (config::isOnlineWallet()) {
             // Updating the wallet balance
-            updateRespId = context->wallet->update_wallet_state();
-        }
-
-        // Starting listeners after balance to speed up the init process
-        if ( config::isOnlineWallet() ) {
+            updateRespId = context->wallet->scan(false, false);
+            // Starting listeners after balance to speed up the init process
             // Start listening, no feedback interested
             context->wallet->listeningStart(context->appContext->isFeatureMWCMQS(),
                                             context->appContext->isFeatureTor());

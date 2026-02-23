@@ -106,6 +106,7 @@ namespace wallet {
     mwc_api::ApiResponse<ResWalletInfo> info(int context_id, int confirmations, const QString & account_path, const QStringList & manuallyLockedOutputs );
 
     mwc_api::ApiResponse<int> scan(int context_id, bool delete_unconfirmed,  const QString & response_callback, const QString & response_id);
+    // Return success with 0 height if wallet update step was skipped (no height was changed from last call)
     mwc_api::ApiResponse<int> update_wallet_state(int context_id, const QString & response_callback, const QString & response_id);
 
     mwc_api::ApiResponse<QJsonObject> get_proof(int context_id, const QString & txUuid);

@@ -33,8 +33,10 @@ namespace state {
 
 HeartBeat::HeartBeat(StateContext * _context) :
             State(_context, STATE::HEART_BEAT ) {
-
-    lastNodeIsHealty = true;
+    // Cold wallet srting with unhelthy node (still running)
+    // Other online starting with pablic healthy
+    lastNodeIsHealty = !config::isColdWallet();
+    lastUsePubNode = !config::isColdWallet();
 
     QObject::connect(context->wallet, &wallet::Wallet::onLogin,
                      this, &HeartBeat::onLogin, Qt::QueuedConnection);
@@ -46,9 +48,11 @@ HeartBeat::HeartBeat(StateContext * _context) :
                  this, &HeartBeat::onScanProgress, Qt::QueuedConnection);
     QObject::connect(context->wallet, &wallet::Wallet::onScanDone,
                  this, &HeartBeat::onScanDone, Qt::QueuedConnection);
+    QObject::connect(context->wallet, &wallet::Wallet::onScanStart,
+                 this, &HeartBeat::onScanStart, Qt::QueuedConnection);
 
-    // Checking/update node status every 20 seconds...
-    startTimer(3000); // Let's update node info every 60 seconds. By some reasons it is slow operation...
+    // Checking/update node status every 3 seconds...
+    startTimer(3000);
 }
 
 HeartBeat::~HeartBeat() {
@@ -154,10 +158,12 @@ void HeartBeat::updateNodeStatus() {
         b->emitNodeStatus( localNodeProgress, nodeStatus );
 
     if (lastNodeDifficulty != nodeStatus.totalDifficulty ) {
-        lastNodeDifficulty = nodeStatus.totalDifficulty;
-        // trigger update because the height was changed
-        context->wallet->update_wallet_state();
-        lastNodeHeight = nodeStatus.nodeHeight;
+        if (context->wallet->isNodeAlive()) {
+            lastNodeDifficulty = nodeStatus.totalDifficulty;
+            // trigger update because the height was changed
+            context->wallet->scan(false, false);
+            lastNodeHeight = nodeStatus.nodeHeight;
+        }
     }
 }
 
@@ -197,28 +203,36 @@ void HeartBeat::onSlateReceivedFrom(QString slate, qint64 mwc, QString fromAddr,
     }
 }
 
+void HeartBeat::onScanStart(QString responseId, bool fullScan) {
+    // Cold wallet case, wallet_update call need special handling with a progress
+    if (config::isColdWallet() && !fullScan) {
+        Q_ASSERT(coldWalletSyncState == state::STATE::NONE);
+        coldWalletSyncResponseId = responseId;
+        coldWalletSyncState = context->stateMachine->getCurrentStateId();
+        context->stateMachine->resetLogoutLimit(true);
+        // Need reset state because we are messaging with windows. State is not valid any more
+        context->stateMachine->resetCurrentState();
+        core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, responseId,
+                                                   "Re-sync with a node", "Preparing to re-sync", "", false);
+    }
+}
+
+
 // Waiting for
 void HeartBeat::onScanProgress( QString responseId, QJsonObject statusMessage ) {
-
-    if (config::isColdWallet() && statusMessage.contains("Scanning"))
+    if (config::isColdWallet())
     {
-        if (coldWalletSyncState == state::STATE::NONE) {
-            coldWalletSyncState = context->stateMachine->getCurrentStateId();
-            context->stateMachine->resetLogoutLimit(true);
-            // Need reset state because we are messaging with windows. State is not valid any more
-            context->stateMachine->resetCurrentState();
-            core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, responseId,
-                                                       "Re-sync with a node", "Preparing to re-sync", "", false);
-        }
-        else {
+        if (responseId == coldWalletSyncResponseId) {
             QJsonArray vals = statusMessage["Scanning"].toArray();
-            int percent_progress = vals[2].toInt();
-            for (auto b: bridge::getBridgeManager()->getProgressWnd()) {
-                if (b->getCallerId() == responseId) {
-                    b->initProgress(responseId, 0, 100);
-                    QString msgProgress = "Re-sync in progress...  " + QString::number(percent_progress) + "%";
-                    b->updateProgress(responseId, percent_progress, msgProgress);
-                    b->setMsgPlus(responseId, "");
+            if (vals.size()>2) {
+                int percent_progress = vals[2].toInt();
+                for (auto b: bridge::getBridgeManager()->getProgressWnd()) {
+                    if (b->getCallerId() == responseId) {
+                        b->initProgress(responseId, 0, 100);
+                        QString msgProgress = "Re-sync in progress...  " + QString::number(percent_progress) + "%";
+                        b->updateProgress(responseId, percent_progress, msgProgress);
+                        b->setMsgPlus(responseId, "");
+                    }
                 }
             }
         }
@@ -304,16 +318,14 @@ void HeartBeat::onScanProgress( QString responseId, QJsonObject statusMessage ) 
 
 void HeartBeat::onScanDone( QString responseId, bool fullScan, int height, QString errorMessage ) {
     Q_UNUSED(responseId);
-    Q_UNUSED(fullScan);
-    Q_UNUSED(height);
     Q_UNUSED(errorMessage);
 
-    if (config::isColdWallet()) {
-        if (coldWalletSyncState != state::STATE::NONE) {
-            context->stateMachine->resetLogoutLimit(true);
-            context->stateMachine->setActionWindow(coldWalletSyncState, true);
-            coldWalletSyncState = state::STATE::NONE;
-        }
+    // wallet_update Calc Wallet case. Restorign UI back from the sacn progress
+    if (responseId == coldWalletSyncResponseId) {
+        Q_ASSERT(coldWalletSyncState != state::STATE::NONE);
+        context->stateMachine->resetLogoutLimit(true);
+        context->stateMachine->setActionWindow(coldWalletSyncState, true);
+        coldWalletSyncState = state::STATE::NONE;
     }
 
     if (!errorMessage.isEmpty()) {
@@ -321,10 +333,12 @@ void HeartBeat::onScanDone( QString responseId, bool fullScan, int height, QStri
         return;
     }
 
+    if (fullScan==false && height==0)
+        return; // It is update wallet that was cancelled
 
     if (lastNodeHeight > height) {
         // retry to finish the update.
-        context->wallet->update_wallet_state();
+        context->wallet->scan(false, false);
     }
     else {
         // Update is done - notify all that balance can be recalculated

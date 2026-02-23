@@ -73,12 +73,18 @@ NodeClient::NodeClient(const QString & _nodeDataPath, QString _network,
     core::AppContext * _appContext, QFuture<QString> * _torStarter) :
     network(_network), embeddedNode( _nodeDataPath.isEmpty() ? nullptr : new MwcNode(_appContext, _torStarter))
 {
-    publicNodeIdx = QRandomGenerator::global()->bounded( getPublicNodes(network).size() );
     if (embeddedNode!=nullptr)
         embeddedNode->start(_nodeDataPath, network);
 
-    QString publicNodeClientUrl = getPublicNodes(network)[publicNodeIdx];
-    publicNodeClient = new util::HttpClient(publicNodeClientUrl);
+    if (!config::isColdWallet()) {
+        publicNodeIdx = QRandomGenerator::global()->bounded( getPublicNodes(network).size() );
+        QString publicNodeClientUrl = getPublicNodes(network)[publicNodeIdx];
+        publicNodeClient = new util::HttpClient(publicNodeClientUrl);
+        usePublicNode = true;
+    }
+    else {
+        usePublicNode = false;
+    }
 }
 
 NodeClient::~NodeClient() {
@@ -190,7 +196,6 @@ QString NodeClient::foreignApiRequest(const QString & request) {
 
 QString NodeClient::callPublicNodeForeignApiLocked(const QString & request) {
     if (publicNodeClient == nullptr) {
-        Q_ASSERT(false);
         return "";
     }
 
@@ -290,6 +295,11 @@ wallet::NodeStatus NodeClient::requestNodeStatusLocked() {
 
     lastStatusTime = QDateTime::currentSecsSinceEpoch();
     return result;
+}
+
+bool NodeClient::isNodeAlive() const {
+    QMutexLocker locker(&callMutex);
+    return publicNodeClient!=nullptr || (embeddedNode!=nullptr && embeddedNode->isAlive());
 }
 
 bool NodeClient::isNodeHealthy() {

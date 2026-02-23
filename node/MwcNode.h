@@ -62,6 +62,7 @@ public:
     MwcNode(core::AppContext * appContext, QFuture<QString> * torStarter);
     virtual ~MwcNode() override;
 
+    bool isAlive() const {return nodeContextId>=0;}
     bool isRunning() const {return nodeContextId>=0 || startingNode.isValid();}
     const QString & getCurrentNetwork() const { return nodeNetwork; }
     const QString & getNodeDataPath() const {return nodeDataPath;}
