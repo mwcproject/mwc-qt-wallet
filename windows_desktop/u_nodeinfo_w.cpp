@@ -149,7 +149,6 @@ void NodeInfo::onSgnSetNodeStatus( QString embeddedNodeStatus,
     }
 
     ui->refreshButton->setEnabled( online );
-    ui->publishTransaction->setEnabled(online);
 
     if (peerHeight==0 || connections==0)
         nodeIsReady = false;
@@ -214,6 +213,7 @@ void NodeInfo::on_publishTransaction_clicked()
 
 void NodeInfo::updateNodeReadyButtons(bool nodeIsReady) {
     ui->saveBlockchianData->setEnabled(nodeIsReady);
+    ui->publishTransaction->setEnabled(nodeIsReady);
 }
 
 void NodeInfo::on_resyncNodeData_clicked()
