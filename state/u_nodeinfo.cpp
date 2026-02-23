@@ -37,6 +37,31 @@
 
 namespace state {
 
+static QString  cleanUpNodePath(QString nodeDataPath) {
+    QString movePathName = nodeDataPath + "_del";
+    { // Clean up before move
+        QDir delPath(movePathName);
+        if (delPath.exists()) {
+            delPath.removeRecursively();
+        }
+    }
+
+    QString errMessage;
+    QDir dir;
+    if (!dir.rename(nodeDataPath, movePathName)) {
+        errMessage = "Unable to clean up the node data at " + nodeDataPath;
+    }
+
+    { // Clean up after move
+        QDir delPath(movePathName);
+        if (delPath.exists()) {
+            delPath.removeRecursively();
+        }
+    }
+
+    return errMessage;
+}
+
 ////////////////////////////////////////////////////
 
 NodeInfo::NodeInfo(StateContext * _context) :
@@ -156,6 +181,7 @@ void NodeInfo::importBlockchainData(QString fileName) {
             QString nodePath = mwcNode->getNodeDataPath();
 
             mwcNode->stop();
+            cleanUpNodePath(nodePath);
 
             res = compress::decompressFolder( fileName,  nodePath, nodeNetwork );
 
@@ -222,12 +248,7 @@ void NodeInfo::resetEmbeddedNodeData() {
 
             mwcNode->stop();
 
-            // Cleaning up the folder
-            QString nodeDataPath = nodePath;
-            QDir dir(nodeDataPath);
-            if (!dir.removeRecursively()) {
-                errMessage = "Unable to clean up the node data at " + nodeDataPath;
-            }
+            errMessage = cleanUpNodePath(nodePath);
 
             mwcNode->start(nodePath, nodeNetwork); //, context->appContext->useTorForNode());
             nodeClient->restoreEmbeddedNode(mwcNode);

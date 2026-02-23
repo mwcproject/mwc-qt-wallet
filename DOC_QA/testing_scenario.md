@@ -2270,7 +2270,7 @@ mv ~/mwc-qt-wallet  ~/mwc-qt-wallet-cold1
 STOP the network, no internet connection allowed!!<br>
 
 Start QT wallet. Select 'Restore instance'<br>
-Use the stored before the passphrase from yout tesing wallet.
+Use the stored before the passphrase from your tesing wallet.
 
 When wallet will be created, go to 'Setting', press "Select running mode" menu.<br>
 There select 'Cold Wallet' and press "Apply"<br>
