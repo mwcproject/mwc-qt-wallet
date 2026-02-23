@@ -207,13 +207,8 @@ void HeartBeat::onScanStart(QString responseId, bool fullScan) {
     // Cold wallet case, wallet_update call need special handling with a progress
     if (config::isColdWallet() && !fullScan) {
         Q_ASSERT(coldWalletSyncState == state::STATE::NONE);
+        // Note, we can't start show scaning progress here, because there might be nothing to scan, just acknoledge the responseId
         coldWalletSyncResponseId = responseId;
-        coldWalletSyncState = context->stateMachine->getCurrentStateId();
-        context->stateMachine->resetLogoutLimit(true);
-        // Need reset state because we are messaging with windows. State is not valid any more
-        context->stateMachine->resetCurrentState();
-        core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, responseId,
-                                                   "Re-sync with a node", "Preparing to re-sync", "", false);
     }
 }
 
@@ -223,6 +218,17 @@ void HeartBeat::onScanProgress( QString responseId, QJsonObject statusMessage ) 
     if (config::isColdWallet())
     {
         if (responseId == coldWalletSyncResponseId) {
+            if (coldWalletSyncState == state::STATE::NONE && statusMessage.contains("Scanning")) {
+                //
+                coldWalletSyncState = context->stateMachine->getCurrentStateId();
+                Q_ASSERT(coldWalletSyncState != state::STATE::NONE);
+                context->stateMachine->resetLogoutLimit(true);
+                // Need reset state because we are messaging with windows. State is not valid any more
+                context->stateMachine->resetCurrentState();
+                core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, responseId,
+                                                       "Re-sync with a node", "Preparing to re-sync", "", false);
+            }
+
             QJsonArray vals = statusMessage["Scanning"].toArray();
             if (vals.size()>2) {
                 int percent_progress = vals[2].toInt();
@@ -322,10 +328,11 @@ void HeartBeat::onScanDone( QString responseId, bool fullScan, int height, QStri
 
     // wallet_update Calc Wallet case. Restorign UI back from the sacn progress
     if (responseId == coldWalletSyncResponseId) {
-        Q_ASSERT(coldWalletSyncState != state::STATE::NONE);
-        context->stateMachine->resetLogoutLimit(true);
-        context->stateMachine->setActionWindow(coldWalletSyncState, true);
-        coldWalletSyncState = state::STATE::NONE;
+        if (coldWalletSyncState != state::STATE::NONE) {
+            context->stateMachine->resetLogoutLimit(true);
+            context->stateMachine->setActionWindow(coldWalletSyncState, true);
+            coldWalletSyncState = state::STATE::NONE;
+        }
     }
 
     if (!errorMessage.isEmpty()) {

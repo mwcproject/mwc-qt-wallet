@@ -135,6 +135,14 @@ bool InputPassword::submitPassword(const QString & password, const QString & sel
             context->wallet->listeningStart(context->appContext->isFeatureMWCMQS(),
                                             context->appContext->isFeatureTor());
         }
+        else {
+            // Need to trigger going to the next stage event.
+            QMetaObject::invokeMethod(this,
+                    [this]() {
+                                          onScanDone(this->updateRespId, false, 0, "");
+                    },
+                    Qt::QueuedConnection);
+        }
     }
 
     if ( context->appContext->getActiveWndState() == STATE::SHOW_SEED ) {
