@@ -86,7 +86,6 @@ Go to the release page
 |-----------------------------------------------|----------------------------------------------------|
 | **Intel/AMD x64 CPU**                         | `mwc-qt-wallet_X.X.XX-win64-setup-standardcpu.exe` |
 | **Low end Intel/AMD x64 CPU (Atom, Celeron)** | `mwc-qt-wallet_X.X.XX-win64-setup-basiccpu.exe`    |
-| **32 bit Windows**                            | `mwc-qt-wallet_X.X.XX-win32-setup.exe`           |
 
 Each archive has a companion file ending in `.sha256sum` - download that too.
 
@@ -180,24 +179,7 @@ mwc-qt-wallet_1.2.14-linux64-standardcpu.deb: OK
 ```
 Any other message means the download is corrupted - delete and re-download.
 
-## 3. Install required Qt5 Libraries
-
-Install Qt5 runtime libraries (required to run the app):
-
-On Debian/Ubuntu:
-```bash
-sudo apt update
-sudo apt install -y libqt5widgets5 libqt5gui5 libqt5core5a
-```
-
-On Fedora/RHEL/CentOS:
-```bash
-sudo dnf install -y qt5-qtbase qt5-qtbase-gui
-```
-
-If you're using another distro, install the Qt5 GUI runtime libraries via your package manager.
-
-## 4. Install MWC QT Wallet
+## 3. Install MWC QT Wallet
 
 For .deb (Debian/Ubuntu):
 ```bash
@@ -216,7 +198,7 @@ cd mwc-qt-wallet
 ./mwc-qt-wallet
 ```
 
-## 5. Launch the App
+## 4. Launch the App
 
 For .deb or .rpm installs you can launch the app from your system's app menu.
 
