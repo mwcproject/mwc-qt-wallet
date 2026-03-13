@@ -21,7 +21,6 @@
 #include "core_mobile/MobileWndManager.h"
 #include <QSysInfo>
 #include "core_mobile/qtandroidservice.h"
-#include <QAndroidService>
 #endif
 
 #include <QApplication>
@@ -178,14 +177,6 @@ QPair<bool, QString> readConfig(QApplication & app) {
 
 int main(int argc, char *argv[])
 {
-#ifdef WALLET_MOBILE
-    if (argc > 1 && strcmp(argv[1], "-service") == 0) {
-        qWarning() << "Service starting with BroadcastReceiver from same .so file";
-        QAndroidService app(argc, argv);
-
-        return app.exec();
-    }
-#endif
     int retVal = 0;
 
     double uiScale = 1.0;
@@ -229,9 +220,6 @@ int main(int argc, char *argv[])
     {
         // QApplication instance is needed to show possible errors
    //     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);  Disabled because it looks badly on 4k Linux and Windows with Scale 200% (default for 4k)
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
 
         Q_ASSERT(argc>=1);
         // Process arglist.
@@ -401,6 +389,7 @@ int main(int argc, char *argv[])
             }
         }
 
+#ifdef WALLET_DESKTOP
         if (!util::acquireAppGlobalLock() )
         {
             // Seems like we are blocked on global semaphore. It is mean that second instance does exist
@@ -408,6 +397,7 @@ int main(int argc, char *argv[])
                     "Another instance of MWC Qt Wallet is already running. You can run only one instance of the wallet at a time.");
             return 1;
         }
+#endif
 
         // Let's start Tor core and init core logs
         rust_logs::initRustLogs("Info");
@@ -417,10 +407,7 @@ int main(int argc, char *argv[])
 #ifdef WALLET_DESKTOP
         wallet::Wallet * wallet = new wallet::Wallet(&torStarter);
 #else
-        // wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
-        wallet::MWC713 * wallet = new wallet::MWC713();
-        QtAndroidService *qtAndroidService = new QtAndroidService(&app);
-        qtAndroidService->sendToService("Start Service");
+        wallet::Wallet * wallet = new wallet::Wallet(&torStarter);
 #endif
 
         state::StateContext context( &appContext, wallet, &torStarter );
@@ -482,4 +469,3 @@ int main(int argc, char *argv[])
 
     return retVal;
   }
-

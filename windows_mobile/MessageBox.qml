@@ -10,7 +10,7 @@ Item {
     id: messagebox
     visible: false
 
-    function open(title, message, isTwoButtons, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks, _callback) {
+    function open(title, message, isTwoButtons, noBtnText, yesBtnText, blockButton, _callback) {
         text_title.text = title
         text_message.text = message
         label_password.visible = false

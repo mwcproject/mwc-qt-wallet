@@ -32,7 +32,8 @@ void MobileWndManager::init(QQmlApplicationEngine * _engine) {
     Q_ASSERT(engine);
 
     engine->load(QUrl(QStringLiteral("qrc:/windows_mobile/main.qml")));
-    mainWindow = engine->rootObjects().first();
+    auto list = engine->rootObjects();
+    mainWindow = list.first();
     mainWindow->setProperty("currentState", 0);
     QStringList downloadPaths = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation);
     for (int i = 0; i < downloadPaths.length(); i++) {
@@ -75,7 +76,7 @@ void MobileWndManager::messageHtmlDlg( QString title, QString message, double wi
 // Two button box
 WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                                                            QString btn1Tooltip, QString btn2Tooltip,
-                                                           bool default1, bool default2, double widthScale, int *ttl_blocks) {
+                                                           bool default1, bool default2, double widthScale) {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::questionTextDlg with title=" + title +
         " message=" + message + " btn1=" + btn1 + " btn2=" + btn2);
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
@@ -87,7 +88,7 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
     if(mainWindow) {
         mainWindow->setProperty("questionTextDlgResponse", -1);
         QVariant retValue;
-        QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2), Q_ARG(QVariant, ""), Q_ARG(QVariant, 0), Q_ARG(QVariant, *ttl_blocks));
+        QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2), Q_ARG(QVariant, ""), Q_ARG(QVariant, 0));
         while(mainWindow->property("questionTextDlgResponse") == -1) {
             QCoreApplication::processEvents();
             QThread::usleep(50);
@@ -182,8 +183,27 @@ QString MobileWndManager::getOpenFileName(const QString &caption, const QString 
 }
 
 
+bool MobileWndManager::sendConfirmationSlatepackDlg( QString title, QString messageBody, double widthScale, int inputsNum, int * ttl ) {
+    Q_UNUSED(title)
+    Q_UNUSED(messageBody)
+    Q_UNUSED(widthScale)
+    Q_UNUSED(inputsNum)
+    Q_UNUSED(ttl)
+    messageTextDlg( "ERROR", "sendConfirmationSlatepackDlg is not implemented", widthScale );
+    return false;
+}
+
+bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, int inputsNum ) {
+    Q_UNUSED(title)
+    Q_UNUSED(message)
+    Q_UNUSED(widthScale)
+    Q_UNUSED(inputsNum)
+    messageTextDlg( "ERROR", "sendConfirmationDlg with inputsNum is not implemented", widthScale );
+    return false;
+}
+
 // Ask for confirmation
-bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
+bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale ) {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::sendConfirmationDlg with title=" + title +
         " message=" + message + " passwordHash=<hidden>");
     Q_UNUSED(widthScale)
@@ -191,7 +211,7 @@ bool MobileWndManager::sendConfirmationDlg( QString title, QString message, doub
     if(mainWindow) {
         mainWindow->setProperty("sendConformationDlgResponse", -1);
         QVariant retValue;
-        QMetaObject::invokeMethod(mainWindow, "openSendConfirmationDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, passwordHash));
+        QMetaObject::invokeMethod(mainWindow, "openSendConfirmationDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message));
         while(mainWindow->property("sendConformationDlgResponse") == -1) {
             QCoreApplication::processEvents();
             QThread::usleep(50);
@@ -236,6 +256,11 @@ void MobileWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
     Q_UNUSED(restoredFromSeed)  // mobile doesn't need it
     //Q_ASSERT(false); // implement me
 }
+
+void MobileWndManager::pageSeedLength() {
+    messageTextDlg( "ERROR", "MobileWndManager::pageSeedLength is not implemented" );
+}
+
 void MobileWndManager::pageEnterSeed() {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageEnterSeed");
     QJsonObject obj;
@@ -343,12 +368,13 @@ void MobileWndManager::pageSendStarting() {
     mainWindow->setProperty("currentState", state::STATE::SEND);
     mainWindow->setProperty("initParams", "");
 }
-void MobileWndManager::pageSendOnline( QString selectedAccount, qint64 amount ) {
-    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendOnline with selectedAccount=" + selectedAccount +
+void MobileWndManager::pageSendOnline( QString selectedAccount, QString selectedAccountPath, qint64 amount ) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendOnline with selectedAccount=" + selectedAccount + " selectedAccountPath=" + selectedAccountPath +
         " amount=" + QString::number(amount));
     QJsonObject obj;
     obj["isSendOnline"] = true;
     obj["selectedAccount"] = selectedAccount;
+    obj["selectedAccountPath"] = selectedAccountPath;
     obj["amount"] = QString::number(amount);
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
@@ -362,12 +388,13 @@ void MobileWndManager::pageSendFile( QString selectedAccount, qint64 amount ) {
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 
-void MobileWndManager::pageSendSlatepack( QString selectedAccount, qint64 amount ) {
-    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendSlatepack with selectedAccount=" + selectedAccount +
+void MobileWndManager::pageSendSlatepack( QString selectedAccount, QString selectedAccountPath, qint64 amount ) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSendSlatepack with selectedAccount=" + selectedAccount + " selectedAccountPath=" + selectedAccountPath +
         " amount=" + QString::number(amount));
     QJsonObject obj;
     obj["isSendOnline"] = false;
     obj["selectedAccount"] = selectedAccount;
+    obj["selectedAccountPath"] = selectedAccountPath;
     obj["amount"] = QString::number(amount);
     obj["isSlatepack"] = true;
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
@@ -380,11 +407,12 @@ void MobileWndManager::pageTransactions() {
 
 // slatepack - slatepack string value to show.
 // backStateId - state ID of the caller. On 'back' will switch to this state Id
-void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) {
+void MobileWndManager::pageShowSlatepack(QString slatepack, QString tx_uuid, int backStateId, QString txExtension, bool enableFinalize) {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageShowSlatepack with <slatepack> backStateId=" + QString::number(backStateId) +
         " txExtension=" + txExtension + " enableFinalize=" + QString::number(enableFinalize));
     QJsonObject obj;
     obj["slatepack"] = slatepack;
+    obj["tx_uuid"] = tx_uuid;
     obj["backStateId"] = backStateId;
     obj["txExtension"] = txExtension;
     obj["enableFinalize"] = enableFinalize;
@@ -434,6 +462,7 @@ void MobileWndManager::pageAccountOptions() {
     mainWindow->setProperty("currentState", state::STATE::ACCOUNT_OPTIONS);
 }
 
+#ifdef FEATURE_SWAP
 void MobileWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageSwapList with selectIncoming=" + QString::number(selectIncoming) + " selectOutgoing=" + QString::number(selectOutgoing) + " selectBackup=" + QString::number(selectBackup) + " selectEthWallet=" + QString::number(selectEthWallet));
     Q_UNUSED(selectIncoming)
@@ -469,7 +498,9 @@ void MobileWndManager::pageSwapTradeDetails(QString swapId) {
     Q_UNUSED(swapId)
     Q_ASSERT(false); // implement me
 }
+#endif
 
+#ifdef FEATURE_MKTPLACE
 void MobileWndManager::pageMarketplace(bool selectMyOffers, bool selectFee) {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageMarketplace with selectMyOffers=" + QString::number(selectMyOffers) + " selectFee=" + QString::number(selectFee));
     Q_UNUSED(selectMyOffers)
@@ -490,6 +521,44 @@ void MobileWndManager::showSwapBackupDlg() {
 void MobileWndManager::pageTransactionFee() {
     logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageTransactionFee");
     Q_ASSERT(false); // implement me
+}
+#endif
+
+void MobileWndManager::pageViewHash() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageViewHash");
+    messageTextDlg("Not Supported Yet", "Viewing-key pages are not wired for mobile yet.");
+}
+
+void MobileWndManager::pageViewAccounts() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageViewAccounts");
+    messageTextDlg("Not Supported Yet", "Viewing-key pages are not wired for mobile yet.");
+}
+
+void MobileWndManager::pageGenerateOwnershipInput() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageGenerateOwnershipInput");
+    messageTextDlg("Not Supported Yet", "Ownership-proof pages are not wired for mobile yet.");
+}
+
+void MobileWndManager::pageGenerateOwnershipResult(const QString & proof) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageGenerateOwnershipResult with proof=<hidden>");
+    Q_UNUSED(proof)
+    messageTextDlg("Not Supported Yet", "Ownership-proof pages are not wired for mobile yet.");
+}
+
+void MobileWndManager::pageValidateOwnershipInput() {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageValidateOwnershipInput");
+    messageTextDlg("Not Supported Yet", "Ownership-proof pages are not wired for mobile yet.");
+}
+
+void MobileWndManager::pageValidateOwnershipResult(const QString & network, const QString & message, const QString & viewingKey,
+                                                   const QString & torAddress, const QString & mqsAddress) {
+    logger::logInfo(logger::QT_WALLET, "Call MobileWndManager::pageValidateOwnershipResult with network=" + network +
+        " message=<hidden> viewingKey=<hidden> torAddress=<hidden> mqsAddress=<hidden>");
+    Q_UNUSED(message)
+    Q_UNUSED(viewingKey)
+    Q_UNUSED(torAddress)
+    Q_UNUSED(mqsAddress)
+    messageTextDlg("Not Supported Yet", "Ownership-proof pages are not wired for mobile yet.");
 }
 
 

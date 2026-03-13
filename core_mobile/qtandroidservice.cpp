@@ -1,113 +1,91 @@
 #include "qtandroidservice.h"
 
-#include <QAndroidJniEnvironment>
-#include <QAndroidIntent>
+#include <QCoreApplication>
 #include <QtDebug>
+#include <QMetaObject>
 
-QtAndroidService *QtAndroidService::m_instance = nullptr;
+#ifdef Q_OS_ANDROID
+#include <QJniEnvironment>
+#include <QtCore/qcoreapplication_platform.h>
+
 const int RESULT_OK = -1;
-
-static void receivedFromAndroidService(JNIEnv *env, jobject /*thiz*/, jstring value)
-{
-    emit QtAndroidService::instance()->messageFromService(
-        env->GetStringUTFChars(value, nullptr));
-}
+#endif
 
 QtAndroidService::QtAndroidService(QObject *parent) : QObject(parent)
 {
-    m_instance = this;
-
-    registerNatives();
-    registerBroadcastReceiver();
-}
-
-void QtAndroidService::sendToService(QString message)
-{
-    QAndroidIntent serviceIntent(QtAndroid::androidActivity().object(),
-                                "mw/mwc/wallet/QtAndroidService");
-    serviceIntent.putExtra("message", message.toUtf8());
-    QAndroidJniObject result = QtAndroid::androidActivity().callObjectMethod(
-                "startService",
-                "(Landroid/content/Intent;)Landroid/content/ComponentName;",
-                serviceIntent.handle().object());
 }
 
 bool QtAndroidService::requestPermissions()
 {
+#ifdef Q_OS_ANDROID
     const QVector<QString> permissions({"android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.READ_EXTERNAL_STORAGE"});
     for(const QString &permission : permissions){
-        auto result = QtAndroid::checkPermission(permission);
-        if(result == QtAndroid::PermissionResult::Denied){
-            auto resultHash = QtAndroid::requestPermissionsSync(QStringList({permission}));
-            if(resultHash[permission] == QtAndroid::PermissionResult::Denied)
+        auto result = QtAndroidPrivate::checkPermission(permission).result();
+        if(result == QtAndroidPrivate::PermissionResult::Denied){
+            auto requestResult = QtAndroidPrivate::requestPermission(permission).result();
+            if(requestResult == QtAndroidPrivate::PermissionResult::Denied)
                 return false;
         }
     }
 
     return true;
+#else
+    return true;
+#endif
 }
-
-void QtAndroidService::registerNatives()
-{
-    JNINativeMethod methods[] {
-        {"sendToQt", "(Ljava/lang/String;)V", reinterpret_cast<void *>(receivedFromAndroidService)}};
-    QAndroidJniObject javaClass("mw/mwc/wallet/ActivityUtils");
-
-    QAndroidJniEnvironment env;
-    jclass objectClass = env->GetObjectClass(javaClass.object<jobject>());
-    env->RegisterNatives(objectClass,
-                         methods,
-                         sizeof(methods) / sizeof(methods[0]));
-    env->DeleteLocalRef(objectClass);
-}
-
-void QtAndroidService::registerBroadcastReceiver()
-{
-    QAndroidJniEnvironment env;
-    jclass javaClass = env.findClass("mw/mwc/wallet/ActivityUtils");
-    QAndroidJniObject classObject(javaClass);
-
-    classObject.callMethod<void>("registerServiceBroadcastReceiver",
-                                 "(Landroid/content/Context;)V",
-                                 QtAndroid::androidContext().object());
-}
-
 // Type values:  .cfg -> text/plain  - doesn't work this way
 //  text/plain
 //  text/*
 void QtAndroidService::openFile( QString pickerInitialUri, QString type, int eventCode ) {
-    QAndroidJniObject jpickerInitialUri = QAndroidJniObject::fromString(pickerInitialUri);
-    QAndroidJniObject jtype = QAndroidJniObject::fromString(type);
+#ifdef Q_OS_ANDROID
+    AndroidJniObject jpickerInitialUri = AndroidJniObject::fromString(pickerInitialUri);
+    AndroidJniObject jtype = AndroidJniObject::fromString(type);
 
-    QAndroidJniObject intent = QAndroidJniObject::callStaticObjectMethod("mw/mwc/wallet/QmlHelper",
+    AndroidJniObject intent = AndroidJniObject::callStaticObjectMethod("mw/mwc/wallet/QmlHelper",
                                                                          "buildOpenFileIntent",
                                                                          "(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;",
                                                                          jpickerInitialUri.object<jstring>(),
                                                                          jtype.object<jstring>());
 
-    QtAndroid::startActivity(intent, eventCode, this);
+    QtAndroidPrivate::startActivity(intent, eventCode, this);
+#else
+    Q_UNUSED(pickerInitialUri)
+    Q_UNUSED(type)
+    qWarning() << "QtAndroidService::openFile is not implemented on this platform";
+    QMetaObject::invokeMethod(this, [this, eventCode]() { emit sgnOnFileReady(eventCode, QString()); },
+                              Qt::QueuedConnection);
+#endif
 }
 
 void QtAndroidService::createFile( QString pickerInitialUri, QString type, QString fileName, int eventCode ) {
-    QAndroidJniObject jpickerInitialUri = QAndroidJniObject::fromString(pickerInitialUri);
-    QAndroidJniObject jtype = QAndroidJniObject::fromString(type);
-    QAndroidJniObject jfileName = QAndroidJniObject::fromString(fileName);
+#ifdef Q_OS_ANDROID
+    AndroidJniObject jpickerInitialUri = AndroidJniObject::fromString(pickerInitialUri);
+    AndroidJniObject jtype = AndroidJniObject::fromString(type);
+    AndroidJniObject jfileName = AndroidJniObject::fromString(fileName);
 
     // Intent buildCreateFileIntent(String pickerInitialUri, String type, String filename )
-    QAndroidJniObject intent = QAndroidJniObject::callStaticObjectMethod("mw/mwc/wallet/QmlHelper",
+    AndroidJniObject intent = AndroidJniObject::callStaticObjectMethod("mw/mwc/wallet/QmlHelper",
                                                                          "buildCreateFileIntent",
                                                                          "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;",
                                                                          jpickerInitialUri.object<jstring>(),
                                                                          jtype.object<jstring>(),
                                                                          jfileName.object<jstring>());
 
-    QtAndroid::startActivity(intent, eventCode, this);
+    QtAndroidPrivate::startActivity(intent, eventCode, this);
+#else
+    Q_UNUSED(pickerInitialUri)
+    Q_UNUSED(type)
+    Q_UNUSED(fileName)
+    qWarning() << "QtAndroidService::createFile is not implemented on this platform";
+    QMetaObject::invokeMethod(this, [this, eventCode]() { emit sgnOnFileReady(eventCode, QString()); },
+                              Qt::QueuedConnection);
+#endif
 }
 
-
-void QtAndroidService::handleActivityResult(int receiverRequestCode, int resultCode, const QAndroidJniObject &data) {
+#ifdef Q_OS_ANDROID
+void QtAndroidService::handleActivityResult(int receiverRequestCode, int resultCode, const AndroidJniObject &data) {
     if ( resultCode == RESULT_OK ) {
-        QAndroidJniObject uri = data.callObjectMethod("getDataString","()Ljava/lang/String;");
+        AndroidJniObject uri = data.callObjectMethod("getDataString","()Ljava/lang/String;");
         emit sgnOnFileReady( receiverRequestCode, uri.toString() );
     }
     else {
@@ -115,12 +93,14 @@ void QtAndroidService::handleActivityResult(int receiverRequestCode, int resultC
         emit sgnOnFileReady( receiverRequestCode, "" );
     }
 }
+#endif
 
 QString QtAndroidService::getApkVersion()
 {
-    QAndroidJniObject activity = QtAndroid::androidActivity();
-    QAndroidJniObject packageName, packageManager, packageInfo;
-    QAndroidJniEnvironment env;
+#ifdef Q_OS_ANDROID
+    QJniObject activity(QNativeInterface::QAndroidApplication::context().object());
+    QJniObject packageName, packageManager, packageInfo;
+    QJniEnvironment env;
     QString info;
 
     packageManager = activity.callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
@@ -145,5 +125,7 @@ QString QtAndroidService::getApkVersion()
     }
 
     return info;
+#else
+    return QCoreApplication::applicationVersion();
+#endif
 }
-

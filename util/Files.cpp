@@ -20,17 +20,14 @@
 #include <QDateTime>
 #include <QDebug>
 
-#ifdef WALLET_MOBILE
-#include <QtAndroid>
-#include <QAndroidJniEnvironment>
-#include <QAndroidIntent>
+#ifdef Q_OS_ANDROID
+#include <QJniEnvironment>
+#include <QJniObject>
+#include <QtCore/qcoreapplication_platform.h>
+using AndroidJniObject = QJniObject;
 #endif
 
 namespace util {
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-#define endl Qt::endl
-#endif
 
 QStringList readTextFile( QString fileName, bool trimmed, bool cleanEMptyLines, std::function<void()> openOpenErrorCallback ) {
     QFile file(fileName);
@@ -67,7 +64,7 @@ bool writeTextFile(QString fileName, const QStringList & lines ) {
     QTextStream out(&file);
 
     for (const auto & ln : lines) {
-        out << ln << endl;
+        out << ln << Qt::endl;
     }
 
     file.close();
@@ -122,11 +119,12 @@ QString genTempFileName(QString extension) {
 }
 
 bool copyUriToFile(QString uriFN, QString fsFN) {
-    QAndroidJniObject activity = QtAndroid::androidActivity();
-    QAndroidJniObject juriFN = QAndroidJniObject::fromString(uriFN);
-    QAndroidJniObject jfsFN = QAndroidJniObject::fromString(fsFN);
+#ifdef Q_OS_ANDROID
+    auto activity = QNativeInterface::QAndroidApplication::context();
+    AndroidJniObject juriFN = AndroidJniObject::fromString(uriFN);
+    AndroidJniObject jfsFN = AndroidJniObject::fromString(fsFN);
 
-    bool result = QAndroidJniObject::callStaticMethod<jboolean>("mw/mwc/wallet/QmlHelper",
+    bool result = AndroidJniObject::callStaticMethod<jboolean>("mw/mwc/wallet/QmlHelper",
                                                                          "copyUriToFile",
                                                                          "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Z",
                                                                          activity.object(),
@@ -135,14 +133,21 @@ bool copyUriToFile(QString uriFN, QString fsFN) {
 
     qDebug() << "copyUriToFile with " + uriFN + ", " + fsFN + " return " << result;
     return result;
+#else
+    Q_UNUSED(uriFN)
+    Q_UNUSED(fsFN)
+    qWarning() << "copyUriToFile is not implemented on this platform";
+    return false;
+#endif
 }
 
 bool copyFileToUri(QString fsFN, QString uriFN) {
-    QAndroidJniObject activity = QtAndroid::androidActivity();
-    QAndroidJniObject jfsFN = QAndroidJniObject::fromString(fsFN);
-    QAndroidJniObject juriFN = QAndroidJniObject::fromString(uriFN);
+#ifdef Q_OS_ANDROID
+    auto activity = QNativeInterface::QAndroidApplication::context();
+    AndroidJniObject jfsFN = AndroidJniObject::fromString(fsFN);
+    AndroidJniObject juriFN = AndroidJniObject::fromString(uriFN);
 
-    bool result = QAndroidJniObject::callStaticMethod<jboolean>("mw/mwc/wallet/QmlHelper",
+    bool result = AndroidJniObject::callStaticMethod<jboolean>("mw/mwc/wallet/QmlHelper",
                                                                          "copyFileToUri",
                                                                          "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Z",
                                                                          activity.object(),
@@ -151,6 +156,12 @@ bool copyFileToUri(QString fsFN, QString uriFN) {
 
     qDebug() << "copyFileToUri with " + fsFN + ", " + uriFN + " return " << result;
     return result;
+#else
+    Q_UNUSED(fsFN)
+    Q_UNUSED(uriFN)
+    qWarning() << "copyFileToUri is not implemented on this platform";
+    return false;
+#endif
 }
 
 #endif

@@ -250,7 +250,7 @@ void InitAccount::generateWordTasks() {
     tasks = core::generateSeedTasks( seed,0, seed.length() ); // generate tasks
 #endif
 #ifdef WALLET_MOBILE
-    tasks = core::generateSeedTasks( seed, 0, std::min(6, seed.length()) ); // generate tasks
+    tasks = core::generateSeedTasks(seed, 0, std::min<qsizetype>(6, seed.length())); // generate tasks
 #endif
     Q_ASSERT(tasks.size()>0);
 

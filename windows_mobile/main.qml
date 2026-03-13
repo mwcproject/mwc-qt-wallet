@@ -85,7 +85,7 @@ Window {
         }
     }
 
-    function openQuestionTextDlg(title, message, noBtnText, yesBtnText, blockButton, _ttl_blocks, passwordHash = "") {
+    function openQuestionTextDlg(title, message, noBtnText, yesBtnText, blockButton) {
         messagebox.open(title, message, true, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks, questionTextDlgCallback)
     }
 
@@ -109,8 +109,8 @@ Window {
         }
     }
 
-    function openSendConfirmationDlg(title, message, passwordHash) {
-        sendConfirmationItem.open(title, message, passwordHash, sendConfirmationDlgCallback)
+    function openSendConfirmationDlg(title, message) {
+        sendConfirmationItem.open(title, message, sendConfirmationDlgCallback)
     }
 
     function openWalletStoppingMessageDlg(taskTimeout) {

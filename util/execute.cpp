@@ -13,9 +13,6 @@
 // limitations under the License.
 
 #include "util/execute.h"
-#include <QProcess>
-#include <QSystemSemaphore>
-#include "TestSystemSemaphoreThread.h"
 #include "../core/Config.h"
 #include <QDir>
 #include <QtGlobal>
@@ -23,6 +20,12 @@
 #include <QUrl>
 #include "../state/state.h"
 #include "../core/appcontext.h"
+
+#ifdef WALLET_DESKTOP
+#include <QProcess>
+#include <QSystemSemaphore>
+#include "TestSystemSemaphoreThread.h"
+#endif
 
 namespace util {
 
@@ -32,23 +35,33 @@ void openUrlInBrowser(const QString & url) {
     QDesktopServices::openUrl( QUrl(url) );
 }
 
+#ifdef WALLET_DESKTOP
 static QSystemSemaphore * instancesSemaphore = nullptr;
+#endif
 
 // MwcQtWallet start/stop/checking management
 // Path to current instance from command line
 void setMwcQtWalletPath( QString path ) {mwcQtWalletPath = path;}
 
+#ifdef WALLET_DESKTOP
 static bool restartRequested = false;
+#endif
 
 // Request to restart mwc qt wallet on exit of this app
 void requestRestartMwcQtWallet() {
     state::getStateContext()->appContext->saveData();
+#ifdef WALLET_DESKTOP
     restartRequested=true;
+#endif
 }
 
 
 // Point of restart only with a gui
 void restartMwcQtWalletIfRequested(double uiScale) {
+#ifdef WALLET_MOBILE
+    Q_UNUSED(uiScale)
+    return;
+#else
     if (!restartRequested)
         return;
 
@@ -61,10 +74,14 @@ void restartMwcQtWalletIfRequested(double uiScale) {
     }
 
     QProcess::startDetached( mwcQtWalletPath, argList, QDir::currentPath() );
+#endif
 }
 
 // Will try to get a global lock. Return true if lock was obtained
 bool acquireAppGlobalLock() {
+#ifdef WALLET_MOBILE
+    return true;
+#else
     Q_ASSERT(instancesSemaphore==nullptr);
     instancesSemaphore = new QSystemSemaphore("mwc-qt-wallet-instances", 1);
 
@@ -88,17 +105,21 @@ bool acquireAppGlobalLock() {
     }
 
     return testResult;
+#endif
 }
 
 // Destroy global lock object. Other instance can start once.
 void releaseAppGlobalLock() {
+#ifdef WALLET_MOBILE
+    return;
+#else
     if (instancesSemaphore!=nullptr) {
         delete instancesSemaphore;
         instancesSemaphore = nullptr;
     }
+#endif
 }
 
 
 }
-
 

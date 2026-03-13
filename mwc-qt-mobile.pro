@@ -1,8 +1,44 @@
 QT += quick
 QT += svg
-QT += androidextras
+QT += widgets
+QT += network
+QT += concurrent
+android: QT += core-private
 
-CONFIG += c++11
+CONFIG += c++17
+
+ios:simulator {
+    QMAKE_APPLE_SIMULATOR_ARCHS = x86_64
+}
+
+ios {
+    QMAKE_IOS_DEPLOYMENT_TARGET = 16.0
+}
+
+# Rust static library
+android {
+    RUST_MOBILE_TARGET = aarch64-linux-android
+}
+
+ios {
+    simulator {
+        RUST_MOBILE_TARGET = x86_64-apple-ios
+    }
+    !simulator {
+        RUST_MOBILE_TARGET = aarch64-apple-ios
+    }
+}
+
+!isEmpty(RUST_MOBILE_TARGET) {
+    LIBDIR = $$PWD/../mwc-wallet/target/$$RUST_MOBILE_TARGET
+
+    CONFIG(debug, debug|release) {
+        LIBS += $$LIBDIR/debug/libmwc_wallet_lib.a
+    }
+    CONFIG(release, debug|release) {
+        LIBS += $$LIBDIR/release/libmwc_wallet_lib.a
+    }
+}
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -27,6 +63,7 @@ SOURCES += $$files(bridge/wnd/*.cpp)
 SOURCES += $$files(tries/*.cpp)
 SOURCES += $$files(util/*.cpp)
 SOURCES += $$files(wallet/*.cpp)
+SOURCES += $$files(wallet/api/*.cpp)
 SOURCES += $$files(node/*.cpp)
 SOURCES += $$files(wallet/tasks/*.cpp)
 
@@ -41,6 +78,7 @@ HEADERS += $$files(bridge/wnd/*.h)
 HEADERS += $$files(tries/*.h)
 HEADERS += $$files(util/*.h)
 HEADERS += $$files(wallet/*.h)
+HEADERS += $$files(wallet/api/*.h)
 HEADERS += $$files(node/*.h)
 HEADERS += $$files(wallet/tasks/*.h)
 
@@ -60,24 +98,17 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    android/AndroidManifest.xml \
-    android/build.gradle \
-    android/gradle/wrapper/gradle-wrapper.jar \
-    android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew \
-    android/gradlew.bat \
-    android/res/values/libs.xml \
-    android/src/com/mwc/mobile/ActivityUtils.java \
-    android/src/com/mwc/mobile/QtAndroidService.java
+android {
+    DISTFILES += \
+        android/AndroidManifest.xml \
+        android/build.gradle \
+        android/gradle.properties \
+        android/gradle/wrapper/gradle-wrapper.jar \
+        android/gradle/wrapper/gradle-wrapper.properties \
+        android/gradlew \
+        android/gradlew.bat \
+        android/res/values/libs.xml
 
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
-
-ANDROID_EXTRA_LIBS = $$PWD/android_bin/x86/libmwc713.so $$PWD/android_bin/x86/libmwczip.so $$PWD/android_bin/x86/libtor.so \
-    $$PWD/android_bin/x86_64/libmwc713.so       $$PWD/android_bin/x86_64/libmwczip.so       $$PWD/android_bin/x86_64/libtor.so \
-    $$PWD/android_bin/armeabi-v7a/libmwc713.so  $$PWD/android_bin/armeabi-v7a/libmwczip.so  $$PWD/android_bin/armeabi-v7a/libtor.so \
-    $$PWD/android_bin/arm64-v8a/libmwc713.so    $$PWD/android_bin/arm64-v8a/libmwczip.so    $$PWD/android_bin/arm64-v8a/libtor.so
-
-
-ANDROID_ABIS = x86_64
-
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+    ANDROID_ABIS = arm64-v8a
+}
