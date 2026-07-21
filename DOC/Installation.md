@@ -27,10 +27,10 @@
 Go to the release page  
 👉 [https://github.com/mwcproject/mwc-qt-wallet/releases](https://github.com/mwcproject/mwc-qt-wallet/releases)
 
-| CPU | Archive to download                       |
-|---|-------------------------------------------|
-| **Apple Silicon (M1 / M2 / M3 …)** | `mwc-qt-wallet_X.X.X-macos-arm.tar.gz` |
-| **Intel** | `mwc-qt-wallet_X.X.X-macos-x64.tar.gz`   |
+| CPU | Archive to download                     |
+|---|-----------------------------------------|
+| **Apple Silicon (M1 / M2 / M3 …)** | `mwc-qt-wallet_X.X.X-macosx-arm.tar.gz` |
+| **Intel** | `mwc-qt-wallet_X.X.X-macosx-x64.tar.gz` |
 
 Each archive has a companion file ending in `.sha256sum` - download that too.
 
@@ -41,11 +41,11 @@ Each archive has a companion file ending in `.sha256sum` - download that too.
 Open **Terminal** and `cd` to the folder where you downloaded the files (usually `~/Downloads`).
 
 ```bash
-shasum -a 256 -c mwc-qt-wallet_*-macos-*.tar.gz.sha256sum
+shasum -a 256 -c mwc-qt-wallet_*-macosx-*.tar.gz.sha256sum
 ```
 If the file is valid you'll see:
 ```
-mwc-qt-wallet_1.2.14-macos-*.tar.gz: OK
+mwc-qt-wallet_1.2.14-macosx-*.tar.gz: OK
 ```
 Any other message means the download is corrupted - delete and re-download.
 
@@ -54,7 +54,7 @@ Any other message means the download is corrupted - delete and re-download.
 In Terminal:
 
 ```bash
-tar -xzf mwc-qt-wallet_*-macos-*.tar.gz
+tar -xzf mwc-qt-wallet_*-macosx-*.tar.gz
 mwc-qt-wallet/install.sh
 ```
 
